@@ -3,58 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Canon-Ipad Booth</title>
+    <title>Admin - Dasbor Canon-Ipad Booth</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Poppins', sans-serif; }</style>
 </head>
-<body class="bg-gray-100 p-6">
-    <div class="max-w-6xl mx-auto space-y-6">
-        <h1 class="text-3xl font-bold text-gray-800">Dasbor Admin</h1>
+<body class="bg-gray-100 p-6 min-h-screen">
+    
+    <div class="max-w-7xl mx-auto space-y-6">
+        <div class="flex justify-between items-center mb-6 border-b pb-4">
+            <h1 class="text-3xl font-bold text-gray-800">Dasbor Admin</h1>
+            <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold text-sm">Keluar</button>
+        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Manajemen Voucher -->
-            <div class="bg-white p-4 rounded shadow">
-                <h2 class="text-xl font-semibold mb-4">Manajemen Voucher</h2>
-                <div class="flex gap-2 mb-4">
-                    <input type="text" id="newVoucher" placeholder="Kode Voucher Baru" class="border p-2 w-full rounded">
-                    <button id="addVoucherBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Tambah</button>
-                </div>
-                <ul id="voucherList" class="space-y-2 h-48 overflow-y-auto border p-2 rounded"></ul>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Panel Generator Voucher (Kiri) -->
+            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-blue-500 lg:col-span-1">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Buat Voucher Baru</h2>
+                <form id="voucherGeneratorForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700">Jenis Voucher</label>
+                        <select id="jenisVoucher" required class="mt-1 w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50">
+                            <option value="Diskon %">Diskon Persentase (%)</option>
+                            <option value="Diskon Nominal">Diskon Nominal Harga (Rp)</option>
+                            <option value="Lainnya">Lainnya (Barang/Gratis)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700">Besaran (Contoh: 30 atau 15000)</label>
+                        <input type="text" id="besaranVoucher" required placeholder="Masukkan nilai" class="mt-1 w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700">Masa Berlaku</label>
+                        <input type="date" id="expiredVoucher" required class="mt-1 w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700">Jumlah Voucher Dibuat</label>
+                        <input type="number" id="jumlahVoucher" required min="1" max="100" value="1" class="mt-1 w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50">
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg mt-4 transition">
+                        Generate Voucher Otomatis
+                    </button>
+                </form>
             </div>
 
-            <!-- Manajemen Paket -->
-            <div class="bg-white p-4 rounded shadow">
-                <h2 class="text-xl font-semibold mb-4">Manajemen Paket Photobooth</h2>
-                <div class="flex gap-2 mb-4">
-                    <input type="text" id="newPaket" placeholder="Nama Paket Baru" class="border p-2 w-full rounded">
-                    <button id="addPaketBtn" class="bg-green-500 text-white px-4 py-2 rounded">Tambah</button>
+            <!-- Panel Daftar Voucher (Tengah) -->
+            <div class="bg-white p-6 rounded-2xl shadow lg:col-span-2">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Daftar Voucher</h2>
+                <div class="overflow-x-auto h-80 border rounded-lg">
+                    <table class="min-w-full table-auto text-sm">
+                        <thead class="bg-gray-100 sticky top-0">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-gray-600">Kode</th>
+                                <th class="px-4 py-2 text-left text-gray-600">Jenis & Besaran</th>
+                                <th class="px-4 py-2 text-left text-gray-600">Berlaku s/d</th>
+                                <th class="px-4 py-2 text-left text-gray-600">Status</th>
+                                <th class="px-4 py-2 text-left text-gray-600">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="voucherList" class="divide-y">
+                            <!-- Daftar voucher akan muncul di sini -->
+                        </tbody>
+                    </table>
                 </div>
-                <ul id="paketList" class="space-y-2 h-48 overflow-y-auto border p-2 rounded"></ul>
             </div>
         </div>
 
-        <!-- Daftar Pendaftar -->
-        <div class="bg-white p-4 rounded shadow">
-            <h2 class="text-xl font-semibold mb-4">Daftar Pendaftar (Tukar Voucher)</h2>
-            <div class="overflow-x-auto">
-                <table class="min-w-full table-auto">
-                    <thead class="bg-gray-200">
-                        <tr>
-                            <th class="px-4 py-2 text-left">Nama</th>
-                            <th class="px-4 py-2 text-left">No HP</th>
-                            <th class="px-4 py-2 text-left">IG (Lomba)</th>
-                            <th class="px-4 py-2 text-left">Paket</th>
-                            <th class="px-4 py-2 text-left">Jadwal</th>
-                            <th class="px-4 py-2 text-left">Voucher</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pendaftarList"></tbody>
-                </table>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+            <!-- Manajemen Paket Photobooth -->
+            <div class="bg-white p-6 rounded-2xl shadow lg:col-span-1 border-t-4 border-green-500">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Paket Photobooth</h2>
+                <div class="flex gap-2 mb-4">
+                    <input type="text" id="newPaket" placeholder="Nama Paket Baru" class="border p-2.5 w-full rounded-lg bg-gray-50">
+                    <button id="addPaketBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-bold">Tambah</button>
+                </div>
+                <ul id="paketList" class="space-y-2 max-h-48 overflow-y-auto pr-2"></ul>
+            </div>
+
+            <!-- Daftar Pendaftar -->
+            <div class="bg-white p-6 rounded-2xl shadow lg:col-span-2">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Pendaftar (Tukar Voucher)</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full table-auto text-sm">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-gray-600">Nama / Kontak</th>
+                                <th class="px-4 py-2 text-left text-gray-600">Paket / Jadwal</th>
+                                <th class="px-4 py-2 text-left text-gray-600">IG (Lomba)</th>
+                                <th class="px-4 py-2 text-left text-gray-600">Kode Voucher Dipakai</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendaftarList" class="divide-y"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Firebase Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getDatabase, ref, onValue, set, push, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -69,38 +120,119 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getDatabase(app);
 
-        // --- Fitur Voucher ---
-        document.getElementById('addVoucherBtn').addEventListener('click', async () => {
-            const code = document.getElementById('newVoucher').value.trim();
-            if(!code) return;
-            await set(ref(db, 'vouchers/' + code), { status: 'aktif' });
-            document.getElementById('newVoucher').value = '';
+        // Proteksi Halaman Admin
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                // Jika belum login, tendang balik ke index
+                window.location.href = 'index.html';
+            }
         });
 
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth).then(() => window.location.href = 'index.html');
+        });
+
+        // ==========================================
+        // 1. SISTEM GENERATE VOUCHER ACAK & UNIK
+        // ==========================================
+        
+        // Fungsi membuat 5 karakter (Campuran Huruf Besar & Angka)
+        function generateRandomCode() {
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const numbers = '0123456789';
+            let code = '';
+            
+            // Pastikan selalu ada kombinasi huruf dan angka agar tidak berurut
+            code += letters.charAt(Math.floor(Math.random() * letters.length));
+            code += numbers.charAt(Math.floor(Math.random() * numbers.length));
+            
+            // Tambahkan 3 karakter acak sisanya (bisa huruf/angka)
+            const allChars = letters + numbers;
+            for (let i = 0; i < 3; i++) {
+                code += allChars.charAt(Math.floor(Math.random() * allChars.length));
+            }
+            
+            // Acak ulang susunannya agar posisinya random
+            return code.split('').sort(() => 0.5 - Math.random()).join('');
+        }
+
+        document.getElementById('voucherGeneratorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btnSubmit = e.target.querySelector('button[type="submit"]');
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = "Membuat...";
+
+            const jenis = document.getElementById('jenisVoucher').value;
+            const besaran = document.getElementById('besaranVoucher').value;
+            const expired = document.getElementById('expiredVoucher').value;
+            const jumlah = parseInt(document.getElementById('jumlahVoucher').value);
+
+            try {
+                for (let i = 0; i < jumlah; i++) {
+                    const code = generateRandomCode();
+                    await set(ref(db, 'vouchers/' + code), {
+                        status: 'aktif',
+                        jenis: jenis,
+                        besaran: besaran,
+                        expired: expired,
+                        dibuatPada: Date.now()
+                    });
+                }
+                alert(`${jumlah} Voucher berhasil dibuat!`);
+                e.target.reset();
+            } catch (error) {
+                alert('Gagal membuat voucher: ' + error.message);
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "Generate Voucher Otomatis";
+            }
+        });
+
+        // ==========================================
+        // 2. MENAMPILKAN DAFTAR VOUCHER
+        // ==========================================
         onValue(ref(db, 'vouchers'), (snapshot) => {
             const list = document.getElementById('voucherList');
             list.innerHTML = '';
             snapshot.forEach((child) => {
-                const status = child.val().status;
-                const color = status === 'aktif' ? 'text-green-600' : 'text-red-600';
+                const data = child.val();
+                const statusBadge = data.status === 'aktif' 
+                    ? `<span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-bold">Aktif</span>` 
+                    : `<span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-bold">Terpakai</span>`;
+                
+                // Tambahkan keterangan Rp atau % berdasarkan jenis
+                let tampilanBesaran = data.besaran;
+                if(data.jenis === "Diskon %") tampilanBesaran = data.besaran + "%";
+                if(data.jenis === "Diskon Nominal") tampilanBesaran = "Rp " + parseInt(data.besaran).toLocaleString('id-ID');
+
                 list.innerHTML += `
-                    <li class="flex justify-between border-b pb-1">
-                        <span>${child.key} <span class="${color} text-sm">(${status})</span></span>
-                        <button class="text-red-500 text-sm delete-voucher" data-id="${child.key}">Hapus</button>
-                    </li>`;
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 font-bold tracking-widest text-gray-800">${child.key}</td>
+                        <td class="px-4 py-3">${data.jenis}<br><span class="font-semibold text-blue-600">${tampilanBesaran}</span></td>
+                        <td class="px-4 py-3 text-red-500 font-medium">${data.expired}</td>
+                        <td class="px-4 py-3">${statusBadge}</td>
+                        <td class="px-4 py-3">
+                            <button class="text-white bg-red-500 hover:bg-red-600 px-2 py-1 rounded text-xs delete-voucher" data-id="${child.key}">Hapus</button>
+                        </td>
+                    </tr>`;
             });
             
             document.querySelectorAll('.delete-voucher').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
-                    const id = e.target.getAttribute('data-id');
-                    await remove(ref(db, 'vouchers/' + id));
+                    if(confirm('Yakin ingin menghapus voucher ini?')) {
+                        const id = e.target.getAttribute('data-id');
+                        await remove(ref(db, 'vouchers/' + id));
+                    }
                 });
             });
         });
 
-        // --- Fitur Paket ---
+        // ==========================================
+        // 3. FITUR PAKET
+        // ==========================================
         document.getElementById('addPaketBtn').addEventListener('click', async () => {
             const nama = document.getElementById('newPaket').value.trim();
             if(!nama) return;
@@ -113,9 +245,9 @@
             list.innerHTML = '';
             snapshot.forEach((child) => {
                 list.innerHTML += `
-                    <li class="flex justify-between border-b pb-1">
-                        <span>${child.val()}</span>
-                        <button class="text-red-500 text-sm delete-paket" data-id="${child.key}">Hapus</button>
+                    <li class="flex justify-between items-center bg-gray-50 p-2 rounded border">
+                        <span class="font-medium text-gray-700">${child.val()}</span>
+                        <button class="text-red-500 hover:text-red-700 text-sm delete-paket font-bold" data-id="${child.key}">X</button>
                     </li>`;
             });
 
@@ -127,7 +259,9 @@
             });
         });
 
-        // --- Fitur Daftar Pendaftar ---
+        // ==========================================
+        // 4. DAFTAR PENDAFTAR
+        // ==========================================
         onValue(ref(db, 'pendaftaran'), (snapshot) => {
             const tbody = document.getElementById('pendaftarList');
             tbody.innerHTML = '';
@@ -137,13 +271,22 @@
                 const jadwal = new Date(data.waktu).toLocaleString('id-ID');
                 
                 tbody.innerHTML += `
-                    <tr class="border-b hover:bg-gray-50">
-                        <td class="px-4 py-2">${data.nama}</td>
-                        <td class="px-4 py-2">${data.nohp}</td>
-                        <td class="px-4 py-2">${data.ig || '-'} <br><span class="text-xs text-gray-500">Lomba: ${lombaStatus}</span></td>
-                        <td class="px-4 py-2">${data.paket}</td>
-                        <td class="px-4 py-2">${jadwal}</td>
-                        <td class="px-4 py-2"><span class="bg-yellow-200 px-2 rounded">${data.voucher}</span></td>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3">
+                            <span class="font-bold text-gray-800">${data.nama}</span><br>
+                            <span class="text-sm text-gray-600">WA: ${data.nohp}</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="font-medium text-blue-600">${data.paket}</span><br>
+                            <span class="text-sm text-gray-500">${jadwal}</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            ${data.ig || '-'}<br>
+                            <span class="text-xs text-gray-500">Lomba: ${lombaStatus}</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="bg-yellow-200 text-yellow-800 font-bold px-3 py-1 rounded tracking-widest">${data.voucher}</span>
+                        </td>
                     </tr>`;
             });
         });
