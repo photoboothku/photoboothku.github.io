@@ -248,32 +248,61 @@
             if(!code) return;
 
             voucherMsg.classList.remove('hidden');
+            voucherMsg.className = "mt-4 font-semibold inline-block px-4 py-2 rounded-lg text-white bg-blue-600/80"; // Default styling
             voucherMsg.innerText = "Memeriksa voucher...";
 
             try {
                 const vRef = ref(db, 'vouchers/' + code);
                 const snap = await get(vRef);
                 
-                if (snap.exists() && snap.val().status === 'aktif') {
-                    voucherMsg.innerText = "Voucher Valid! Mengarahkan ke login Google...";
-                    validVoucherCode = code;
+                if (snap.exists()) {
+                    const vData = snap.val();
+                    const today = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
+                    
+                    if (vData.status === 'aktif') {
+                        if (vData.expired >= today) {
+                            // VOUCHER VALID & BELUM KEDALUWARSA
+                            let teksBesaran = vData.besaran;
+                            if(vData.jenis === "Diskon %") teksBesaran += "%";
+                            else if(vData.jenis === "Diskon Nominal") teksBesaran = "Rp " + parseInt(vData.besaran).toLocaleString('id-ID');
+                            
+                            voucherMsg.className = "mt-4 font-semibold inline-block px-4 py-2 rounded-lg text-green-900 bg-green-200";
+                            voucherMsg.innerHTML = `✅ <strong>Voucher Valid!</strong><br> ${vData.jenis}: ${teksBesaran} <br> <span class="text-xs">Berlaku s/d: ${vData.expired}</span><br>Mengarahkan ke pendaftaran...`;
+                            
+                            validVoucherCode = code;
 
-                    const provider = new GoogleAuthProvider();
-                    try {
-                        const result = await signInWithPopup(auth, provider);
-                        currentUserData = result.user;
-                        
-                        mainInterface.classList.add('hidden');
-                        formInterface.classList.remove('hidden');
-                        document.getElementById('userGreeting').innerHTML = `Halo, <strong>${currentUserData.displayName}</strong> (${currentUserData.email}).`;
-                        
-                        loadPaket();
-                    } catch (authError) {
-                        voucherMsg.innerText = "Gagal login dengan Google.";
+                            // Jeda sejenak agar user bisa membaca info voucher sebelum popup Google muncul
+                            setTimeout(async () => {
+                                const provider = new GoogleAuthProvider();
+                                try {
+                                    const result = await signInWithPopup(auth, provider);
+                                    currentUserData = result.user;
+                                    
+                                    mainInterface.classList.add('hidden');
+                                    formInterface.classList.remove('hidden');
+                                    document.getElementById('userGreeting').innerHTML = `Halo, <strong>${currentUserData.displayName}</strong> (${currentUserData.email}).`;
+                                    
+                                    loadPaket();
+                                } catch (authError) {
+                                    voucherMsg.className = "mt-4 font-semibold inline-block px-4 py-2 rounded-lg text-red-900 bg-red-200";
+                                    voucherMsg.innerText = "Gagal login dengan Google.";
+                                }
+                            }, 2000); // delay 2 detik
+
+                        } else {
+                            // VOUCHER KEDALUWARSA
+                            voucherMsg.className = "mt-4 font-semibold inline-block px-4 py-2 rounded-lg text-red-900 bg-red-200";
+                            voucherMsg.innerText = `❌ Voucher ini sudah kedaluwarsa pada ${vData.expired}.`;
+                        }
+                    } else {
+                        // VOUCHER SUDAH DIPAKAI
+                        voucherMsg.className = "mt-4 font-semibold inline-block px-4 py-2 rounded-lg text-red-900 bg-red-200";
+                        voucherMsg.innerText = "❌ Voucher tidak valid atau sudah digunakan!";
                     }
                 } else {
-                    voucherMsg.innerText = "Voucher tidak valid atau sudah digunakan!";
-                    voucherMsg.classList.replace('text-white', 'text-red-300');
+                    // VOUCHER TIDAK DITEMUKAN
+                    voucherMsg.className = "mt-4 font-semibold inline-block px-4 py-2 rounded-lg text-red-900 bg-red-200";
+                    voucherMsg.innerText = "❌ Kode Voucher tidak ditemukan!";
                 }
             } catch (error) {
                 voucherMsg.innerText = "Terjadi kesalahan jaringan.";
