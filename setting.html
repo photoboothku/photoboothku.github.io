@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Canon-Ipad Booth</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-6xl mx-auto space-y-6">
+        <h1 class="text-3xl font-bold text-gray-800">Dasbor Admin</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Manajemen Voucher -->
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="text-xl font-semibold mb-4">Manajemen Voucher</h2>
+                <div class="flex gap-2 mb-4">
+                    <input type="text" id="newVoucher" placeholder="Kode Voucher Baru" class="border p-2 w-full rounded">
+                    <button id="addVoucherBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Tambah</button>
+                </div>
+                <ul id="voucherList" class="space-y-2 h-48 overflow-y-auto border p-2 rounded"></ul>
+            </div>
+
+            <!-- Manajemen Paket -->
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="text-xl font-semibold mb-4">Manajemen Paket Photobooth</h2>
+                <div class="flex gap-2 mb-4">
+                    <input type="text" id="newPaket" placeholder="Nama Paket Baru" class="border p-2 w-full rounded">
+                    <button id="addPaketBtn" class="bg-green-500 text-white px-4 py-2 rounded">Tambah</button>
+                </div>
+                <ul id="paketList" class="space-y-2 h-48 overflow-y-auto border p-2 rounded"></ul>
+            </div>
+        </div>
+
+        <!-- Daftar Pendaftar -->
+        <div class="bg-white p-4 rounded shadow">
+            <h2 class="text-xl font-semibold mb-4">Daftar Pendaftar (Tukar Voucher)</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full table-auto">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="px-4 py-2 text-left">Nama</th>
+                            <th class="px-4 py-2 text-left">No HP</th>
+                            <th class="px-4 py-2 text-left">IG (Lomba)</th>
+                            <th class="px-4 py-2 text-left">Paket</th>
+                            <th class="px-4 py-2 text-left">Jadwal</th>
+                            <th class="px-4 py-2 text-left">Voucher</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendaftarList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getDatabase, ref, onValue, set, push, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdM-1ziZLq2r8P1qpgHM763ke8GUPitvw",
+            authDomain: "dasborusaha.firebaseapp.com",
+            databaseURL: "https://dasborusaha-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "dasborusaha",
+            storageBucket: "dasborusaha.firebasestorage.app",
+            messagingSenderId: "427165972600",
+            appId: "1:427165972600:web:a0731cbf737717d567558d",
+            measurementId: "G-TL37HXZ834"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // --- Fitur Voucher ---
+        document.getElementById('addVoucherBtn').addEventListener('click', async () => {
+            const code = document.getElementById('newVoucher').value.trim();
+            if(!code) return;
+            await set(ref(db, 'vouchers/' + code), { status: 'aktif' });
+            document.getElementById('newVoucher').value = '';
+        });
+
+        onValue(ref(db, 'vouchers'), (snapshot) => {
+            const list = document.getElementById('voucherList');
+            list.innerHTML = '';
+            snapshot.forEach((child) => {
+                const status = child.val().status;
+                const color = status === 'aktif' ? 'text-green-600' : 'text-red-600';
+                list.innerHTML += `
+                    <li class="flex justify-between border-b pb-1">
+                        <span>${child.key} <span class="${color} text-sm">(${status})</span></span>
+                        <button class="text-red-500 text-sm delete-voucher" data-id="${child.key}">Hapus</button>
+                    </li>`;
+            });
+            
+            document.querySelectorAll('.delete-voucher').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = e.target.getAttribute('data-id');
+                    await remove(ref(db, 'vouchers/' + id));
+                });
+            });
+        });
+
+        // --- Fitur Paket ---
+        document.getElementById('addPaketBtn').addEventListener('click', async () => {
+            const nama = document.getElementById('newPaket').value.trim();
+            if(!nama) return;
+            await push(ref(db, 'settings/paket'), nama);
+            document.getElementById('newPaket').value = '';
+        });
+
+        onValue(ref(db, 'settings/paket'), (snapshot) => {
+            const list = document.getElementById('paketList');
+            list.innerHTML = '';
+            snapshot.forEach((child) => {
+                list.innerHTML += `
+                    <li class="flex justify-between border-b pb-1">
+                        <span>${child.val()}</span>
+                        <button class="text-red-500 text-sm delete-paket" data-id="${child.key}">Hapus</button>
+                    </li>`;
+            });
+
+            document.querySelectorAll('.delete-paket').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = e.target.getAttribute('data-id');
+                    await remove(ref(db, 'settings/paket/' + id));
+                });
+            });
+        });
+
+        // --- Fitur Daftar Pendaftar ---
+        onValue(ref(db, 'pendaftaran'), (snapshot) => {
+            const tbody = document.getElementById('pendaftarList');
+            tbody.innerHTML = '';
+            snapshot.forEach((child) => {
+                const data = child.val();
+                const lombaStatus = data.lomba ? "✅ Ya" : "❌ Tidak";
+                const jadwal = new Date(data.waktu).toLocaleString('id-ID');
+                
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-4 py-2">${data.nama}</td>
+                        <td class="px-4 py-2">${data.nohp}</td>
+                        <td class="px-4 py-2">${data.ig || '-'} <br><span class="text-xs text-gray-500">Lomba: ${lombaStatus}</span></td>
+                        <td class="px-4 py-2">${data.paket}</td>
+                        <td class="px-4 py-2">${jadwal}</td>
+                        <td class="px-4 py-2"><span class="bg-yellow-200 px-2 rounded">${data.voucher}</span></td>
+                    </tr>`;
+            });
+        });
+    </script>
+</body>
+</html>
