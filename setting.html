@@ -63,9 +63,7 @@
                                 <th class="px-4 py-2 text-left text-gray-600">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="voucherList" class="divide-y">
-                            <!-- Daftar voucher akan muncul di sini -->
-                        </tbody>
+                        <tbody id="voucherList" class="divide-y"></tbody>
                     </table>
                 </div>
             </div>
@@ -75,11 +73,21 @@
             <!-- Manajemen Paket Photobooth -->
             <div class="bg-white p-6 rounded-2xl shadow lg:col-span-1 border-t-4 border-green-500">
                 <h2 class="text-xl font-bold mb-4 text-gray-800">Paket Photobooth</h2>
-                <div class="flex gap-2 mb-4">
-                    <input type="text" id="newPaket" placeholder="Nama Paket Baru" class="border p-2.5 w-full rounded-lg bg-gray-50">
-                    <button id="addPaketBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-bold">Tambah</button>
+                
+                <!-- Form Input/Edit Paket -->
+                <div class="mb-4 space-y-3 bg-gray-50 p-4 rounded-lg border">
+                    <input type="hidden" id="paketId">
+                    <input type="text" id="namaPaket" placeholder="Nama Paket (cth: Paket Grup)" required class="border p-2.5 w-full rounded-lg">
+                    <input type="number" id="hargaPaket" placeholder="Harga (Rp)" required class="border p-2.5 w-full rounded-lg">
+                    <textarea id="deskripsiPaket" placeholder="Deskripsi/Detail paket..." rows="2" class="border p-2.5 w-full rounded-lg"></textarea>
+                    
+                    <div class="flex gap-2">
+                        <button id="savePaketBtn" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-bold">Simpan</button>
+                        <button id="cancelEditBtn" class="hidden bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-bold">Batal</button>
+                    </div>
                 </div>
-                <ul id="paketList" class="space-y-2 max-h-48 overflow-y-auto pr-2"></ul>
+
+                <ul id="paketList" class="space-y-3 max-h-60 overflow-y-auto pr-2"></ul>
             </div>
 
             <!-- Daftar Pendaftar -->
@@ -106,7 +114,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getDatabase, ref, onValue, set, push, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        import { getDatabase, ref, onValue, set, push, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDdM-1ziZLq2r8P1qpgHM763ke8GUPitvw",
@@ -123,87 +131,51 @@
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        // Proteksi Halaman Admin
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                // Jika belum login, tendang balik ke index
-                window.location.href = 'index.html';
-            }
-        });
+        onAuthStateChanged(auth, (user) => { if (!user) window.location.href = 'index.html'; });
+        document.getElementById('logoutBtn').addEventListener('click', () => { signOut(auth).then(() => window.location.href = 'index.html'); });
 
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            signOut(auth).then(() => window.location.href = 'index.html');
-        });
-
-        // ==========================================
-        // 1. SISTEM GENERATE VOUCHER ACAK & UNIK
-        // ==========================================
-        
-        // Fungsi membuat 5 karakter (Campuran Huruf Besar & Angka)
+        // --- 1. FITUR VOUCHER ---
         function generateRandomCode() {
-            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            const numbers = '0123456789';
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let code = '';
-            
-            // Pastikan selalu ada kombinasi huruf dan angka agar tidak berurut
-            code += letters.charAt(Math.floor(Math.random() * letters.length));
-            code += numbers.charAt(Math.floor(Math.random() * numbers.length));
-            
-            // Tambahkan 3 karakter acak sisanya (bisa huruf/angka)
-            const allChars = letters + numbers;
-            for (let i = 0; i < 3; i++) {
-                code += allChars.charAt(Math.floor(Math.random() * allChars.length));
-            }
-            
-            // Acak ulang susunannya agar posisinya random
-            return code.split('').sort(() => 0.5 - Math.random()).join('');
+            for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            return code;
         }
 
         document.getElementById('voucherGeneratorForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btnSubmit = e.target.querySelector('button[type="submit"]');
-            btnSubmit.disabled = true;
-            btnSubmit.innerText = "Membuat...";
-
             const jenis = document.getElementById('jenisVoucher').value;
             const besaran = document.getElementById('besaranVoucher').value;
             const expired = document.getElementById('expiredVoucher').value;
             const jumlah = parseInt(document.getElementById('jumlahVoucher').value);
 
-            try {
-                for (let i = 0; i < jumlah; i++) {
-                    const code = generateRandomCode();
-                    await set(ref(db, 'vouchers/' + code), {
-                        status: 'aktif',
-                        jenis: jenis,
-                        besaran: besaran,
-                        expired: expired,
-                        dibuatPada: Date.now()
-                    });
-                }
-                alert(`${jumlah} Voucher berhasil dibuat!`);
-                e.target.reset();
-            } catch (error) {
-                alert('Gagal membuat voucher: ' + error.message);
-            } finally {
-                btnSubmit.disabled = false;
-                btnSubmit.innerText = "Generate Voucher Otomatis";
+            for (let i = 0; i < jumlah; i++) {
+                await set(ref(db, 'vouchers/' + generateRandomCode()), {
+                    status: 'aktif', jenis: jenis, besaran: besaran, expired: expired, dibuatPada: Date.now()
+                });
             }
+            alert(`${jumlah} Voucher berhasil dibuat!`);
+            e.target.reset();
         });
 
-        // ==========================================
-        // 2. MENAMPILKAN DAFTAR VOUCHER
-        // ==========================================
         onValue(ref(db, 'vouchers'), (snapshot) => {
             const list = document.getElementById('voucherList');
             list.innerHTML = '';
+            const today = new Date().toISOString().split('T')[0];
+
             snapshot.forEach((child) => {
                 const data = child.val();
-                const statusBadge = data.status === 'aktif' 
-                    ? `<span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-bold">Aktif</span>` 
-                    : `<span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-bold">Terpakai</span>`;
+                let statusBadge = "";
                 
-                // Tambahkan keterangan Rp atau % berdasarkan jenis
+                // Cek status dan kadaluarsa di tampilan admin
+                if(data.status === 'terpakai') {
+                    statusBadge = `<span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-bold">Terpakai</span>`;
+                } else if (data.expired < today) {
+                    statusBadge = `<span class="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs font-bold">Kedaluwarsa</span>`;
+                } else {
+                    statusBadge = `<span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-bold">Aktif</span>`;
+                }
+                
                 let tampilanBesaran = data.besaran;
                 if(data.jenis === "Diskon %") tampilanBesaran = data.besaran + "%";
                 if(data.jenis === "Diskon Nominal") tampilanBesaran = "Rp " + parseInt(data.besaran).toLocaleString('id-ID');
@@ -212,7 +184,7 @@
                     <tr class="hover:bg-gray-50">
                         <td class="px-4 py-3 font-bold tracking-widest text-gray-800">${child.key}</td>
                         <td class="px-4 py-3">${data.jenis}<br><span class="font-semibold text-blue-600">${tampilanBesaran}</span></td>
-                        <td class="px-4 py-3 text-red-500 font-medium">${data.expired}</td>
+                        <td class="px-4 py-3 text-gray-600 text-xs">${data.expired}</td>
                         <td class="px-4 py-3">${statusBadge}</td>
                         <td class="px-4 py-3">
                             <button class="text-white bg-red-500 hover:bg-red-600 px-2 py-1 rounded text-xs delete-voucher" data-id="${child.key}">Hapus</button>
@@ -223,45 +195,112 @@
             document.querySelectorAll('.delete-voucher').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     if(confirm('Yakin ingin menghapus voucher ini?')) {
-                        const id = e.target.getAttribute('data-id');
-                        await remove(ref(db, 'vouchers/' + id));
+                        await remove(ref(db, 'vouchers/' + e.target.getAttribute('data-id')));
                     }
                 });
             });
         });
 
-        // ==========================================
-        // 3. FITUR PAKET
-        // ==========================================
-        document.getElementById('addPaketBtn').addEventListener('click', async () => {
-            const nama = document.getElementById('newPaket').value.trim();
-            if(!nama) return;
-            await push(ref(db, 'settings/paket'), nama);
-            document.getElementById('newPaket').value = '';
+        // --- 2. FITUR PAKET LENGKAP (CRUD) ---
+        const savePaketBtn = document.getElementById('savePaketBtn');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const paketIdInput = document.getElementById('paketId');
+        const namaPaketInput = document.getElementById('namaPaket');
+        const hargaPaketInput = document.getElementById('hargaPaket');
+        const deskripsiPaketInput = document.getElementById('deskripsiPaket');
+
+        // Fungsi Bersihkan Form
+        function resetPaketForm() {
+            paketIdInput.value = '';
+            namaPaketInput.value = '';
+            hargaPaketInput.value = '';
+            deskripsiPaketInput.value = '';
+            savePaketBtn.innerText = 'Simpan';
+            savePaketBtn.className = 'flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-bold';
+            cancelEditBtn.classList.add('hidden');
+        }
+
+        cancelEditBtn.addEventListener('click', resetPaketForm);
+
+        // Tambah / Update Paket
+        savePaketBtn.addEventListener('click', async () => {
+            const id = paketIdInput.value;
+            const nama = namaPaketInput.value.trim();
+            const harga = hargaPaketInput.value;
+            const deskripsi = deskripsiPaketInput.value.trim();
+
+            if(!nama || !harga) {
+                alert("Nama dan Harga wajib diisi!");
+                return;
+            }
+
+            const dataPaket = { nama, harga, deskripsi };
+
+            if(id) {
+                // Proses Edit
+                await update(ref(db, 'settings/paket/' + id), dataPaket);
+            } else {
+                // Proses Tambah Baru
+                await push(ref(db, 'settings/paket'), dataPaket);
+            }
+            resetPaketForm();
         });
 
+        // Tampilkan Daftar Paket
         onValue(ref(db, 'settings/paket'), (snapshot) => {
             const list = document.getElementById('paketList');
             list.innerHTML = '';
+            
             snapshot.forEach((child) => {
+                const data = child.val();
+                // Antisipasi data paket lama yang hanya string
+                const nama = typeof data === 'object' ? data.nama : data;
+                const harga = typeof data === 'object' && data.harga ? data.harga : 0;
+                const deskripsi = typeof data === 'object' && data.deskripsi ? data.deskripsi : "-";
+                
                 list.innerHTML += `
-                    <li class="flex justify-between items-center bg-gray-50 p-2 rounded border">
-                        <span class="font-medium text-gray-700">${child.val()}</span>
-                        <button class="text-red-500 hover:text-red-700 text-sm delete-paket font-bold" data-id="${child.key}">X</button>
+                    <li class="bg-white p-3 rounded-lg border shadow-sm flex flex-col gap-2">
+                        <div>
+                            <div class="flex justify-between items-start">
+                                <span class="font-bold text-gray-800">${nama}</span>
+                                <span class="text-blue-600 font-bold text-sm">Rp ${parseInt(harga).toLocaleString('id-ID')}</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">${deskripsi}</p>
+                        </div>
+                        <div class="flex justify-end gap-2 border-t pt-2 mt-1">
+                            <button class="text-blue-500 hover:text-blue-700 text-xs font-bold edit-paket" 
+                                data-id="${child.key}" data-nama="${nama}" data-harga="${harga}" data-deskripsi="${deskripsi}">Edit</button>
+                            <button class="text-red-500 hover:text-red-700 text-xs font-bold delete-paket" 
+                                data-id="${child.key}">Hapus</button>
+                        </div>
                     </li>`;
             });
 
+            // Action Hapus
             document.querySelectorAll('.delete-paket').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
-                    const id = e.target.getAttribute('data-id');
-                    await remove(ref(db, 'settings/paket/' + id));
+                    if(confirm("Hapus paket ini?")) {
+                        await remove(ref(db, 'settings/paket/' + e.target.getAttribute('data-id')));
+                    }
+                });
+            });
+
+            // Action Edit
+            document.querySelectorAll('.edit-paket').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    paketIdInput.value = e.target.getAttribute('data-id');
+                    namaPaketInput.value = e.target.getAttribute('data-nama');
+                    hargaPaketInput.value = e.target.getAttribute('data-harga');
+                    deskripsiPaketInput.value = e.target.getAttribute('data-deskripsi');
+                    
+                    savePaketBtn.innerText = 'Update Paket';
+                    savePaketBtn.className = 'flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg font-bold';
+                    cancelEditBtn.classList.remove('hidden');
                 });
             });
         });
 
-        // ==========================================
-        // 4. DAFTAR PENDAFTAR
-        // ==========================================
+        // --- 3. DAFTAR PENDAFTAR ---
         onValue(ref(db, 'pendaftaran'), (snapshot) => {
             const tbody = document.getElementById('pendaftarList');
             tbody.innerHTML = '';
@@ -271,7 +310,7 @@
                 const jadwal = new Date(data.waktu).toLocaleString('id-ID');
                 
                 tbody.innerHTML += `
-                    <tr class="hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50 border-b">
                         <td class="px-4 py-3">
                             <span class="font-bold text-gray-800">${data.nama}</span><br>
                             <span class="text-sm text-gray-600">WA: ${data.nohp}</span>
