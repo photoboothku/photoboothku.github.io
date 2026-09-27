@@ -1,145 +1,205 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canon-Ipad Booth | by WAWANCELLCOMP</title>
-    <!-- Tailwind CSS -->
+    <title>Canon-Ipad Booth by WAWANCELLCOMP</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Poppins', sans-serif; }
-        /* Background gambar fotografi modern dari Unsplash */
         .hero-bg {
-            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-image: linear-gradient(rgba(17, 24, 39, 0.7), rgba(17, 24, 39, 0.7)), url('https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1920&q=80');
             background-size: cover;
             background-position: center;
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-50 text-gray-800 antialiased">
 
     <!-- Navbar -->
-    <nav class="absolute top-0 left-0 w-full z-50 p-4 md:p-6 flex justify-between items-center text-white">
-        <div class="font-bold text-xl md:text-2xl tracking-wider">
-            📸 CANON-IPAD BOOTH
+    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0 font-bold text-xl text-gray-900 tracking-wider">
+                    📸 CANON-IPAD BOOTH
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#beranda" class="text-gray-700 hover:text-blue-600 font-medium">Beranda</a>
+                    <a href="#paket" class="text-gray-700 hover:text-blue-600 font-medium">Paket Harga</a>
+                    <a href="#galeri" class="text-gray-700 hover:text-blue-600 font-medium">Galeri</a>
+                    <a href="#voucher-section" class="text-gray-700 hover:text-blue-600 font-medium">Tukar Voucher</a>
+                </div>
+                <div>
+                    <button id="openAdminModalBtn" class="text-xs font-semibold text-gray-400 hover:text-gray-800 transition border rounded px-3 py-1">
+                        Admin Login
+                    </button>
+                </div>
+            </div>
         </div>
-        <button id="openAdminModalBtn" class="text-sm font-semibold hover:text-yellow-400 transition">
-            Admin Akses <span aria-hidden="true">&rarr;</span>
-        </button>
     </nav>
 
-    <!-- Modal Login Admin -->
-    <div id="adminModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-sm p-4">
-        <div class="bg-white rounded-2xl p-6 md:p-8 w-full max-w-sm shadow-2xl relative">
+    <!-- Modal Admin -->
+    <div id="adminModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-sm shadow-2xl relative">
             <button id="closeAdminModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 text-xl">&times;</button>
-            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Login Admin</h2>
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Masuk Dasbor</h2>
             <form id="adminLoginForm" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Email Admin</label>
-                    <input type="email" id="adminEmail" required class="mt-1 block w-full border border-gray-300 rounded-lg p-3 focus:ring-yellow-500 focus:border-yellow-500">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Password</label>
-                    <input type="password" id="adminPassword" required class="mt-1 block w-full border border-gray-300 rounded-lg p-3 focus:ring-yellow-500 focus:border-yellow-500">
-                </div>
-                <button type="submit" class="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
-                    Masuk ke Dasbor
-                </button>
+                <input type="email" id="adminEmail" placeholder="Email Admin" required class="w-full border border-gray-300 rounded-lg p-3">
+                <input type="password" id="adminPassword" placeholder="Password" required class="w-full border border-gray-300 rounded-lg p-3">
+                <button type="submit" class="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 rounded-lg">Masuk</button>
             </form>
         </div>
     </div>
 
-    <!-- Hero Section & Validasi Voucher -->
-    <header class="hero-bg min-h-screen flex items-center justify-center p-4">
-        <div id="mainInterface" class="bg-white/20 backdrop-blur-lg border border-white/30 rounded-3xl p-8 md:p-12 w-full max-w-2xl text-center shadow-2xl transition-all duration-500">
-            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Abadikan Momen Manismu!</h1>
-            <p class="text-gray-200 mb-8 md:text-lg">Klaim diskon spesial dari Warung Seblak dan pesan jadwal photobooth Anda sekarang juga.</p>
-
-            <!-- Box Input Voucher -->
-            <div id="voucherBox" class="bg-white rounded-2xl p-4 flex flex-col md:flex-row gap-3 shadow-lg">
-                <input type="text" id="voucherCode" placeholder="Masukkan Kode Voucher Anda" class="flex-1 text-lg font-semibold text-center md:text-left border-none focus:ring-0 p-3 bg-gray-50 rounded-xl" autocomplete="off">
-                <button id="validateVoucherBtn" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 px-8 rounded-xl transition duration-300 transform hover:scale-105">
-                    Daftarkan Voucher
-                </button>
-            </div>
-            <p id="voucherMsg" class="mt-4 font-semibold text-white bg-black/40 inline-block px-4 py-1 rounded-full hidden"></p>
+    <!-- Hero Section -->
+    <section id="beranda" class="hero-bg h-screen flex items-center justify-center text-center px-4">
+        <div class="max-w-3xl">
+            <h1 class="text-4xl md:text-6xl font-bold text-white mb-6">Abadikan Momen Manismu di Sini!</h1>
+            <p class="text-lg md:text-xl text-gray-200 mb-8">Photobooth rumahan berkualitas studio dengan properti seru, cetak instan, dan *soft file* gratis.</p>
+            <a href="#voucher-section" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 px-8 rounded-full transition transform hover:scale-105 shadow-lg inline-block">
+                Punya Voucher Diskon? Tukar Di Sini
+            </a>
         </div>
+    </section>
 
-        <!-- Form Pendaftaran (Muncul setelah voucher valid & login Google) -->
-        <div id="formInterface" class="hidden bg-white rounded-3xl p-6 md:p-10 w-full max-w-2xl text-left shadow-2xl animate-fade-in-up">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">Atur Jadwal Photobooth</h2>
-                <span id="activeVoucherBadge" class="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full">Voucher: AKTIF</span>
+    <!-- Section Paket Harga -->
+    <section id="paket" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold text-gray-900 mb-12">Pilihan Paket Photobooth</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="border rounded-2xl p-6 shadow-sm hover:shadow-xl transition">
+                    <h3 class="text-xl font-bold mb-2">Paket Sesi Grup</h3>
+                    <p class="text-3xl font-bold text-blue-600 mb-4">Rp 25.000</p>
+                    <ul class="text-gray-600 space-y-2 text-sm text-left mb-6">
+                        <li>✔️ Maksimal 6 Orang</li>
+                        <li>✔️ Dapat 4 lembar foto strip</li>
+                        <li>✔️ Durasi 15 menit</li>
+                        <li>✔️ Soft file bebas ambil</li>
+                    </ul>
+                </div>
+                <!-- Card 2 -->
+                <div class="border rounded-2xl p-6 shadow-sm hover:shadow-xl transition bg-blue-50 border-blue-200 transform scale-105">
+                    <div class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full inline-block mb-2">Paling Hemat</div>
+                    <h3 class="text-xl font-bold mb-2">Paket Per Orang</h3>
+                    <p class="text-3xl font-bold text-blue-600 mb-4">Rp 5.000 <span class="text-sm text-gray-500">/org</span></p>
+                    <ul class="text-gray-600 space-y-2 text-sm text-left mb-6">
+                        <li>✔️ Minimal 2 Orang</li>
+                        <li>✔️ Dapat 1 foto strip / orang</li>
+                        <li>✔️ Durasi 3 menit / orang</li>
+                        <li>✔️ Tambah orang +5rb</li>
+                    </ul>
+                </div>
+                <!-- Card 3 -->
+                <div class="border rounded-2xl p-6 shadow-sm hover:shadow-xl transition">
+                    <h3 class="text-xl font-bold mb-2">Paket Keluarga</h3>
+                    <p class="text-3xl font-bold text-blue-600 mb-4">Rp 85.000</p>
+                    <ul class="text-gray-600 space-y-2 text-sm text-left mb-6">
+                        <li>✔️ 1 Jam Puas</li>
+                        <li>✔️ Dapat 10 lembar foto strip</li>
+                        <li>✔️ Properti seru termasuk</li>
+                        <li>✔️ Soft file bebas ambil</li>
+                    </ul>
+                </div>
             </div>
-            <p id="userGreeting" class="text-sm text-gray-500 mb-6 border-b pb-4"></p>
+        </div>
+    </section>
 
-            <form id="registrationForm" class="space-y-5">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
-                        <input type="text" id="nama" required class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">No. HP / WhatsApp</label>
-                        <input type="tel" id="nohp" required class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                </div>
+    <!-- Section Galeri Mockup -->
+    <section id="galeri" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold text-gray-900 mb-12">Galeri Keseruan</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-gray-200 h-48 rounded-xl animate-pulse flex items-center justify-center text-gray-400">Foto 1</div>
+                <div class="bg-gray-200 h-48 rounded-xl animate-pulse flex items-center justify-center text-gray-400">Foto 2</div>
+                <div class="bg-gray-200 h-48 rounded-xl animate-pulse flex items-center justify-center text-gray-400">Foto 3</div>
+                <div class="bg-gray-200 h-48 rounded-xl animate-pulse flex items-center justify-center text-gray-400">Foto 4</div>
+            </div>
+        </div>
+    </section>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Username Instagram (Opsional)</label>
-                    <input type="text" id="ig" placeholder="@username" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500">
-                    <p class="text-xs text-gray-400 mt-1">*Isi jika Anda ingin mengikuti perlombaan foto kami.</p>
-                </div>
-                
-                <!-- Checkbox Lomba (Otomatis muncul jika IG diisi) -->
-                <div id="lombaDiv" class="hidden flex items-start p-4 bg-blue-50 rounded-lg border border-blue-100">
-                    <div class="flex items-center h-5">
-                        <input type="checkbox" id="persetujuanLomba" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
-                    </div>
-                    <div class="ml-3 text-sm">
-                        <label for="persetujuanLomba" class="font-medium text-gray-700">Persetujuan Publikasi</label>
-                        <p class="text-gray-500">Saya menyetujui hasil foto dipublikasikan oleh WAWANCELLCOMP untuk keperluan perlombaan.</p>
-                    </div>
-                </div>
+    <!-- Section Penukaran Voucher (Sistem Database) -->
+    <section id="voucher-section" class="py-20 bg-blue-600 text-white">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold mb-4">Klaim Voucher Diskonmu!</h2>
+                <p class="text-blue-100">Dapat voucher dari Warung Seblak? Masukkan kodenya di bawah ini untuk mengatur jadwal foto Anda.</p>
+            </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <!-- Interface Input Voucher -->
+            <div id="mainInterface" class="bg-white/10 backdrop-blur-md border border-white/20 p-8 rounded-3xl shadow-xl text-center">
+                <div class="flex flex-col md:flex-row gap-3 max-w-xl mx-auto">
+                    <input type="text" id="voucherCode" placeholder="Masukkan Kode Voucher" class="flex-1 text-gray-900 text-lg font-semibold text-center md:text-left border-none focus:ring-0 p-4 rounded-xl" autocomplete="off">
+                    <button id="validateVoucherBtn" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-4 px-8 rounded-xl transition">
+                        Daftarkan Voucher
+                    </button>
+                </div>
+                <p id="voucherMsg" class="mt-4 font-semibold text-white hidden"></p>
+            </div>
+
+            <!-- Interface Form Pendaftaran (Hidden by Default) -->
+            <div id="formInterface" class="hidden bg-white text-gray-800 rounded-3xl p-8 shadow-2xl mt-8">
+                <div class="flex justify-between items-center mb-4 border-b pb-4">
+                    <h3 class="text-2xl font-bold">Lengkapi Jadwal Anda</h3>
+                    <span class="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full">Voucher: AKTIF</span>
+                </div>
+                <p id="userGreeting" class="text-sm text-gray-500 mb-6"></p>
+
+                <form id="registrationForm" class="space-y-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <input type="text" id="nama" placeholder="Nama Lengkap" required class="w-full border border-gray-300 rounded-lg p-3">
+                        <input type="tel" id="nohp" placeholder="No. HP / WhatsApp" required class="w-full border border-gray-300 rounded-lg p-3">
+                    </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Pilih Paket</label>
-                        <select id="paket" required class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500">
+                        <input type="text" id="ig" placeholder="Username IG (Opsional - Untuk ikut lomba)" class="w-full border border-gray-300 rounded-lg p-3">
+                    </div>
+                    
+                    <div id="lombaDiv" class="hidden flex items-start p-4 bg-blue-50 rounded-lg border border-blue-100">
+                        <input type="checkbox" id="persetujuanLomba" class="mt-1 w-4 h-4 text-blue-600 rounded">
+                        <label for="persetujuanLomba" class="ml-3 text-sm text-gray-700">Saya menyetujui hasil foto dipublikasikan oleh WAWANCELLCOMP untuk keperluan lomba.</label>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <select id="paket" required class="w-full border border-gray-300 rounded-lg p-3">
                             <option value="">Memuat paket...</option>
                         </select>
+                        <input type="datetime-local" id="waktu" required class="w-full border border-gray-300 rounded-lg p-3">
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Pilih Jadwal (Hari & Jam)</label>
-                        <input type="datetime-local" id="waktu" required class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500">
+                    
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 text-sm text-yellow-700">
+                        <strong>Catatan:</strong> Voucher tetap berlaku walaupun lewat jadwal yang sudah ditetapkan.
                     </div>
-                </div>
-                
-                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
-                    <div class="flex">
-                        <div class="ml-3">
-                            <p class="text-sm text-yellow-700">
-                                <strong>Catatan:</strong> Voucher Anda akan tetap berlaku walaupun Anda datang melewati jadwal yang telah ditetapkan di atas.
-                            </p>
-                        </div>
-                    </div>
-                </div>
 
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 shadow-md">
-                    Konfirmasi Pendaftaran
-                </button>
-            </form>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-md">
+                        Konfirmasi Pendaftaran
+                    </button>
+                </form>
+            </div>
         </div>
-    </header>
+    </section>
 
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 py-10">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
+            <div>
+                <h4 class="text-white text-lg font-bold mb-4">Canon-Ipad Booth by WAWANCELLCOMP</h4>
+                <p>Photobooth rumahan dengan kualitas cetak premium. Cocok untuk mengabadikan momen bersama keluarga dan sahabat.</p>
+            </div>
+            <div class="md:text-right">
+                <h4 class="text-white text-lg font-bold mb-4">Lokasi & Kontak</h4>
+                <p>Jln. Protokol Dusun V Desa Sei Kamah II<br>Dekat Simpang Terong</p>
+                <p class="mt-2 text-yellow-400 font-bold">WA: 0822 1188 2667</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase Scripts & Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getDatabase, ref, get, push, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-        // Konfigurasi Firebase Anda
         const firebaseConfig = {
             apiKey: "AIzaSyDdM-1ziZLq2r8P1qpgHM763ke8GUPitvw",
             authDomain: "dasborusaha.firebaseapp.com",
@@ -158,7 +218,6 @@
         let validVoucherCode = "";
         let currentUserData = null;
 
-        // UI Elements
         const mainInterface = document.getElementById('mainInterface');
         const formInterface = document.getElementById('formInterface');
         const voucherMsg = document.getElementById('voucherMsg');
@@ -167,7 +226,7 @@
         const paketSelect = document.getElementById('paket');
         const adminModal = document.getElementById('adminModal');
 
-        // --- SISTEM ADMIN LOGIN ---
+        // Admin Modal Logic
         document.getElementById('openAdminModalBtn').addEventListener('click', () => adminModal.classList.remove('hidden'));
         document.getElementById('closeAdminModalBtn').addEventListener('click', () => adminModal.classList.add('hidden'));
 
@@ -176,7 +235,6 @@
             const email = document.getElementById('adminEmail').value;
             const pass = document.getElementById('adminPassword').value;
             try {
-                // Autentikasi Admin dengan Email/Password Firebase
                 await signInWithEmailAndPassword(auth, email, pass);
                 window.location.href = 'setting.html';
             } catch (error) {
@@ -184,7 +242,7 @@
             }
         });
 
-        // --- SISTEM VALIDASI VOUCHER & LOGIN PENGGUNA ---
+        // Voucher Validation & Google Login Logic
         document.getElementById('validateVoucherBtn').addEventListener('click', async () => {
             const code = document.getElementById('voucherCode').value.trim();
             if(!code) return;
@@ -197,35 +255,31 @@
                 const snap = await get(vRef);
                 
                 if (snap.exists() && snap.val().status === 'aktif') {
-                    voucherMsg.innerText = "Voucher Valid! Mengarahkan ke pendaftaran...";
+                    voucherMsg.innerText = "Voucher Valid! Mengarahkan ke login Google...";
                     validVoucherCode = code;
 
-                    // Voucher Valid -> Munculkan Login Google
                     const provider = new GoogleAuthProvider();
                     try {
                         const result = await signInWithPopup(auth, provider);
                         currentUserData = result.user;
                         
-                        // Sukses Login -> Ubah Tampilan ke Form
                         mainInterface.classList.add('hidden');
                         formInterface.classList.remove('hidden');
-                        document.getElementById('userGreeting').innerHTML = `Halo, <strong>${currentUserData.displayName}</strong> (${currentUserData.email}). Silakan lengkapi data Anda.`;
+                        document.getElementById('userGreeting').innerHTML = `Halo, <strong>${currentUserData.displayName}</strong> (${currentUserData.email}).`;
                         
-                        // Load pilihan paket dari database
                         loadPaket();
                     } catch (authError) {
-                        voucherMsg.innerText = "Gagal login. Silakan coba lagi.";
+                        voucherMsg.innerText = "Gagal login dengan Google.";
                     }
                 } else {
                     voucherMsg.innerText = "Voucher tidak valid atau sudah digunakan!";
-                    voucherMsg.classList.replace('text-white', 'text-red-400');
+                    voucherMsg.classList.replace('text-white', 'text-red-300');
                 }
             } catch (error) {
                 voucherMsg.innerText = "Terjadi kesalahan jaringan.";
             }
         });
 
-        // Load Paket Data
         async function loadPaket() {
             const snap = await get(ref(db, 'settings/paket'));
             if (snap.exists()) {
@@ -233,13 +287,9 @@
                 snap.forEach(child => {
                     paketSelect.innerHTML += `<option value="${child.val()}">${child.val()}</option>`;
                 });
-            } else {
-                paketSelect.innerHTML = '<option value="">Belum ada paket tersedia</option>';
             }
         }
 
-        // --- LOGIK FORM ---
-        // Deteksi input IG untuk memunculkan persetujuan lomba
         igInput.addEventListener('input', (e) => {
             if(e.target.value.trim() !== "") {
                 lombaDiv.classList.remove('hidden');
@@ -249,7 +299,6 @@
             }
         });
 
-        // Submit Form ke Firebase
         document.getElementById('registrationForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -270,9 +319,7 @@
             };
 
             try {
-                // 1. Simpan pendaftaran baru
                 await push(ref(db, 'pendaftaran'), data);
-                // 2. Ubah status voucher jadi terpakai
                 await update(ref(db, 'vouchers/' + validVoucherCode), { 
                     status: 'terpakai', 
                     digunakanOleh: currentUserData.email 
@@ -281,7 +328,7 @@
                 alert('Pendaftaran berhasil! Sampai jumpa di Canon-Ipad Booth.');
                 window.location.reload();
             } catch (error) {
-                alert('Terjadi kesalahan: ' + error.message);
+                alert('Terjadi kesalahan saat menyimpan data.');
                 submitBtn.innerText = "Konfirmasi Pendaftaran";
                 submitBtn.disabled = false;
             }
