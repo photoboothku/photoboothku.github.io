@@ -75,19 +75,31 @@
                 <img id="dashProfilePic" src="https://via.placeholder.com/150" alt="Profile" class="w-24 h-24 rounded-full object-cover border-4 border-gray-200 shadow-sm">
                 <div class="flex-1 text-center md:text-left">
                     <h2 class="text-3xl font-bold text-gray-900" id="dashCustomerName">Memuat...</h2>
-                    <p class="text-gray-500" id="dashCustomerEmail">Memuat...</p>
-                    <p class="text-xs text-blue-500 mt-1 font-semibold bg-blue-50 inline-block px-3 py-1 rounded-full">Pelanggan Setia Photobooth</p>
+                    <p class="text-gray-500 mb-2" id="dashCustomerEmail">Memuat...</p>
+                    <div class="text-xs text-blue-800 bg-blue-100 inline-block px-3 py-1 rounded-lg border border-blue-200">
+                        📱 <span id="dashCustomerPhone">-</span> | 📸 IG: <span id="dashCustomerIG">-</span>
+                    </div>
                 </div>
-                <button id="btnLogoutPelanggan" class="bg-red-100 text-red-600 hover:bg-red-200 font-bold px-5 py-2 rounded-lg transition shadow-sm">Keluar Akun</button>
+                <!-- Tombol Aksi Profil & Sync -->
+                <div class="flex flex-wrap justify-center gap-2 mt-4 md:mt-0">
+                    <button id="btnEditProfil" class="bg-blue-100 text-blue-700 hover:bg-blue-200 font-bold px-4 py-2 rounded-lg transition shadow-sm text-sm">✏️ Edit Profil</button>
+                    <button id="btnSyncDash" class="bg-gray-200 text-gray-800 hover:bg-gray-300 font-bold px-4 py-2 rounded-lg transition shadow-sm text-sm">🔄 Sync</button>
+                    <button id="btnLogoutPelanggan" class="bg-red-100 text-red-600 hover:bg-red-200 font-bold px-4 py-2 rounded-lg transition shadow-sm text-sm">Keluar</button>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- BOX NOMOR ANTREAN (TERINTEGRASI ADMIN) -->
+                <!-- BOX NOMOR ANTREAN & BOOKING MANDIRI -->
                 <div id="queueBoxContainer" class="bg-blue-600 rounded-2xl shadow p-6 md:col-span-1 text-white flex flex-col items-center justify-center text-center relative overflow-hidden transition-colors duration-500">
                     <div class="absolute top-0 right-0 p-4 opacity-20 text-6xl">🎟️</div>
                     <h3 class="text-lg font-medium text-white/80 mb-1 z-10">Nomor Antrean Anda</h3>
                     <p id="dashAntreanNumber" class="text-5xl font-voucher font-bold my-2 z-10 text-white">-</p>
+                    <p id="dashAntreanPaket" class="text-lg font-bold text-yellow-300 z-10 mb-1 leading-tight hidden"></p>
                     <p id="dashAntreanWaktu" class="text-sm text-white/90 z-10">Belum ada pesanan aktif</p>
+                    
+                    <button id="btnBookingMandiri" class="mt-4 bg-white/20 hover:bg-white/30 text-white font-bold py-2 px-4 rounded-lg z-10 border border-white/50 transition w-full shadow text-sm">
+                        + Bikin Pesanan / Booking Mandiri
+                    </button>
                 </div>
 
                 <!-- Data Voucher -->
@@ -138,6 +150,47 @@
             </div>
         </div>
     </section>
+
+    <!-- Modal Edit Profil -->
+    <div id="profilModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl relative border-t-4 border-blue-500">
+            <button id="closeProfilModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl">&times;</button>
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Lengkapi Profil Anda</h2>
+            <form id="profilForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nomor HP/WhatsApp</label>
+                    <input type="tel" id="profilHP" required placeholder="0812..." class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Username Instagram (Opsional)</label>
+                    <input type="text" id="profilIG" placeholder="@username" class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg">Simpan Profil</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Booking Mandiri -->
+    <div id="bookingMandiriModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl relative border-t-4 border-yellow-500">
+            <button id="closeBookingMandiriBtn" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl">&times;</button>
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Booking Paket Baru</h2>
+            <form id="bookingMandiriForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Pilih Paket</label>
+                    <select id="bmPaket" required class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white text-gray-700"></select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tentukan Jadwal & Jam</label>
+                    <input type="datetime-local" id="bmWaktu" required class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white text-gray-700">
+                </div>
+                <div class="bg-blue-50 p-3 rounded text-xs text-blue-800">
+                    *Pemesanan ini tidak menggunakan voucher diskon. Pembayaran dapat dilakukan di lokasi (Kasir).
+                </div>
+                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 rounded-lg shadow-lg">Buat Pesanan & Ambil Antrean</button>
+            </form>
+        </div>
+    </div>
 
     <!-- Modal Full View Foto Dasbor -->
     <div id="photoModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/95 p-4">
@@ -338,6 +391,7 @@
         let validVoucherCode = "";
         let currentUserData = null;
         let globalUserRating = 5;
+        let currentProfileInfo = { nohp: '', ig: '' };
         const cloudName = 'y2k0oqrl';
 
         // ==========================================
@@ -347,13 +401,9 @@
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const targetId = link.getAttribute('href');
-                
-                // Tutup dasbor jika sedang terbuka
                 document.getElementById('pelanggan-dashboard').classList.add('hidden');
                 document.getElementById('mainWebsiteContent').classList.remove('hidden');
-                window.location.hash = ''; // Bersihkan hash agar tidak memicu auth ulang ke dasbor
-                
-                // Gulir perlahan
+                window.location.hash = ''; 
                 document.querySelector(targetId).scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
         });
@@ -364,16 +414,23 @@
         async function loadPaketData() {
             try {
                 const snap = await get(ref(db, 'settings/paket'));
-                const sel = document.getElementById('paket'); const cont = document.getElementById('pricingContainer');
+                const sel = document.getElementById('paket'); 
+                const cont = document.getElementById('pricingContainer');
+                const bmSel = document.getElementById('bmPaket'); // Dropdown untuk booking mandiri
+                
                 if (snap.exists()) {
-                    sel.innerHTML = '<option value="">Pilih Paket Photobooth...</option>'; cont.innerHTML = '';
+                    sel.innerHTML = '<option value="">Pilih Paket Photobooth...</option>'; 
+                    bmSel.innerHTML = '<option value="">Pilih Paket Photobooth...</option>';
+                    cont.innerHTML = '';
                     snap.forEach(child => {
                         const data = child.val();
                         const nama = typeof data === 'object' ? data.nama : data;
                         const harga = typeof data === 'object' && data.harga ? data.harga : 0;
                         const deskripsi = typeof data === 'object' && data.deskripsi ? data.deskripsi : '-';
                         const hRp = harga > 0 ? `Rp ${parseInt(harga).toLocaleString('id-ID')}` : 'Hubungi Admin';
+                        
                         sel.innerHTML += `<option value="${nama}">${nama} (${hRp})</option>`;
+                        bmSel.innerHTML += `<option value="${nama}">${nama} (${hRp})</option>`;
                         cont.innerHTML += `
                             <div class="border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-xl transition bg-white text-left">
                                 <h3 class="text-xl font-bold mb-2 text-gray-800">${nama}</h3>
@@ -392,7 +449,7 @@
                     let has5Star = false;
                     const tests = []; snap.forEach(c => tests.push(c.val()));
                     tests.reverse().forEach(t => {
-                        if(t.rating === 5) { // Hanya tampilkan Bintang 5
+                        if(t.rating === 5) { 
                             has5Star = true;
                             cont.innerHTML += `
                                 <div class="bg-gray-50 border border-gray-100 rounded-2xl p-6 shadow-sm relative text-left">
@@ -408,7 +465,7 @@
             });
         }
         
-        loadPaketData(); loadTestimonials(); loadPublicGallery(); // Panggil di awal
+        loadPaketData(); loadTestimonials(); loadPublicGallery();
 
         // ==========================================
         // 2. ADMIN LOGIN & VOUCHER SYSTEM
@@ -422,7 +479,7 @@
         });
 
         document.getElementById('validateVoucherBtn').addEventListener('click', async () => {
-            const code = document.getElementById('voucherCode').value.trim().toUpperCase(); // Format kapital
+            const code = document.getElementById('voucherCode').value.trim().toUpperCase(); 
             if(!code) return;
             const msg = document.getElementById('voucherMsg');
             msg.classList.remove('hidden'); msg.className = "mt-4 font-semibold inline-block px-4 py-2 rounded-lg text-white bg-blue-600/80 shadow"; msg.innerText = "Memeriksa...";
@@ -447,10 +504,32 @@
         // ==========================================
         document.getElementById('ig').addEventListener('input', (e) => document.getElementById('lombaDiv').classList.toggle('hidden', e.target.value.trim() === ""));
 
-        async function simpanPendaftaran(email) {
-            const tglPilih = document.getElementById('waktu').value.split('T')[0];
+        async function simpanPendaftaran(email, sourceData = null) {
+            let tglPilih, paketVal, nohpVal, igVal, lombaVal, originType;
             
-            // Generate Nomor Antrean berdasarkan Hari
+            if (sourceData) {
+                // Berasal dari Booking Mandiri
+                tglPilih = sourceData.waktu.split('T')[0];
+                paketVal = sourceData.paket;
+                nohpVal = currentProfileInfo.nohp || '000'; // Ambil dari profil yang tersimpan
+                igVal = currentProfileInfo.ig || '';
+                lombaVal = false; // By default no if manual
+                originType = 'Mandiri (No Voucher)';
+            } else {
+                // Berasal dari Form Voucher Utama
+                tglPilih = document.getElementById('waktu').value.split('T')[0];
+                paketVal = document.getElementById('paket').value;
+                nohpVal = document.getElementById('nohp').value;
+                igVal = document.getElementById('ig').value;
+                lombaVal = document.getElementById('persetujuanLomba').checked;
+                originType = 'Voucher';
+                
+                // Jika user pertama kali isi form, simpan HP/IG nya ke Profile
+                const safeEmail = formatSafeEmail(email);
+                await update(ref(db, 'users/' + safeEmail), { nohp: nohpVal, ig: igVal });
+            }
+            
+            // Generate Nomor Antrean 
             const snapAll = await get(ref(db, 'pendaftaran'));
             let antreanKe = 1;
             if(snapAll.exists()) {
@@ -458,16 +537,28 @@
             }
             const nomorAntreanStr = "A-" + antreanKe.toString().padStart(3, '0');
 
-            const data = {
-                antrean: nomorAntreanStr, // Simpan Antrean
-                nama: document.getElementById('nama').value, nohp: document.getElementById('nohp').value,
-                ig: document.getElementById('ig').value, lomba: document.getElementById('persetujuanLomba').checked,
-                paket: document.getElementById('paket').value, waktu: document.getElementById('waktu').value,
-                voucher: validVoucherCode, email: email, status: 'Menunggu', timestamp: Date.now()
+            const dataToSave = {
+                antrean: nomorAntreanStr,
+                nama: auth.currentUser ? auth.currentUser.displayName : document.getElementById('nama').value, 
+                nohp: nohpVal,
+                ig: igVal, 
+                lomba: lombaVal,
+                paket: paketVal, 
+                waktu: sourceData ? sourceData.waktu : document.getElementById('waktu').value,
+                voucher: sourceData ? '' : validVoucherCode, 
+                email: email, 
+                status: 'Menunggu', 
+                tipe: originType,
+                timestamp: Date.now()
             };
-            await push(ref(db, 'pendaftaran'), data);
-            if(validVoucherCode) await update(ref(db, 'vouchers/' + validVoucherCode), { status: 'terpakai', digunakanOleh: email });
-            alert(`Berhasil! Nomor Antrean Anda: ${nomorAntreanStr}. Menuju Dasbor...`);
+
+            await push(ref(db, 'pendaftaran'), dataToSave);
+            
+            if(!sourceData && validVoucherCode) {
+                await update(ref(db, 'vouchers/' + validVoucherCode), { status: 'terpakai', digunakanOleh: email });
+            }
+            
+            alert(`Berhasil! Nomor Antrean Anda: ${nomorAntreanStr}. Silakan cek Dasbor Anda.`);
             window.location.hash = "#pelanggan-dashboard"; window.location.reload();
         }
 
@@ -490,7 +581,7 @@
         document.getElementById('registrationForm').addEventListener('submit', async (e) => { e.preventDefault(); if(currentUserData) await simpanPendaftaran(currentUserData.email); });
 
         // ==========================================
-        // 4. LOGIN GLOBAL & DASBOR PELANGGAN
+        // 4. LOGIN GLOBAL, PROFIL & DASBOR PELANGGAN
         // ==========================================
         const navBtns = [document.getElementById('navLoginPelangganBtn'), document.getElementById('mobileNavLoginBtn'), document.getElementById('heroLoginBtn')];
         navBtns.forEach(btn => btn.addEventListener('click', async () => {
@@ -502,6 +593,58 @@
         onAuthStateChanged(auth, (user) => { if (user && window.location.hash === "#pelanggan-dashboard") { document.getElementById('navLoginPelangganBtn').innerText = "Dasbor Saya"; tampilkanDasbor(user); } });
         function formatSafeEmail(email) { return email.replace(/[@.]/g, '_'); }
 
+        // Fitur Tombol Sync
+        document.getElementById('btnSyncDash').addEventListener('click', () => {
+            const btn = document.getElementById('btnSyncDash');
+            btn.innerHTML = '🔄 Syncing...';
+            if(auth.currentUser) {
+                // Trick untuk memaksa ambil data ulang dari Firebase dengan memanggil fungsi render
+                tampilkanDasbor(auth.currentUser); 
+                setTimeout(() => { btn.innerHTML = '🔄 Sync'; }, 1000);
+            }
+        });
+
+        // Fitur Edit Profil
+        document.getElementById('btnEditProfil').addEventListener('click', () => {
+            document.getElementById('profilModal').classList.remove('hidden');
+            document.getElementById('profilHP').value = currentProfileInfo.nohp || '';
+            document.getElementById('profilIG').value = currentProfileInfo.ig || '';
+        });
+        document.getElementById('closeProfilModalBtn').addEventListener('click', () => document.getElementById('profilModal').classList.add('hidden'));
+        
+        document.getElementById('profilForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const safeEmail = formatSafeEmail(auth.currentUser.email);
+            const nohp = document.getElementById('profilHP').value;
+            const ig = document.getElementById('profilIG').value;
+            
+            await update(ref(db, 'users/' + safeEmail), { nohp: nohp, ig: ig });
+            alert('Profil berhasil diperbarui!');
+            document.getElementById('profilModal').classList.add('hidden');
+        });
+
+        // Fitur Booking Mandiri
+        document.getElementById('btnBookingMandiri').addEventListener('click', () => {
+            if(!currentProfileInfo.nohp) {
+                alert("Harap lengkapi Profil (Nomor HP) Anda terlebih dahulu sebelum memesan.");
+                document.getElementById('btnEditProfil').click();
+                return;
+            }
+            document.getElementById('bookingMandiriModal').classList.remove('hidden');
+        });
+        document.getElementById('closeBookingMandiriBtn').addEventListener('click', () => document.getElementById('bookingMandiriModal').classList.add('hidden'));
+        
+        document.getElementById('bookingMandiriForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const sourceData = {
+                paket: document.getElementById('bmPaket').value,
+                waktu: document.getElementById('bmWaktu').value
+            };
+            document.getElementById('bookingMandiriModal').classList.add('hidden');
+            await simpanPendaftaran(auth.currentUser.email, sourceData);
+        });
+
+        // Fungsi Utama Tampil Dasbor
         async function tampilkanDasbor(user) {
             document.getElementById('mainWebsiteContent').classList.add('hidden'); document.getElementById('pelanggan-dashboard').classList.remove('hidden');
             document.getElementById('dashCustomerName').innerText = user.displayName; document.getElementById('dashCustomerEmail').innerText = user.email;
@@ -513,10 +656,15 @@
                     const ud = snap.val();
                     if(ud.profilePic) document.getElementById('dashProfilePic').src = ud.profilePic;
                     if(ud.rating) globalUserRating = ud.rating;
+                    
+                    currentProfileInfo.nohp = ud.nohp || '';
+                    currentProfileInfo.ig = ud.ig || '';
+                    document.getElementById('dashCustomerPhone').innerText = ud.nohp || 'Belum diisi';
+                    document.getElementById('dashCustomerIG').innerText = ud.ig || 'Belum diisi';
                 }
             });
 
-            // B. Cek Antrean Terbaru & Riwayat Voucher (DENGAN LOGIKA RESCHEDULE ADMIN)
+            // B. Cek Antrean Terbaru & Riwayat (Terintegrasi Admin)
             onValue(ref(db, 'pendaftaran'), (snap) => {
                 const vTerpakaiList = document.getElementById('voucherTerpakaiList'); vTerpakaiList.innerHTML = '';
                 let hasV = false; let latestBooking = null;
@@ -524,34 +672,41 @@
                 snap.forEach(child => {
                     const data = child.val();
                     if(data.email === user.email) {
-                        // Cari pemesanan terbaru
                         if(!latestBooking || data.timestamp > latestBooking.timestamp) latestBooking = data;
                         if(data.voucher) { hasV = true; vTerpakaiList.innerHTML += `<li class="font-voucher tracking-widest text-gray-500">🎟️ ${data.voucher} <span class="text-green-500 text-[10px] ml-1">(Dipakai)</span></li>`; }
                     }
                 });
                 if(!hasV) vTerpakaiList.innerHTML = "Belum ada voucher yang dipakai.";
                 
-                // Tampilkan Nomor Antrean & Tanggapan Admin (Reschedule/Selesai)
+                // Tampilkan Nomor Antrean & Tanggapan Admin
+                const qBox = document.getElementById('queueBoxContainer');
+                const pkgText = document.getElementById('dashAntreanPaket');
+                const bmBtn = document.getElementById('btnBookingMandiri');
+
                 if(latestBooking && latestBooking.antrean) {
                     document.getElementById('dashAntreanNumber').innerText = latestBooking.antrean;
-                    const qBox = document.getElementById('queueBoxContainer');
+                    pkgText.classList.remove('hidden');
+                    pkgText.innerText = `📦 ${latestBooking.paket}`;
+                    
                     let statusText = `Jadwal: ${new Date(latestBooking.waktu).toLocaleString('id-ID')}`;
                     
-                    // Cek Status Peringatan / Sukses
                     if (latestBooking.status && latestBooking.status.includes('Telat')) {
-                        // Admin merechedule karena telat
                         statusText = `<span class="text-yellow-100 font-bold block bg-red-700/50 p-2 rounded text-xs mt-1 border border-red-400">⚠️ ${latestBooking.pesanAdmin || 'Jadwal Anda di-reschedule karena telat.'}</span>`;
-                        qBox.classList.remove('bg-blue-600', 'bg-green-600'); qBox.classList.add('bg-red-600');
+                        qBox.className = "bg-red-600 rounded-2xl shadow p-6 md:col-span-1 text-white flex flex-col items-center justify-center text-center relative overflow-hidden transition-colors duration-500";
                     } else if (latestBooking.status === 'Selesai') {
-                        // Sesi Selesai
                         statusText = `<span class="text-green-100 font-bold bg-green-700/50 p-1 px-3 rounded-full mt-2 inline-block shadow-sm">✅ Sesi Selesai</span>`;
-                        qBox.classList.remove('bg-blue-600', 'bg-red-600'); qBox.classList.add('bg-green-600');
+                        qBox.className = "bg-green-600 rounded-2xl shadow p-6 md:col-span-1 text-white flex flex-col items-center justify-center text-center relative overflow-hidden transition-colors duration-500";
                     } else {
-                        // Normal Menunggu
-                        qBox.classList.remove('bg-red-600', 'bg-green-600'); qBox.classList.add('bg-blue-600');
+                        qBox.className = "bg-blue-600 rounded-2xl shadow p-6 md:col-span-1 text-white flex flex-col items-center justify-center text-center relative overflow-hidden transition-colors duration-500";
                     }
                     
                     document.getElementById('dashAntreanWaktu').innerHTML = statusText;
+                } else {
+                    // Tidak ada bookingan aktif
+                    document.getElementById('dashAntreanNumber').innerText = '-';
+                    pkgText.classList.add('hidden');
+                    document.getElementById('dashAntreanWaktu').innerText = "Belum ada pesanan aktif";
+                    qBox.className = "bg-blue-600 rounded-2xl shadow p-6 md:col-span-1 text-white flex flex-col items-center justify-center text-center relative overflow-hidden transition-colors duration-500";
                 }
             });
 
@@ -585,8 +740,7 @@
             await push(ref(db, 'testimonials'), { email: email, nama: auth.currentUser.displayName, rating: rating, teks: teks, waktu: Date.now() });
 
             if(rating === 5) {
-                // Generate Voucher 20% khusus user ini
-                const vCode = "V-" + Math.floor(100 + Math.random() * 900) + "RV"; // Format Pendek
+                const vCode = "V-" + Math.floor(100 + Math.random() * 900) + "RV"; 
                 const expDate = new Date(); expDate.setMonth(expDate.getMonth() + 1); 
                 await set(ref(db, 'vouchers/' + vCode), { status: 'aktif', pemilik: email, jenis: 'Diskon %', besaran: '20', expired: expDate.toISOString().split('T')[0] });
                 alert(`Terima kasih! Anda mendapat Voucher Diskon 20%. Kode: ${vCode} (Cek di Dasbor)`);
@@ -637,7 +791,6 @@
         document.getElementById('setProfileBtn').addEventListener('click', async () => { await update(ref(db, 'users/' + formatSafeEmail(auth.currentUser.email)), { profilePic: cViewUrl }); document.getElementById('dashProfilePic').src = cViewUrl; alert("Foto profil diperbarui!"); });
         document.getElementById('hidePhotoBtn').addEventListener('click', async () => { if(confirm("Yakin sembunyikan foto?")) { await push(ref(db, 'hidden_photos/' + formatSafeEmail(auth.currentUser.email)), cViewUrl); document.getElementById('photoModal').classList.add('hidden'); loadCloudinaryPhotos(auth.currentUser.email); }});
         
-        // Push ke Galeri Publik
         document.getElementById('setBerandaBtn').addEventListener('click', async () => {
             if(globalUserRating <= 3) return alert("Fitur ini dinonaktifkan karena rating Anda 3 Bintang ke bawah.");
             const pk = 'PUB-' + Date.now();
@@ -654,10 +807,7 @@
                 const pGrid = document.getElementById('publicGalleryGrid'); const potwGrid = document.getElementById('potwGalleryGrid');
                 pGrid.innerHTML = ''; potwGrid.innerHTML = '';
                 if(snap.exists()) {
-                    let photos = [];
-                    snap.forEach(c => { let p = c.val(); p.key = c.key; photos.push(p); });
-                    
-                    // Sort untuk POTW
+                    let photos = []; snap.forEach(c => { let p = c.val(); p.key = c.key; photos.push(p); });
                     let sortedForPotw = [...photos].sort((a,b) => (b.likes||0) - (a.likes||0));
                     let top5 = sortedForPotw.slice(0, 5).filter(p => (p.likes||0) > 0); 
 
@@ -672,15 +822,10 @@
                                         <p class="text-xs text-yellow-400">❤️ ${p.likes} Suka</p>
                                     </div>
                                 </div>`;
-                            
-                            // Hadiah Otomatis POTW
-                            if(auth.currentUser && auth.currentUser.email === p.ownerEmail) {
-                                cekDanBerikanRewardPOTW(p.key, p.ownerEmail);
-                            }
+                            if(auth.currentUser && auth.currentUser.email === p.ownerEmail) { cekDanBerikanRewardPOTW(p.key, p.ownerEmail); }
                         });
                     } else { potwGrid.innerHTML = `<div class="col-span-full text-gray-400 py-5">Belum ada foto yang mendapat Like minggu ini.</div>`; }
 
-                    // Galeri Publik Biasa
                     photos.sort((a,b) => b.timestamp - a.timestamp).forEach(p => {
                         const curUserEmail = auth.currentUser ? formatSafeEmail(auth.currentUser.email) : null;
                         const userVote = (curUserEmail && p.voters && p.voters[curUserEmail]) ? p.voters[curUserEmail] : null;
@@ -708,20 +853,14 @@
         window.votePhoto = async function(photoKey, type) {
             if(!auth.currentUser) return alert("Silakan Login Akun terlebih dahulu untuk memberikan dukungan!");
             const safeEmail = formatSafeEmail(auth.currentUser.email);
-            
             const snap = await get(ref(db, `homepage_photos/${photoKey}`));
             if(!snap.exists()) return;
-            const p = snap.val();
-            let voters = p.voters || {};
-            let l = p.likes || 0; let d = p.dislikes || 0;
-            
+            const p = snap.val(); let voters = p.voters || {}; let l = p.likes || 0; let d = p.dislikes || 0;
             const oldVote = voters[safeEmail];
-            if(oldVote === type) return; 
             
-            if(oldVote === 'like') l--;
-            if(oldVote === 'dislike') d--;
-            if(type === 'like') l++;
-            if(type === 'dislike') d++;
+            if(oldVote === type) return; 
+            if(oldVote === 'like') l--; if(oldVote === 'dislike') d--;
+            if(type === 'like') l++; if(type === 'dislike') d++;
             voters[safeEmail] = type;
             
             await update(ref(db, `homepage_photos/${photoKey}`), { likes: l, dislikes: d, voters: voters });
