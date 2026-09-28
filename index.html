@@ -26,7 +26,7 @@
                 </div>
                 <div class="hidden md:flex space-x-6 items-center">
                     <a href="#beranda" class="text-gray-700 hover:text-blue-600 font-medium text-sm">Beranda</a>
-                    <a href="#paket" class="text-gray-700 hover:text-blue-600 font-medium text-sm">Paket Harga</a>
+                    <a href="#paket-harga" class="text-gray-700 hover:text-blue-600 font-medium text-sm">Paket Harga</a>
                     <a href="#voucher-section" class="text-gray-700 hover:text-blue-600 font-medium text-sm">Tukar Voucher</a>
                     <button id="navLoginPelangganBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full font-bold text-sm transition">
                         Masuk / Galeri Saya
@@ -106,44 +106,15 @@
             </div>
         </section>
 
-        <!-- Section Paket Harga -->
-        <section id="paket" class="py-20 bg-white">
+        <!-- Section Paket Harga (SEKARANG DINAMIS DARI DATABASE) -->
+        <section id="paket-harga" class="py-20 bg-white">
             <div class="max-w-7xl mx-auto px-4 text-center">
                 <h2 class="text-3xl font-bold text-gray-900 mb-12">Pilihan Paket Photobooth</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <!-- Card 1 -->
-                    <div class="border rounded-2xl p-6 shadow-sm hover:shadow-xl transition">
-                        <h3 class="text-xl font-bold mb-2">Paket Sesi Grup</h3>
-                        <p class="text-3xl font-bold text-blue-600 mb-4">Rp 25.000</p>
-                        <ul class="text-gray-600 space-y-2 text-sm text-left mb-6">
-                            <li>✔️ Maksimal 6 Orang</li>
-                            <li>✔️ Dapat 4 lembar foto strip</li>
-                            <li>✔️ Durasi 15 menit</li>
-                            <li>✔️ Soft file bebas ambil</li>
-                        </ul>
-                    </div>
-                    <!-- Card 2 -->
-                    <div class="border rounded-2xl p-6 shadow-sm hover:shadow-xl transition bg-blue-50 border-blue-200 transform scale-105">
-                        <div class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full inline-block mb-2">Paling Hemat</div>
-                        <h3 class="text-xl font-bold mb-2">Paket Per Orang</h3>
-                        <p class="text-3xl font-bold text-blue-600 mb-4">Rp 5.000 <span class="text-sm text-gray-500">/org</span></p>
-                        <ul class="text-gray-600 space-y-2 text-sm text-left mb-6">
-                            <li>✔️ Minimal 2 Orang</li>
-                            <li>✔️ Dapat 1 foto strip / orang</li>
-                            <li>✔️ Durasi 3 menit / orang</li>
-                            <li>✔️ Tambah orang +5rb</li>
-                        </ul>
-                    </div>
-                    <!-- Card 3 -->
-                    <div class="border rounded-2xl p-6 shadow-sm hover:shadow-xl transition">
-                        <h3 class="text-xl font-bold mb-2">Paket Keluarga</h3>
-                        <p class="text-3xl font-bold text-blue-600 mb-4">Rp 85.000</p>
-                        <ul class="text-gray-600 space-y-2 text-sm text-left mb-6">
-                            <li>✔️ 1 Jam Puas</li>
-                            <li>✔️ Dapat 10 lembar foto strip</li>
-                            <li>✔️ Properti seru termasuk</li>
-                            <li>✔️ Soft file bebas ambil</li>
-                        </ul>
+                
+                <!-- Container ini akan diisi otomatis oleh JavaScript berdasarkan data Dasbor Admin -->
+                <div id="pricingContainer" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="col-span-full text-center py-10 text-gray-500 animate-pulse">
+                        Mengecek daftar paket terbaru...
                     </div>
                 </div>
             </div>
@@ -300,7 +271,53 @@
         const btnDaftarBaru = document.getElementById('btnDaftarBaru');
         const btnSimpanJadwalSaja = document.getElementById('btnSimpanJadwalSaja');
 
-        // Admin Modal Logic
+        // 0. LOAD DATA PAKET SECARA GLOBAL (Untuk Halaman Utama & Form)
+        async function loadPaketData() {
+            try {
+                const snap = await get(ref(db, 'settings/paket'));
+                const selectDropdown = document.getElementById('paket');
+                const pricingContainer = document.getElementById('pricingContainer');
+                
+                if (snap.exists()) {
+                    selectDropdown.innerHTML = '<option value="">Pilih Paket Photobooth...</option>';
+                    pricingContainer.innerHTML = '';
+
+                    snap.forEach(child => {
+                        const data = child.val();
+                        // Support data lama & baru
+                        const nama = typeof data === 'object' ? data.nama : data;
+                        const harga = typeof data === 'object' && data.harga ? data.harga : 0;
+                        const deskripsi = typeof data === 'object' && data.deskripsi ? data.deskripsi : 'Tidak ada deskripsi.';
+                        
+                        const hargaRp = harga > 0 ? `Rp ${parseInt(harga).toLocaleString('id-ID')}` : 'Harga Hubungi Admin';
+                        const labelDropdown = harga > 0 ? `${nama} (Rp ${parseInt(harga).toLocaleString('id-ID')})` : nama;
+                        
+                        // 1. Masukkan ke dropdown form pendaftaran
+                        selectDropdown.innerHTML += `<option value="${nama}">${labelDropdown}</option>`;
+                        
+                        // 2. Masukkan ke daftar paket di halaman utama
+                        pricingContainer.innerHTML += `
+                            <div class="border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-xl transition bg-white text-left">
+                                <h3 class="text-xl font-bold mb-2 text-gray-800">${nama}</h3>
+                                <p class="text-3xl font-bold text-blue-600 mb-4">${hargaRp}</p>
+                                <p class="text-gray-600 text-sm whitespace-pre-line">${deskripsi}</p>
+                            </div>
+                        `;
+                    });
+                } else {
+                    selectDropdown.innerHTML = '<option value="">Belum ada paket tersedia</option>';
+                    pricingContainer.innerHTML = '<div class="col-span-full text-center text-gray-500">Belum ada paket yang ditambahkan dari Dasbor Admin.</div>';
+                }
+            } catch (error) {
+                console.error("Gagal memuat paket dari database:", error);
+                document.getElementById('paket').innerHTML = '<option value="">Gagal memuat paket</option>';
+            }
+        }
+        
+        // Panggil saat website pertama dibuka
+        loadPaketData();
+
+        // 1. ADMIN LOGIN LOGIC
         document.getElementById('openAdminModalBtn').addEventListener('click', () => adminModal.classList.remove('hidden'));
         document.getElementById('closeAdminModalBtn').addEventListener('click', () => adminModal.classList.add('hidden'));
 
@@ -314,7 +331,7 @@
             }
         });
 
-        // 1. VALIDASI VOUCHER
+        // 2. VALIDASI VOUCHER
         document.getElementById('validateVoucherBtn').addEventListener('click', async () => {
             const code = document.getElementById('voucherCode').value.trim();
             if(!code) return;
@@ -343,7 +360,6 @@
                             setTimeout(() => {
                                 mainInterface.classList.add('hidden');
                                 formInterface.classList.remove('hidden');
-                                loadPaket(); // Load paket yang sudah diperbaiki
                             }, 1500);
 
                         } else {
@@ -363,23 +379,7 @@
             }
         });
 
-        // Load Data Paket (Perbaikan untuk baca Format Object dari setting.html)
-        async function loadPaket() {
-            const snap = await get(ref(db, 'settings/paket'));
-            if (snap.exists()) {
-                paketSelect.innerHTML = '<option value="">Pilih Paket...</option>';
-                snap.forEach(child => {
-                    const data = child.val();
-                    // Handle format Object (baru) maupun String (lama)
-                    const namaPaket = typeof data === 'object' ? data.nama : data;
-                    const hargaPaket = typeof data === 'object' && data.harga ? ` (Rp ${parseInt(data.harga).toLocaleString('id-ID')})` : '';
-                    
-                    paketSelect.innerHTML += `<option value="${namaPaket}">${namaPaket}${hargaPaket}</option>`;
-                });
-            }
-        }
-
-        // 2. ALUR PENDAFTARAN & LOGIN GOOGLE
+        // 3. ALUR PENDAFTARAN & LOGIN GOOGLE
         igInput.addEventListener('input', (e) => {
             if(e.target.value.trim() !== "") {
                 lombaDiv.classList.remove('hidden');
@@ -415,7 +415,6 @@
 
         // A. Jika Pelanggan Baru (Isi Form -> Klik Daftar)
         btnDaftarBaru.addEventListener('click', async () => {
-            // Cek kelengkapan form
             if(!document.getElementById('nama').value || !document.getElementById('nohp').value || !document.getElementById('paket').value || !document.getElementById('waktu').value) {
                 alert("Harap lengkapi Nama, No HP, Paket, dan Jadwal terlebih dahulu!");
                 return;
@@ -437,7 +436,7 @@
                 const result = await signInWithPopup(auth, provider);
                 currentUserData = result.user;
                 
-                // Ubah Tampilan Form (Hide Data Diri, Munculkan Konfirmasi Saja)
+                // Ubah Tampilan Form
                 existingUserPanel.classList.add('hidden');
                 dataDiriGroup.classList.add('hidden');
                 btnDaftarBaru.classList.add('hidden');
@@ -447,9 +446,9 @@
                 
                 btnSimpanJadwalSaja.classList.remove('hidden');
 
-                // Bypass Required Form Data Diri
+                // Bypass Required Validation for hidden inputs
                 document.getElementById('nama').value = currentUserData.displayName;
-                document.getElementById('nohp').value = "000000000"; // Dummy agar html validation pass
+                document.getElementById('nohp').value = "000000000"; 
             } catch(e) {
                 alert('Gagal login dengan Google.');
             }
@@ -472,11 +471,10 @@
             }
         });
 
-        // 3. FITUR DASBOR & GALERI PELANGGAN (Cloudinary)
+        // 4. FITUR DASBOR & GALERI PELANGGAN (Cloudinary)
         const mainWebsiteContent = document.getElementById('mainWebsiteContent');
         const pelangganDashboard = document.getElementById('pelanggan-dashboard');
         
-        // Cek Status Login Global untuk Navigasi "Galeri Saya"
         document.getElementById('navLoginPelangganBtn').addEventListener('click', () => handleGaleriLogin());
         document.getElementById('mobileNavLoginBtn').addEventListener('click', () => handleGaleriLogin());
 
@@ -505,17 +503,15 @@
 
         // Cek Auth saat reload page
         onAuthStateChanged(auth, (user) => {
-            // Jika ada hash galeri, otomatis arahkan ke dashboard
             if (user && (window.location.hash === "#pelanggan-dashboard" || window.location.hash === "#galeri")) {
                 tampilkanDasbor(user);
                 document.getElementById('navLoginPelangganBtn').innerText = "Dasbor Saya";
             }
         });
 
-        // Fetch Foto Cloudinary menggunakan Client-Side List
+        // Fetch Foto Cloudinary
         async function loadCloudinaryPhotos(email) {
             const grid = document.getElementById('cloudinaryGalleryGrid');
-            // Cloudinary List API butuh tag yang aman untuk URL. Kita ubah format email: budi@gmail.com -> budi_gmail_com
             const tag = email.replace(/[@.]/g, '_'); 
             const cloudName = 'y2k0oqrl';
             const url = `https://res.cloudinary.com/${cloudName}/image/list/${tag}.json`;
@@ -528,9 +524,7 @@
                 if(data.resources && data.resources.length > 0) {
                     grid.innerHTML = '';
                     data.resources.forEach(img => {
-                        // URL asli gambar
                         const imgUrl = `https://res.cloudinary.com/${cloudName}/image/upload/v${img.version}/${img.public_id}.${img.format}`;
-                        // URL download paksa
                         const dlUrl = `https://res.cloudinary.com/${cloudName}/image/upload/fl_attachment/v${img.version}/${img.public_id}.${img.format}`;
                         
                         grid.innerHTML += `
@@ -554,7 +548,7 @@
             }
         }
 
-        // Logika Modal Full View, Download & Share
+        // Logika Modal Full View
         let currentShareUrl = "";
         let currentDownloadUrl = "";
 
@@ -587,7 +581,6 @@
                 alert('Maaf, browser perangkat ini tidak mendukung fitur Share langsung. Silakan Download foto terlebih dahulu.');
             }
         });
-
     </script>
 </body>
 </html>
