@@ -695,8 +695,8 @@
                         msg.className = "mt-6 font-bold inline-block px-6 py-3 rounded-xl text-green-900 bg-green-400 shadow-[0_0_15px_rgba(74,222,128,0.5)]";
                         msg.innerHTML = `<i class="fas fa-check-circle mr-2"></i><strong>Valid!</strong> ${vData.jenis}: ${besaran}`;
                         setTimeout(() => { document.getElementById('mainInterface').classList.add('hidden'); document.getElementById('formInterface').classList.remove('hidden'); }, 1500);
-                    } else { msg.className = "mt-6 font-voucher font-bold text-red-900 bg-red-300 px-6 py-3 rounded-xl shadow-md"; msg.innerHTML = "<i class="fas fa-times-circle mr-2"></i>Voucher sudah tidak berlaku."; }
-                } else { msg.className = "mt-6 font-voucher font-bold text-red-900 bg-red-300 px-6 py-3 rounded-xl shadow-md"; msg.innerHTML = "<i class="fas fa-search mr-2"></i>Kode tidak ditemukan."; }
+                    } else { msg.className = "mt-6 font-voucher font-bold text-red-900 bg-red-300 px-6 py-3 rounded-xl shadow-md"; msg.innerHTML = '<i class="fas fa-times-circle mr-2"></i>Voucher sudah tidak berlaku.'; }
+                } else { msg.className = "mt-6 font-voucher font-bold text-red-900 bg-red-300 px-6 py-3 rounded-xl shadow-md"; msg.innerHTML = '<i class="fas fa-search mr-2"></i>Kode tidak ditemukan.'; }
             } catch (error) { msg.innerText = "Error jaringan."; }
         });
 
