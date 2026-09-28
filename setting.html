@@ -6,14 +6,19 @@
     <title>Admin - Dasbor Canon-Ipad Booth</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Poppins', sans-serif; }</style>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .font-voucher { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; }
+    </style>
 </head>
 <body class="bg-gray-100 p-6 min-h-screen">
     
     <div class="max-w-7xl mx-auto space-y-6">
         <div class="flex justify-between items-center mb-6 border-b pb-4">
             <h1 class="text-3xl font-bold text-gray-800">Dasbor Admin</h1>
-            <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold text-sm">Keluar</button>
+            <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold text-sm shadow">Keluar</button>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -39,12 +44,12 @@
                         <input type="date" id="expiredVoucher" required class="mt-1 w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700">Jumlah Voucher Dibuat</label>
+                        <label class="block text-sm font-semibold text-gray-700">Jumlah Dibuat</label>
                         <input type="number" id="jumlahVoucher" required min="1" max="100" value="1" class="mt-1 w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50">
                     </div>
                     
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg mt-4 transition">
-                        Generate Voucher Otomatis
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg mt-4 transition shadow">
+                        Generate Otomatis
                     </button>
                 </form>
             </div>
@@ -72,9 +77,8 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
             <!-- Manajemen Paket Photobooth -->
             <div class="bg-white p-6 rounded-2xl shadow lg:col-span-1 border-t-4 border-green-500">
-                <h2 class="text-xl font-bold mb-4 text-gray-800">Paket Photobooth</h2>
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Paket Harga</h2>
                 
-                <!-- Form Input/Edit Paket -->
                 <div class="mb-4 space-y-3 bg-gray-50 p-4 rounded-lg border">
                     <input type="hidden" id="paketId">
                     <input type="text" id="namaPaket" placeholder="Nama Paket (cth: Paket Grup)" required class="border p-2.5 w-full rounded-lg">
@@ -82,7 +86,7 @@
                     <textarea id="deskripsiPaket" placeholder="Deskripsi/Detail paket..." rows="2" class="border p-2.5 w-full rounded-lg"></textarea>
                     
                     <div class="flex gap-2">
-                        <button id="savePaketBtn" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-bold">Simpan</button>
+                        <button id="savePaketBtn" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-bold shadow">Simpan</button>
                         <button id="cancelEditBtn" class="hidden bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-bold">Batal</button>
                     </div>
                 </div>
@@ -90,31 +94,64 @@
                 <ul id="paketList" class="space-y-3 max-h-60 overflow-y-auto pr-2"></ul>
             </div>
 
-            <!-- Daftar Pendaftar -->
-            <div class="bg-white p-6 rounded-2xl shadow lg:col-span-2">
-                <h2 class="text-xl font-bold mb-4 text-gray-800">Pendaftar (Tukar Voucher)</h2>
+            <!-- Daftar Pendaftar & Antrean -->
+            <div class="bg-white p-6 rounded-2xl shadow lg:col-span-2 border-t-4 border-yellow-500">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+                    <h2 class="text-xl font-bold text-gray-800">Manajemen Antrean Pelanggan</h2>
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <a href="pos.html" target="_blank" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg font-bold text-sm shadow flex-1 text-center">
+                            <i class="fas fa-cash-register mr-1"></i> Buka POS
+                        </a>
+                        <button id="btnOpenOfflineModal" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-lg font-bold text-sm shadow flex-1">
+                            <i class="fas fa-user-plus mr-1"></i> Booking Walk-in
+                        </button>
+                    </div>
+                </div>
+                
                 <div class="overflow-x-auto">
-                    <table class="min-w-full table-auto text-sm">
+                    <table class="min-w-full table-auto text-sm border-collapse">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="px-4 py-2 text-left text-gray-600">Nama / Kontak</th>
-                                <th class="px-4 py-2 text-left text-gray-600">Paket / Jadwal</th>
-                                <th class="px-4 py-2 text-left text-gray-600">IG (Lomba)</th>
-                                <th class="px-4 py-2 text-left text-gray-600">Kode Voucher Dipakai</th>
+                                <th class="px-4 py-3 text-center text-gray-600 border-b">Antrean</th>
+                                <th class="px-4 py-3 text-left text-gray-600 border-b">Pelanggan & Kontak</th>
+                                <th class="px-4 py-3 text-left text-gray-600 border-b">Paket & Waktu</th>
+                                <th class="px-4 py-3 text-center text-gray-600 border-b">Aksi / Status</th>
                             </tr>
                         </thead>
-                        <tbody id="pendaftarList" class="divide-y"></tbody>
+                        <tbody id="pendaftarList" class="divide-y divide-gray-200"></tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Firebase Scripts -->
+    <!-- Modal Booking Offline -->
+    <div id="offlineModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl relative border-t-8 border-yellow-500">
+            <button id="closeOfflineModal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl">&times;</button>
+            <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-store text-yellow-500 mr-2"></i> Input Walk-in Offline</h2>
+            <form id="offlineForm" class="space-y-4">
+                <input type="text" id="offNama" placeholder="Nama Pelanggan" required class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white">
+                <div class="relative">
+                    <span class="absolute left-3 top-3.5 text-gray-400"><i class="fab fa-whatsapp"></i></span>
+                    <input type="tel" id="offWA" placeholder="Nomor WA (contoh: 0812...)" required class="w-full border border-gray-300 rounded-lg p-3 pl-10 bg-gray-50 focus:bg-white">
+                </div>
+                <select id="offPaket" required class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white text-gray-700">
+                    <option value="">Memuat Paket...</option>
+                </select>
+                <div class="bg-blue-50 p-3 rounded text-xs text-blue-800">
+                    <i class="fas fa-info-circle mr-1"></i> Jadwal akan otomatis dibuat untuk hari ini, saat ini juga. Jangan lupa catat pembayaran di POS Kasir.
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg">Simpan & Beri Nomor Antrean</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts (Modular SDK) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getDatabase, ref, onValue, set, push, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        import { getDatabase, ref, onValue, set, push, update, remove, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDdM-1ziZLq2r8P1qpgHM763ke8GUPitvw",
@@ -167,7 +204,6 @@
                 const data = child.val();
                 let statusBadge = "";
                 
-                // Cek status dan kadaluarsa di tampilan admin
                 if(data.status === 'terpakai') {
                     statusBadge = `<span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-bold">Terpakai</span>`;
                 } else if (data.expired < today) {
@@ -182,12 +218,12 @@
 
                 list.innerHTML += `
                     <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 font-mono tracking-widest font-bold text-gray-800 text-lg">${child.key}</td>
+                        <td class="px-4 py-3 font-voucher font-bold text-gray-800 text-lg">${child.key}</td>
                         <td class="px-4 py-3">${data.jenis}<br><span class="font-semibold text-blue-600">${tampilanBesaran}</span></td>
                         <td class="px-4 py-3 text-gray-600 text-xs">${data.expired}</td>
                         <td class="px-4 py-3">${statusBadge}</td>
                         <td class="px-4 py-3">
-                            <button class="text-white bg-red-500 hover:bg-red-600 px-2 py-1 rounded text-xs delete-voucher" data-id="${child.key}">Hapus</button>
+                            <button class="text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-xs font-bold delete-voucher shadow" data-id="${child.key}">X</button>
                         </td>
                     </tr>`;
             });
@@ -209,55 +245,36 @@
         const hargaPaketInput = document.getElementById('hargaPaket');
         const deskripsiPaketInput = document.getElementById('deskripsiPaket');
 
-        // Fungsi Bersihkan Form
         function resetPaketForm() {
-            paketIdInput.value = '';
-            namaPaketInput.value = '';
-            hargaPaketInput.value = '';
-            deskripsiPaketInput.value = '';
-            savePaketBtn.innerText = 'Simpan';
-            savePaketBtn.className = 'flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-bold';
+            paketIdInput.value = ''; namaPaketInput.value = ''; hargaPaketInput.value = ''; deskripsiPaketInput.value = '';
+            savePaketBtn.innerText = 'Simpan'; savePaketBtn.className = 'flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-bold shadow';
             cancelEditBtn.classList.add('hidden');
         }
 
         cancelEditBtn.addEventListener('click', resetPaketForm);
 
-        // Tambah / Update Paket
         savePaketBtn.addEventListener('click', async () => {
-            const id = paketIdInput.value;
-            const nama = namaPaketInput.value.trim();
-            const harga = hargaPaketInput.value;
-            const deskripsi = deskripsiPaketInput.value.trim();
-
-            if(!nama || !harga) {
-                alert("Nama dan Harga wajib diisi!");
-                return;
-            }
-
+            const id = paketIdInput.value; const nama = namaPaketInput.value.trim(); const harga = hargaPaketInput.value; const deskripsi = deskripsiPaketInput.value.trim();
+            if(!nama || !harga) return alert("Nama dan Harga wajib diisi!");
             const dataPaket = { nama, harga, deskripsi };
-
-            if(id) {
-                // Proses Edit
-                await update(ref(db, 'settings/paket/' + id), dataPaket);
-            } else {
-                // Proses Tambah Baru
-                await push(ref(db, 'settings/paket'), dataPaket);
-            }
+            if(id) await update(ref(db, 'settings/paket/' + id), dataPaket);
+            else await push(ref(db, 'settings/paket'), dataPaket);
             resetPaketForm();
         });
 
-        // Tampilkan Daftar Paket
         onValue(ref(db, 'settings/paket'), (snapshot) => {
-            const list = document.getElementById('paketList');
-            list.innerHTML = '';
+            const list = document.getElementById('paketList'); list.innerHTML = '';
+            const offPaket = document.getElementById('offPaket'); offPaket.innerHTML = '<option value="">Pilih Paket...</option>';
             
             snapshot.forEach((child) => {
                 const data = child.val();
-                // Antisipasi data paket lama yang hanya string
                 const nama = typeof data === 'object' ? data.nama : data;
                 const harga = typeof data === 'object' && data.harga ? data.harga : 0;
                 const deskripsi = typeof data === 'object' && data.deskripsi ? data.deskripsi : "-";
                 
+                // Tambah ke form Offline
+                offPaket.innerHTML += `<option value="${nama}">${nama} (Rp ${parseInt(harga).toLocaleString('id-ID')})</option>`;
+
                 list.innerHTML += `
                     <li class="bg-white p-3 rounded-lg border shadow-sm flex flex-col gap-2">
                         <div>
@@ -268,66 +285,163 @@
                             <p class="text-xs text-gray-500 mt-1">${deskripsi}</p>
                         </div>
                         <div class="flex justify-end gap-2 border-t pt-2 mt-1">
-                            <button class="text-blue-500 hover:text-blue-700 text-xs font-bold edit-paket" 
+                            <button class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-xs font-bold edit-paket" 
                                 data-id="${child.key}" data-nama="${nama}" data-harga="${harga}" data-deskripsi="${deskripsi}">Edit</button>
-                            <button class="text-red-500 hover:text-red-700 text-xs font-bold delete-paket" 
+                            <button class="bg-red-100 text-red-700 hover:bg-red-200 px-3 py-1 rounded text-xs font-bold delete-paket" 
                                 data-id="${child.key}">Hapus</button>
                         </div>
                     </li>`;
             });
 
-            // Action Hapus
             document.querySelectorAll('.delete-paket').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
-                    if(confirm("Hapus paket ini?")) {
-                        await remove(ref(db, 'settings/paket/' + e.target.getAttribute('data-id')));
-                    }
+                    if(confirm("Hapus paket ini?")) await remove(ref(db, 'settings/paket/' + e.target.getAttribute('data-id')));
                 });
             });
 
-            // Action Edit
             document.querySelectorAll('.edit-paket').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    paketIdInput.value = e.target.getAttribute('data-id');
-                    namaPaketInput.value = e.target.getAttribute('data-nama');
-                    hargaPaketInput.value = e.target.getAttribute('data-harga');
-                    deskripsiPaketInput.value = e.target.getAttribute('data-deskripsi');
-                    
-                    savePaketBtn.innerText = 'Update Paket';
-                    savePaketBtn.className = 'flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg font-bold';
+                    paketIdInput.value = e.target.getAttribute('data-id'); namaPaketInput.value = e.target.getAttribute('data-nama');
+                    hargaPaketInput.value = e.target.getAttribute('data-harga'); deskripsiPaketInput.value = e.target.getAttribute('data-deskripsi');
+                    savePaketBtn.innerText = 'Update Paket'; savePaketBtn.className = 'flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold shadow';
                     cancelEditBtn.classList.remove('hidden');
                 });
             });
         });
 
-        // --- 3. DAFTAR PENDAFTAR ---
+        // --- 3. MANAJEMEN ANTREAN & PELANGGAN ---
+        // Expose function to window for inline onclick inside dynamic HTML
+        window.tandaiSelesai = async function(key) {
+            if(confirm("Tandai sesi ini telah Selesai?")) await update(ref(db, 'pendaftaran/' + key), { status: 'Selesai' });
+        }
+
+        window.tandaiTelat = async function(key, tglWaktuAsli) {
+            if(!confirm("Pelanggan ini telat? Memindahkan jadwal mereka ke antrean terakhir hari ini...")) return;
+            
+            const tglPilih = tglWaktuAsli.split('T')[0];
+            const snapAll = await get(ref(db, 'pendaftaran'));
+            let maxQueue = 0;
+            
+            if(snapAll.exists()) {
+                snapAll.forEach(c => {
+                    const d = c.val();
+                    if(d.waktu && d.waktu.startsWith(tglPilih) && d.antrean) {
+                        const numOnly = parseInt(d.antrean.replace('A-', ''));
+                        if(numOnly > maxQueue) maxQueue = numOnly;
+                    }
+                });
+            }
+            const newAntreanStr = "A-" + (maxQueue + 1).toString().padStart(3, '0');
+            
+            await update(ref(db, 'pendaftaran/' + key), { 
+                status: 'Reschedule (Telat)', 
+                antrean: newAntreanStr,
+                pesanAdmin: `Pemberitahuan: Jadwal sebelumnya terlewat. Anda telah otomatis dipindahkan ke ujung antrean (${newAntreanStr}).`
+            });
+            alert(`Berhasil dipindah ke antrean baru: ${newAntreanStr}`);
+        }
+
         onValue(ref(db, 'pendaftaran'), (snapshot) => {
             const tbody = document.getElementById('pendaftarList');
             tbody.innerHTML = '';
-            snapshot.forEach((child) => {
-                const data = child.val();
-                const lombaStatus = data.lomba ? "✅ Ya" : "❌ Tidak";
-                const jadwal = new Date(data.waktu).toLocaleString('id-ID');
+            
+            // Urutkan data berdasarkan waktu terbaru di atas
+            let listPendaftar = [];
+            snapshot.forEach(c => { let v = c.val(); v.key = c.key; listPendaftar.push(v); });
+            listPendaftar.sort((a,b) => b.timestamp - a.timestamp);
+
+            listPendaftar.forEach((data) => {
+                const jadwal = data.waktu ? new Date(data.waktu).toLocaleString('id-ID') : '-';
+                const status = data.status || 'Menunggu';
+                const antreanBadge = data.antrean ? `<span class="font-voucher text-xl font-black text-blue-700 tracking-wider">${data.antrean}</span>` : `<span class="text-gray-400">-</span>`;
                 
+                let statusUI = `<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-bold border border-yellow-200">${status}</span>`;
+                if(status === 'Selesai') statusUI = `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold border border-green-200"><i class="fas fa-check-circle mr-1"></i>Selesai</span>`;
+                if(status.includes('Telat')) statusUI = `<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-[10px] font-bold border border-red-200 leading-tight block mt-1">${status}</span>`;
+                
+                const aksiUI = status === 'Selesai' ? `<span class="text-gray-400 italic text-xs">Telah Selesai</span>` : `
+                    <div class="flex flex-col gap-1">
+                        <button onclick="tandaiSelesai('${data.key}')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition"><i class="fas fa-check mr-1"></i> Selesai</button>
+                        <button onclick="tandaiTelat('${data.key}', '${data.waktu}')" class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 rounded text-[10px] font-bold shadow-sm transition mt-1 uppercase"><i class="fas fa-clock mr-1"></i> Telat (Reschedule)</button>
+                    </div>`;
+
                 tbody.innerHTML += `
-                    <tr class="hover:bg-gray-50 border-b">
-                        <td class="px-4 py-3">
-                            <span class="font-bold text-gray-800">${data.nama}</span><br>
-                            <span class="text-sm text-gray-600">WA: ${data.nohp}</span>
+                    <tr class="hover:bg-blue-50 transition border-b">
+                        <td class="px-4 py-4 text-center align-middle bg-gray-50 border-r border-gray-100">
+                            ${antreanBadge}<br>
+                            <div class="mt-2">${statusUI}</div>
                         </td>
-                        <td class="px-4 py-3">
-                            <span class="font-medium text-blue-600">${data.paket}</span><br>
-                            <span class="text-sm text-gray-500">${jadwal}</span>
+                        <td class="px-4 py-4">
+                            <div class="font-bold text-gray-900 text-base">${data.nama} 
+                                ${data.tipe === 'Offline' ? '<span class="ml-2 bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">Offline (Walk-in)</span>' : ''}
+                            </div>
+                            <div class="text-sm text-gray-600 font-voucher mt-1">
+                                <a href="https://wa.me/${data.nohp}" target="_blank" class="text-green-600 hover:text-green-700 transition">
+                                    <i class="fab fa-whatsapp text-lg align-middle mr-1"></i>${data.nohp}
+                                </a>
+                            </div>
                         </td>
-                        <td class="px-4 py-3">
-                            ${data.ig || '-'}<br>
-                            <span class="text-xs text-gray-500">Lomba: ${lombaStatus}</span>
+                        <td class="px-4 py-4">
+                            <span class="font-bold text-blue-700 block">${data.paket}</span>
+                            <span class="text-xs text-gray-500 flex items-center mt-1"><i class="far fa-calendar-alt mr-1"></i> ${jadwal}</span>
+                            ${data.voucher ? `<span class="inline-block mt-2 bg-yellow-100 text-yellow-800 text-[10px] px-2 py-0.5 rounded font-bold border border-yellow-300">Voucher: ${data.voucher}</span>` : ''}
                         </td>
-                        <td class="px-4 py-3">
-                            <span class="bg-yellow-200 text-yellow-800 font-bold px-3 py-1 rounded tracking-widest">${data.voucher}</span>
+                        <td class="px-4 py-4 text-center align-middle w-32">
+                            ${aksiUI}
                         </td>
                     </tr>`;
             });
+        });
+
+        // --- 4. BOOKING OFFLINE (WALK-IN) ---
+        document.getElementById('btnOpenOfflineModal').addEventListener('click', () => document.getElementById('offlineModal').classList.remove('hidden'));
+        document.getElementById('closeOfflineModal').addEventListener('click', () => document.getElementById('offlineModal').classList.add('hidden'));
+        
+        document.getElementById('offlineForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btnSubmit = e.target.querySelector('button[type="submit"]');
+            btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...'; btnSubmit.disabled = true;
+
+            const now = new Date();
+            const wibOffset = now.getTimezoneOffset() * 60000; 
+            const localISOTime = (new Date(now - wibOffset)).toISOString().slice(0, 16);
+            const tglPilih = localISOTime.split('T')[0];
+
+            // Hitung Nomor Antrean Hari Ini
+            const snapAll = await get(ref(db, 'pendaftaran'));
+            let antreanKe = 1;
+            if(snapAll.exists()) {
+                snapAll.forEach(c => {
+                    const d = c.val();
+                    if(d.waktu && d.waktu.startsWith(tglPilih) && d.antrean) {
+                        const maxNum = parseInt(d.antrean.replace('A-', ''));
+                        if (maxNum >= antreanKe) antreanKe = maxNum + 1;
+                    }
+                });
+            }
+            const antreanStr = "A-" + antreanKe.toString().padStart(3, '0');
+
+            const data = {
+                antrean: antreanStr,
+                nama: document.getElementById('offNama').value,
+                nohp: document.getElementById('offWA').value,
+                paket: document.getElementById('offPaket').value,
+                waktu: localISOTime,
+                tipe: 'Offline',
+                status: 'Menunggu',
+                timestamp: Date.now()
+            };
+
+            try {
+                await push(ref(db, 'pendaftaran'), data);
+                alert(`Booking Offline Berhasil!\nNomor Antrean: ${antreanStr}`);
+                document.getElementById('offlineModal').classList.add('hidden');
+                e.target.reset();
+            } catch (error) {
+                alert("Terjadi kesalahan sistem.");
+            } finally {
+                btnSubmit.innerHTML = 'Simpan & Beri Nomor Antrean'; btnSubmit.disabled = false;
+            }
         });
     </script>
 </body>
