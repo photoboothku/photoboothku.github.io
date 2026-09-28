@@ -72,15 +72,17 @@
             
             <!-- Header Profil -->
             <div class="bg-white rounded-2xl shadow p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 border-t-4 border-blue-600">
-                <img id="dashProfilePic" src="https://via.placeholder.com/150" alt="Profile" class="w-24 h-24 rounded-full object-cover border-4 border-gray-200 shadow-sm">
+                <div class="relative">
+                    <img id="dashProfilePic" src="https://via.placeholder.com/150" alt="Profile" class="w-24 h-24 rounded-full object-cover border-4 border-gray-200 transition-all duration-300">
+                </div>
                 <div class="flex-1 text-center md:text-left">
                     <h2 class="text-3xl font-bold text-gray-900" id="dashCustomerName">Memuat...</h2>
                     <p class="text-gray-500 mb-2" id="dashCustomerEmail">Memuat...</p>
+                    <div id="dashCustomerTier" class="text-xs font-bold inline-block px-3 py-1 rounded-full border mb-2">Memuat Tingkatan...</div>
                     <div class="text-xs text-blue-800 bg-blue-100 inline-block px-3 py-1 rounded-lg border border-blue-200">
                         📱 <span id="dashCustomerPhone">-</span> | 📸 IG: <span id="dashCustomerIG">-</span>
                     </div>
                 </div>
-                <!-- Tombol Aksi Profil & Sync -->
                 <div class="flex flex-wrap justify-center gap-2 mt-4 md:mt-0">
                     <button id="btnEditProfil" class="bg-blue-100 text-blue-700 hover:bg-blue-200 font-bold px-4 py-2 rounded-lg transition shadow-sm text-sm">✏️ Edit Profil</button>
                     <button id="btnSyncDash" class="bg-gray-200 text-gray-800 hover:bg-gray-300 font-bold px-4 py-2 rounded-lg transition shadow-sm text-sm">🔄 Sync</button>
@@ -98,7 +100,7 @@
                     <p id="dashAntreanWaktu" class="text-sm text-white/90 z-10">Belum ada pesanan aktif</p>
                     
                     <button id="btnBookingMandiri" class="mt-4 bg-white/20 hover:bg-white/30 text-white font-bold py-2 px-4 rounded-lg z-10 border border-white/50 transition w-full shadow text-sm">
-                        + Bikin Pesanan / Booking Mandiri
+                        + Booking Mandiri (Pesan Baru)
                     </button>
                 </div>
 
@@ -107,7 +109,7 @@
                     <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Voucher Saya</h3>
                     <div class="space-y-4 text-sm">
                         <div>
-                            <strong class="text-green-600 block mb-1">Aktif (Belum Digunakan)</strong>
+                            <strong class="text-green-600 block mb-1">Aktif (Klaim/Belum Digunakan)</strong>
                             <ul id="voucherAktifList" class="space-y-2 text-gray-700 max-h-24 overflow-y-auto pr-2"></ul>
                         </div>
                         <div>
@@ -155,8 +157,14 @@
     <div id="profilModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl relative border-t-4 border-blue-500">
             <button id="closeProfilModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl">&times;</button>
-            <h2 class="text-xl font-bold mb-4 text-gray-800">Lengkapi Profil Anda</h2>
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Edit Profil Anda</h2>
             <form id="profilForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Pilih Foto Profil dari Galeri</label>
+                    <div id="profilPhotoPicker" class="flex flex-wrap gap-2 mb-2 max-h-32 overflow-y-auto p-1">
+                        <p class="text-xs text-gray-400">Memuat galeri...</p>
+                    </div>
+                </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Nomor HP/WhatsApp</label>
                     <input type="tel" id="profilHP" required placeholder="0812..." class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white">
@@ -184,8 +192,10 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Tentukan Jadwal & Jam</label>
                     <input type="datetime-local" id="bmWaktu" required class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white text-gray-700">
                 </div>
-                <div class="bg-blue-50 p-3 rounded text-xs text-blue-800">
-                    *Pemesanan ini tidak menggunakan voucher diskon. Pembayaran dapat dilakukan di lokasi (Kasir).
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Kode Voucher (Opsional)</label>
+                    <input type="text" id="bmVoucherCode" placeholder="Contoh: V-REW1234" class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 uppercase font-voucher focus:bg-white transition text-center tracking-widest font-bold">
+                    <p class="text-[10px] text-gray-500 mt-1">*Masukkan voucher fisik atau voucher dari aplikasi jika ada.</p>
                 </div>
                 <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 rounded-lg shadow-lg">Buat Pesanan & Ambil Antrean</button>
             </form>
@@ -197,7 +207,6 @@
         <button id="closePhotoModalBtn" class="absolute top-4 right-4 text-white hover:text-red-500 text-4xl">&times;</button>
         <div class="relative max-w-4xl w-full text-center">
             <img id="fullViewImg" src="" alt="Full View" class="max-h-[60vh] mx-auto rounded-lg shadow-2xl mb-6 object-contain">
-            
             <div class="flex flex-wrap justify-center gap-3 bg-white/10 p-4 rounded-xl backdrop-blur-md">
                 <button id="setProfileBtn" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded shadow transition">👤 Jadikan Profil</button>
                 <button id="setBerandaBtn" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 text-sm font-bold py-2 px-4 rounded shadow transition">🌟 Tampil di Beranda</button>
@@ -392,6 +401,8 @@
         let currentUserData = null;
         let globalUserRating = 5;
         let currentProfileInfo = { nohp: '', ig: '' };
+        let userCloudinaryPhotos = [];
+        let selectedProfilImgTemp = "";
         const cloudName = 'y2k0oqrl';
 
         // ==========================================
@@ -416,7 +427,7 @@
                 const snap = await get(ref(db, 'settings/paket'));
                 const sel = document.getElementById('paket'); 
                 const cont = document.getElementById('pricingContainer');
-                const bmSel = document.getElementById('bmPaket'); // Dropdown untuk booking mandiri
+                const bmSel = document.getElementById('bmPaket'); 
                 
                 if (snap.exists()) {
                     sel.innerHTML = '<option value="">Pilih Paket Photobooth...</option>'; 
@@ -508,28 +519,24 @@
             let tglPilih, paketVal, nohpVal, igVal, lombaVal, originType;
             
             if (sourceData) {
-                // Berasal dari Booking Mandiri
                 tglPilih = sourceData.waktu.split('T')[0];
                 paketVal = sourceData.paket;
-                nohpVal = currentProfileInfo.nohp || '000'; // Ambil dari profil yang tersimpan
+                nohpVal = currentProfileInfo.nohp || '000'; 
                 igVal = currentProfileInfo.ig || '';
-                lombaVal = false; // By default no if manual
-                originType = 'Mandiri (No Voucher)';
+                lombaVal = false; 
+                originType = 'Mandiri';
             } else {
-                // Berasal dari Form Voucher Utama
                 tglPilih = document.getElementById('waktu').value.split('T')[0];
                 paketVal = document.getElementById('paket').value;
                 nohpVal = document.getElementById('nohp').value;
                 igVal = document.getElementById('ig').value;
                 lombaVal = document.getElementById('persetujuanLomba').checked;
-                originType = 'Voucher';
+                originType = 'Voucher Awal';
                 
-                // Jika user pertama kali isi form, simpan HP/IG nya ke Profile
                 const safeEmail = formatSafeEmail(email);
                 await update(ref(db, 'users/' + safeEmail), { nohp: nohpVal, ig: igVal });
             }
             
-            // Generate Nomor Antrean 
             const snapAll = await get(ref(db, 'pendaftaran'));
             let antreanKe = 1;
             if(snapAll.exists()) {
@@ -540,21 +547,14 @@
             const dataToSave = {
                 antrean: nomorAntreanStr,
                 nama: auth.currentUser ? auth.currentUser.displayName : document.getElementById('nama').value, 
-                nohp: nohpVal,
-                ig: igVal, 
-                lomba: lombaVal,
-                paket: paketVal, 
-                waktu: sourceData ? sourceData.waktu : document.getElementById('waktu').value,
-                voucher: sourceData ? '' : validVoucherCode, 
-                email: email, 
-                status: 'Menunggu', 
-                tipe: originType,
-                timestamp: Date.now()
+                nohp: nohpVal, ig: igVal, lomba: lombaVal,
+                paket: paketVal, waktu: sourceData ? sourceData.waktu : document.getElementById('waktu').value,
+                voucher: validVoucherCode, email: email, status: 'Menunggu', tipe: originType, timestamp: Date.now()
             };
 
             await push(ref(db, 'pendaftaran'), dataToSave);
             
-            if(!sourceData && validVoucherCode) {
+            if(validVoucherCode) {
                 await update(ref(db, 'vouchers/' + validVoucherCode), { status: 'terpakai', digunakanOleh: email });
             }
             
@@ -595,35 +595,50 @@
 
         // Fitur Tombol Sync
         document.getElementById('btnSyncDash').addEventListener('click', () => {
-            const btn = document.getElementById('btnSyncDash');
-            btn.innerHTML = '🔄 Syncing...';
-            if(auth.currentUser) {
-                // Trick untuk memaksa ambil data ulang dari Firebase dengan memanggil fungsi render
-                tampilkanDasbor(auth.currentUser); 
-                setTimeout(() => { btn.innerHTML = '🔄 Sync'; }, 1000);
-            }
+            const btn = document.getElementById('btnSyncDash'); btn.innerHTML = '🔄 Syncing...';
+            if(auth.currentUser) { tampilkanDasbor(auth.currentUser); setTimeout(() => { btn.innerHTML = '🔄 Sync'; }, 1000); }
         });
 
-        // Fitur Edit Profil
+        // Fitur Edit Profil & Picker Foto
         document.getElementById('btnEditProfil').addEventListener('click', () => {
             document.getElementById('profilModal').classList.remove('hidden');
             document.getElementById('profilHP').value = currentProfileInfo.nohp || '';
             document.getElementById('profilIG').value = currentProfileInfo.ig || '';
+            renderPhotoPickerForProfile();
         });
         document.getElementById('closeProfilModalBtn').addEventListener('click', () => document.getElementById('profilModal').classList.add('hidden'));
         
+        function renderPhotoPickerForProfile() {
+            const picker = document.getElementById('profilPhotoPicker');
+            picker.innerHTML = ''; selectedProfilImgTemp = "";
+            if(userCloudinaryPhotos.length === 0) {
+                picker.innerHTML = '<p class="text-xs text-gray-400">Belum ada foto photobooth Anda yang tersedia.</p>'; return;
+            }
+            userCloudinaryPhotos.forEach(url => {
+                picker.innerHTML += `<img src="${url}" class="w-16 h-16 object-cover rounded cursor-pointer border-2 border-transparent hover:border-blue-400 transition" onclick="selectProfilPhoto(this, '${url}')">`;
+            });
+        }
+
+        window.selectProfilPhoto = function(imgElement, url) {
+            document.querySelectorAll('#profilPhotoPicker img').forEach(el => el.classList.remove('border-blue-600', 'shadow-md'));
+            imgElement.classList.add('border-blue-600', 'shadow-md');
+            selectedProfilImgTemp = url;
+        }
+
         document.getElementById('profilForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const safeEmail = formatSafeEmail(auth.currentUser.email);
-            const nohp = document.getElementById('profilHP').value;
-            const ig = document.getElementById('profilIG').value;
+            const nohp = document.getElementById('profilHP').value; const ig = document.getElementById('profilIG').value;
             
-            await update(ref(db, 'users/' + safeEmail), { nohp: nohp, ig: ig });
+            let updates = { nohp: nohp, ig: ig };
+            if (selectedProfilImgTemp !== "") { updates.profilePic = selectedProfilImgTemp; document.getElementById('dashProfilePic').src = selectedProfilImgTemp; }
+            
+            await update(ref(db, 'users/' + safeEmail), updates);
             alert('Profil berhasil diperbarui!');
             document.getElementById('profilModal').classList.add('hidden');
         });
 
-        // Fitur Booking Mandiri
+        // Fitur Booking Mandiri & Kolom Voucher
         document.getElementById('btnBookingMandiri').addEventListener('click', () => {
             if(!currentProfileInfo.nohp) {
                 alert("Harap lengkapi Profil (Nomor HP) Anda terlebih dahulu sebelum memesan.");
@@ -636,15 +651,26 @@
         
         document.getElementById('bookingMandiriForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const sourceData = {
-                paket: document.getElementById('bmPaket').value,
-                waktu: document.getElementById('bmWaktu').value
-            };
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerHTML = 'Memproses...'; btn.disabled = true;
+
+            const bmVoucher = document.getElementById('bmVoucherCode').value.trim().toUpperCase();
+            if (bmVoucher) {
+                const snap = await get(ref(db, 'vouchers/' + bmVoucher));
+                if(snap.exists()) {
+                    const v = snap.val(); const today = new Date().toISOString().split('T')[0];
+                    if (v.status === 'aktif' && v.expired >= today) validVoucherCode = bmVoucher;
+                    else { alert("Voucher tidak valid atau kedaluwarsa."); btn.innerHTML = 'Buat Pesanan & Ambil Antrean'; btn.disabled = false; return; }
+                } else { alert("Kode voucher tidak ditemukan."); btn.innerHTML = 'Buat Pesanan & Ambil Antrean'; btn.disabled = false; return; }
+            } else { validVoucherCode = ""; }
+
+            const sourceData = { paket: document.getElementById('bmPaket').value, waktu: document.getElementById('bmWaktu').value };
             document.getElementById('bookingMandiriModal').classList.add('hidden');
             await simpanPendaftaran(auth.currentUser.email, sourceData);
+            btn.innerHTML = 'Buat Pesanan & Ambil Antrean'; btn.disabled = false;
         });
 
-        // Fungsi Utama Tampil Dasbor
+        // TAMPILKAN DASBOR & TIER PELANGGAN
         async function tampilkanDasbor(user) {
             document.getElementById('mainWebsiteContent').classList.add('hidden'); document.getElementById('pelanggan-dashboard').classList.remove('hidden');
             document.getElementById('dashCustomerName').innerText = user.displayName; document.getElementById('dashCustomerEmail').innerText = user.email;
@@ -657,37 +683,41 @@
                     if(ud.profilePic) document.getElementById('dashProfilePic').src = ud.profilePic;
                     if(ud.rating) globalUserRating = ud.rating;
                     
-                    currentProfileInfo.nohp = ud.nohp || '';
-                    currentProfileInfo.ig = ud.ig || '';
+                    currentProfileInfo.nohp = ud.nohp || ''; currentProfileInfo.ig = ud.ig || '';
                     document.getElementById('dashCustomerPhone').innerText = ud.nohp || 'Belum diisi';
                     document.getElementById('dashCustomerIG').innerText = ud.ig || 'Belum diisi';
                 }
             });
 
-            // B. Cek Antrean Terbaru & Riwayat (Terintegrasi Admin)
+            // B. Cek Antrean Terbaru, Riwayat, & Tingkatan Pelanggan
             onValue(ref(db, 'pendaftaran'), (snap) => {
-                const vTerpakaiList = document.getElementById('voucherTerpakaiList'); vTerpakaiList.innerHTML = '';
-                let hasV = false; let latestBooking = null;
+                let latestBooking = null; let bookingCount = 0;
 
                 snap.forEach(child => {
                     const data = child.val();
                     if(data.email === user.email) {
+                        bookingCount++;
                         if(!latestBooking || data.timestamp > latestBooking.timestamp) latestBooking = data;
-                        if(data.voucher) { hasV = true; vTerpakaiList.innerHTML += `<li class="font-voucher tracking-widest text-gray-500">🎟️ ${data.voucher} <span class="text-green-500 text-[10px] ml-1">(Dipakai)</span></li>`; }
                     }
                 });
-                if(!hasV) vTerpakaiList.innerHTML = "Belum ada voucher yang dipakai.";
                 
-                // Tampilkan Nomor Antrean & Tanggapan Admin
+                // Set Customer Tier based on booking count
+                let tierText = "Pelanggan Baru"; let tierClass = "bg-gray-100 text-gray-600 border-gray-200"; let imgBorder = "border-gray-200 shadow-sm";
+                if(bookingCount >= 10) { tierText = "Pelanggan VIP 👑"; tierClass = "bg-yellow-100 text-yellow-800 border-yellow-400"; imgBorder = "border-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.6)]"; }
+                else if(bookingCount >= 5) { tierText = "Pelanggan Setia"; tierClass = "bg-slate-200 text-slate-800 border-slate-400"; imgBorder = "border-slate-400"; }
+                else if(bookingCount >= 2) { tierText = "Pelanggan Reguler"; tierClass = "bg-orange-100 text-orange-800 border-orange-400"; imgBorder = "border-orange-400"; }
+                
+                const tierEl = document.getElementById('dashCustomerTier');
+                tierEl.innerText = tierText; tierEl.className = `text-xs font-bold inline-block px-3 py-1 rounded-full border mb-2 ${tierClass}`;
+                document.getElementById('dashProfilePic').className = `w-24 h-24 rounded-full object-cover border-4 transition-all duration-300 ${imgBorder}`;
+                
+                // Tampilkan Nomor Antrean
                 const qBox = document.getElementById('queueBoxContainer');
                 const pkgText = document.getElementById('dashAntreanPaket');
-                const bmBtn = document.getElementById('btnBookingMandiri');
 
                 if(latestBooking && latestBooking.antrean) {
                     document.getElementById('dashAntreanNumber').innerText = latestBooking.antrean;
-                    pkgText.classList.remove('hidden');
-                    pkgText.innerText = `📦 ${latestBooking.paket}`;
-                    
+                    pkgText.classList.remove('hidden'); pkgText.innerText = `📦 ${latestBooking.paket}`;
                     let statusText = `Jadwal: ${new Date(latestBooking.waktu).toLocaleString('id-ID')}`;
                     
                     if (latestBooking.status && latestBooking.status.includes('Telat')) {
@@ -699,28 +729,35 @@
                     } else {
                         qBox.className = "bg-blue-600 rounded-2xl shadow p-6 md:col-span-1 text-white flex flex-col items-center justify-center text-center relative overflow-hidden transition-colors duration-500";
                     }
-                    
                     document.getElementById('dashAntreanWaktu').innerHTML = statusText;
                 } else {
-                    // Tidak ada bookingan aktif
                     document.getElementById('dashAntreanNumber').innerText = '-';
-                    pkgText.classList.add('hidden');
-                    document.getElementById('dashAntreanWaktu').innerText = "Belum ada pesanan aktif";
+                    pkgText.classList.add('hidden'); document.getElementById('dashAntreanWaktu').innerText = "Belum ada pesanan aktif";
                     qBox.className = "bg-blue-600 rounded-2xl shadow p-6 md:col-span-1 text-white flex flex-col items-center justify-center text-center relative overflow-hidden transition-colors duration-500";
                 }
             });
 
-            // C. Voucher Aktif
+            // C. Riwayat Voucher Detail
             onValue(ref(db, 'vouchers'), (snap) => {
-                const vAktifList = document.getElementById('voucherAktifList'); vAktifList.innerHTML = ''; let hasAktif = false;
+                const vAktifList = document.getElementById('voucherAktifList'); vAktifList.innerHTML = ''; 
+                const vTerpakaiList = document.getElementById('voucherTerpakaiList'); vTerpakaiList.innerHTML = '';
+                let hasAktif = false, hasTerpakai = false;
+                
                 snap.forEach(child => {
                     const v = child.val();
+                    let b = v.jenis === "Diskon %" ? v.besaran+"%" : "Rp "+parseInt(v.besaran).toLocaleString('id-ID');
+                    
                     if(v.pemilik === user.email && v.status === 'aktif') {
-                        hasAktif = true; let b = v.jenis === "Diskon %" ? v.besaran+"%" : "Rp "+v.besaran;
+                        hasAktif = true;
                         vAktifList.innerHTML += `<li class="bg-green-50 border border-green-200 p-2 rounded text-xs text-green-800">KODE: <span class="font-voucher font-bold text-sm bg-white px-2 py-0.5 rounded shadow-sm border">${child.key}</span> (${b})</li>`;
+                    }
+                    else if(v.digunakanOleh === user.email && v.status === 'terpakai') {
+                        hasTerpakai = true;
+                        vTerpakaiList.innerHTML += `<li class="bg-gray-50 border border-gray-200 p-2 rounded text-xs text-gray-500 line-through">KODE: <span class="font-voucher font-bold">${child.key}</span> (${b})</li>`;
                     }
                 });
                 if(!hasAktif) vAktifList.innerHTML = "<span class='text-xs'>Tidak ada voucher aktif.</span>";
+                if(!hasTerpakai) vTerpakaiList.innerHTML = "<span class='text-xs'>Belum ada riwayat penggunaan voucher.</span>";
             });
 
             loadCloudinaryPhotos(user.email); window.scrollTo(0,0);
@@ -742,7 +779,7 @@
             if(rating === 5) {
                 const vCode = "V-" + Math.floor(100 + Math.random() * 900) + "RV"; 
                 const expDate = new Date(); expDate.setMonth(expDate.getMonth() + 1); 
-                await set(ref(db, 'vouchers/' + vCode), { status: 'aktif', pemilik: email, jenis: 'Diskon %', besaran: '20', expired: expDate.toISOString().split('T')[0] });
+                await set(ref(db, 'vouchers/' + vCode), { status: 'aktif', pemilik: email, jenis: 'Diskon %', besaran: '20', max_diskon: 15000, expired: expDate.toISOString().split('T')[0] });
                 alert(`Terima kasih! Anda mendapat Voucher Diskon 20%. Kode: ${vCode} (Cek di Dasbor)`);
             } else { alert('Terima kasih atas ulasan Anda!'); }
             e.target.reset(); document.getElementById('ratingWarning').classList.add('hidden');
@@ -764,12 +801,16 @@
             const grid = document.getElementById('cloudinaryGalleryGrid');
             try {
                 const res = await fetch(`https://res.cloudinary.com/${cloudName}/image/list/${safeEmail}.json`);
-                if(!res.ok) throw new Error("List Not Found"); const data = await res.json(); grid.innerHTML = '';
-                let found = false;
+                if(!res.ok) throw new Error("List Not Found"); const data = await res.json(); 
+                
+                grid.innerHTML = ''; userCloudinaryPhotos = []; let found = false;
+                
                 data.resources.forEach(img => {
                     const imgUrl = `https://res.cloudinary.com/${cloudName}/image/upload/v${img.version}/${img.public_id}.${img.format}`;
                     if(hiddenPhotosList.includes(imgUrl)) return;
-                    found = true; const dlUrl = `https://res.cloudinary.com/${cloudName}/image/upload/fl_attachment/v${img.version}/${img.public_id}.${img.format}`;
+                    found = true; userCloudinaryPhotos.push(imgUrl);
+                    
+                    const dlUrl = `https://res.cloudinary.com/${cloudName}/image/upload/fl_attachment/v${img.version}/${img.public_id}.${img.format}`;
                     grid.innerHTML += `
                         <div class="relative group overflow-hidden rounded-xl shadow-md cursor-pointer aspect-square bg-gray-200" onclick="openPhotoModal('${imgUrl}', '${dlUrl}')">
                             <img src="${imgUrl}" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-300" loading="lazy">
@@ -872,7 +913,6 @@
             if(!snap.exists()) {
                 const expDate = new Date(); expDate.setMonth(expDate.getMonth() + 1); 
                 await set(ref(db, 'vouchers/' + vCode), { status: 'aktif', pemilik: ownerEmail, jenis: 'Diskon %', besaran: '20', max_diskon: 15000, expired: expDate.toISOString().split('T')[0] });
-                alert("🎉 SELAMAT! Foto Anda masuk Top 5 Photo of the Week! Anda mendapat hadiah Voucher 20%. Cek di Dasbor.");
             }
         }
     </script>
