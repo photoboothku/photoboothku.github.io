@@ -12,14 +12,26 @@
         .font-voucher { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; }
         .hero-bg {
             background-image: linear-gradient(rgba(17, 24, 39, 0.7), rgba(17, 24, 39, 0.7)), url('https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1920&q=80');
-            background-size: cover;
-            background-position: center;
+            background-size: cover; background-position: center;
         }
         .star-rating input { display: none; }
         .star-rating label { cursor: pointer; color: #d1d5db; font-size: 2rem; transition: color 0.2s; }
-        .star-rating input:checked ~ label,
-        .star-rating label:hover,
-        .star-rating label:hover ~ label { color: #fbbf24; }
+        .star-rating input:checked ~ label, .star-rating label:hover, .star-rating label:hover ~ label { color: #fbbf24; }
+        
+        /* Tema Voucher Emas Mengkilap */
+        .bg-gold-gradient {
+            background: linear-gradient(135deg, #FFF8D6 0%, #D4AF37 50%, #FFDF00 100%);
+            background-size: 200% 200%;
+            animation: goldShine 3s ease infinite;
+            color: #4A3300;
+            border: 1px solid #B8860B;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+        }
+        @keyframes goldShine {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
@@ -28,9 +40,7 @@
     <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
-                <div class="flex-shrink-0 font-bold text-xl text-gray-900 tracking-wider">
-                    📸 CANON-IPAD BOOTH
-                </div>
+                <div class="flex-shrink-0 font-bold text-xl text-gray-900 tracking-wider">📸 CANON-IPAD BOOTH</div>
                 <div class="hidden md:flex space-x-6 items-center">
                     <a href="#beranda" class="nav-link text-gray-700 hover:text-blue-600 font-medium text-sm">Beranda</a>
                     <a href="#paket-harga" class="nav-link text-gray-700 hover:text-blue-600 font-medium text-sm">Paket Harga</a>
@@ -43,9 +53,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <button id="mobileNavLoginBtn" class="md:hidden bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold">Masuk</button>
-                    <button id="openAdminModalBtn" class="text-xs font-semibold text-gray-400 hover:text-gray-800 transition border rounded px-3 py-1 hidden md:block">
-                        Admin
-                    </button>
+                    <button id="openAdminModalBtn" class="text-xs font-semibold text-gray-400 hover:text-gray-800 transition border rounded px-3 py-1 hidden md:block">Admin</button>
                 </div>
             </div>
         </div>
@@ -70,16 +78,25 @@
     <section id="pelanggan-dashboard" class="hidden pt-24 pb-20 bg-gray-50 min-h-screen">
         <div class="max-w-7xl mx-auto px-4 space-y-6">
             
-            <!-- Header Profil -->
+            <!-- Header Profil & Tiering -->
             <div class="bg-white rounded-2xl shadow p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 border-t-4 border-blue-600">
                 <div class="relative">
-                    <img id="dashProfilePic" src="https://via.placeholder.com/150" alt="Profile" class="w-24 h-24 rounded-full object-cover border-4 border-gray-200 transition-all duration-300">
+                    <img id="dashProfilePic" src="https://via.placeholder.com/150" alt="Profile" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-gray-200 transition-all duration-500 z-10 relative bg-white">
                 </div>
-                <div class="flex-1 text-center md:text-left">
+                <div class="flex-1 text-center md:text-left w-full md:w-auto">
                     <h2 class="text-3xl font-bold text-gray-900" id="dashCustomerName">Memuat...</h2>
-                    <p class="text-gray-500 mb-2" id="dashCustomerEmail">Memuat...</p>
-                    <div id="dashCustomerTier" class="text-xs font-bold inline-block px-3 py-1 rounded-full border mb-2">Memuat Tingkatan...</div>
-                    <div class="text-xs text-blue-800 bg-blue-100 inline-block px-3 py-1 rounded-lg border border-blue-200">
+                    <p class="text-gray-500 mb-2 text-sm" id="dashCustomerEmail">Memuat...</p>
+                    
+                    <!-- Progress Bar Tiering -->
+                    <div class="mb-3 max-w-xs mx-auto md:mx-0">
+                        <div id="dashCustomerTier" class="text-xs font-bold inline-block px-3 py-1 rounded-full border mb-1">Memuat Tingkatan...</div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div id="tierProgressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                        <p id="tierProgressText" class="text-[10px] text-gray-500 mt-1 font-semibold text-right">0/3 untuk Reguler</p>
+                    </div>
+
+                    <div class="text-xs text-blue-800 bg-blue-50 inline-block px-3 py-1 rounded-lg border border-blue-100">
                         📱 <span id="dashCustomerPhone">-</span> | 📸 IG: <span id="dashCustomerIG">-</span>
                     </div>
                 </div>
@@ -104,50 +121,66 @@
                     </button>
                 </div>
 
-                <!-- Data Voucher -->
+                <!-- RIWAYAT SELESAI & TOTAL BELANJA -->
+                <div class="bg-white rounded-2xl shadow p-6 md:col-span-1 border border-gray-100 flex flex-col">
+                    <h3 class="text-lg font-bold text-gray-800 mb-2 border-b pb-2">Total Transaksi Selesai</h3>
+                    <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 text-center mb-3 shadow-inner">
+                        <p class="text-xs text-blue-600 font-bold uppercase tracking-wider">Total Belanja Anda</p>
+                        <p id="dashTotalBelanja" class="text-2xl font-black text-blue-800">Rp 0</p>
+                        <p id="dashRewardProgress" class="text-[10px] text-gray-500 mt-1">Belanja terus untuk dapatkan Voucher Emas!</p>
+                    </div>
+                    <div class="flex-1 overflow-y-auto max-h-32 pr-2 space-y-2 text-sm" id="riwayatSelesaiList">
+                        <div class="text-gray-400 italic text-center text-xs mt-4">Belum ada riwayat pesanan selesai.</div>
+                    </div>
+                </div>
+
+                <!-- VOUCHER SAYA -->
                 <div class="bg-white rounded-2xl shadow p-6 md:col-span-1 border border-gray-100">
                     <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Voucher Saya</h3>
                     <div class="space-y-4 text-sm">
                         <div>
-                            <strong class="text-green-600 block mb-1">Aktif (Klaim/Belum Digunakan)</strong>
-                            <ul id="voucherAktifList" class="space-y-2 text-gray-700 max-h-24 overflow-y-auto pr-2"></ul>
+                            <strong class="text-green-600 block mb-2">🎁 Voucher Digital Tersedia</strong>
+                            <ul id="voucherAktifList" class="space-y-2 text-gray-700 max-h-32 overflow-y-auto pr-2 pb-2"></ul>
                         </div>
                         <div>
                             <strong class="text-gray-400 block mb-1">Riwayat Terpakai</strong>
-                            <ul id="voucherTerpakaiList" class="space-y-1 text-gray-400 text-xs max-h-24 overflow-y-auto pr-2"></ul>
+                            <ul id="voucherTerpakaiList" class="space-y-2 text-gray-400 text-xs max-h-24 overflow-y-auto pr-2"></ul>
                         </div>
                     </div>
                 </div>
-
-                <!-- Testimoni Box -->
-                <div class="bg-white rounded-2xl shadow p-6 md:col-span-1 bg-gradient-to-br from-blue-50 to-white">
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">Berikan Testimoni</h3>
-                    <p class="text-xs text-gray-500 mb-4">Dapatkan voucher <span class="font-bold text-blue-600">Diskon 20% (Max 15rb)</span> untuk rating 5 Bintang!</p>
-                    
-                    <form id="testimoniForm" class="space-y-3">
-                        <div class="star-rating flex flex-row-reverse justify-end gap-1" id="starContainer">
-                            <input type="radio" id="star5" name="rating" value="5"><label for="star5">★</label>
-                            <input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
-                            <input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label>
-                            <input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
-                            <input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
-                        </div>
-                        <p id="ratingWarning" class="text-xs text-red-500 font-bold hidden bg-red-50 p-2 rounded">
-                            ⚠️ Bintang 3 ke bawah: Fitur "Tampilkan Foto di Beranda" akan dinonaktifkan.
-                        </p>
-                        <textarea id="testimoniTeks" placeholder="Bagaimana pengalaman Anda?" required class="w-full border border-gray-300 rounded-lg p-2 text-sm bg-white"></textarea>
-                        <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2 rounded-lg text-sm shadow">Kirim Testimoni</button>
-                    </form>
-                </div>
             </div>
 
-            <!-- Galeri Pelanggan -->
-            <div class="bg-white rounded-2xl shadow p-6 md:p-8">
-                <h3 class="text-xl font-bold text-gray-800 mb-2">Galeri Foto Photobooth Kamu 📸</h3>
-                <p class="text-sm text-gray-500 mb-6">Klik foto untuk aksi: Jadikan Profil, Tampilkan ke Beranda Publik, Download, atau Hapus.</p>
-                
-                <div id="cloudinaryGalleryGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="col-span-full text-center py-10 text-gray-400" id="galleryLoadingMsg">Memuat foto dari galeri...</div>
+            <!-- Testimoni & Galeri -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Testimoni Box -->
+                <div class="bg-gradient-to-br from-blue-50 to-white rounded-2xl shadow p-6 md:col-span-1">
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Berikan Testimoni</h3>
+                    <p class="text-xs text-gray-500 mb-4">Dapatkan voucher emas <span class="font-bold text-yellow-600">Diskon 20%</span> khusus rating 5! (Hanya 1x klaim per akun).</p>
+                    
+                    <div id="testimoniWrapper">
+                        <form id="testimoniForm" class="space-y-3">
+                            <div class="star-rating flex flex-row-reverse justify-end gap-1" id="starContainer">
+                                <input type="radio" id="star5" name="rating" value="5"><label for="star5">★</label>
+                                <input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
+                                <input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label>
+                                <input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
+                                <input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
+                            </div>
+                            <p id="ratingWarning" class="text-xs text-red-500 font-bold hidden bg-red-50 p-2 rounded">⚠️ Rating rendah: Foto tidak akan masuk beranda.</p>
+                            <textarea id="testimoniTeks" placeholder="Bagaimana pengalaman Anda?" required class="w-full border border-gray-300 rounded-lg p-2 text-sm bg-white"></textarea>
+                            <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2 rounded-lg text-sm shadow">Kirim Ulasan & Klaim Voucher</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Galeri Pelanggan -->
+                <div class="bg-white rounded-2xl shadow p-6 md:p-8 md:col-span-2">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Galeri Foto Photobooth Kamu 📸</h3>
+                    <p class="text-sm text-gray-500 mb-4">Klik foto untuk menjadikan profil, tampil di beranda, atau kelola foto lainnya.</p>
+                    
+                    <div id="cloudinaryGalleryGrid" class="grid grid-cols-3 md:grid-cols-5 gap-3">
+                        <div class="col-span-full text-center py-10 text-gray-400" id="galleryLoadingMsg">Memuat foto dari galeri...</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -161,8 +194,8 @@
             <form id="profilForm" class="space-y-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Pilih Foto Profil dari Galeri</label>
-                    <div id="profilPhotoPicker" class="flex flex-wrap gap-2 mb-2 max-h-32 overflow-y-auto p-1">
-                        <p class="text-xs text-gray-400">Memuat galeri...</p>
+                    <div id="profilPhotoPicker" class="flex flex-wrap gap-2 mb-2 max-h-32 overflow-y-auto p-1 bg-gray-50 rounded-lg border border-gray-200">
+                        <p class="text-xs text-gray-400 w-full text-center p-4">Memuat galeri...</p>
                     </div>
                 </div>
                 <div>
@@ -192,12 +225,24 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Tentukan Jadwal & Jam</label>
                     <input type="datetime-local" id="bmWaktu" required class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white text-gray-700">
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Kode Voucher (Opsional)</label>
-                    <input type="text" id="bmVoucherCode" placeholder="Contoh: V-REW1234" class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 uppercase font-voucher focus:bg-white transition text-center tracking-widest font-bold">
-                    <p class="text-[10px] text-gray-500 mt-1">*Masukkan voucher fisik atau voucher dari aplikasi jika ada.</p>
+                
+                <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-200 shadow-inner">
+                    <label class="block text-sm font-bold text-yellow-800 mb-2"><i class="fas fa-ticket-alt"></i> Gunakan Voucher (Pilih Salah Satu)</label>
+                    
+                    <select id="bmDigitalVoucher" class="w-full border border-yellow-300 rounded-lg p-2.5 bg-white text-gray-700 font-bold mb-3 shadow-sm transition">
+                        <option value="">-- Pilih Voucher Digital Saya --</option>
+                    </select>
+                    
+                    <div class="flex items-center gap-2 my-2">
+                        <div class="h-px bg-yellow-300 flex-1"></div>
+                        <span class="text-[10px] font-bold text-yellow-600 uppercase">Atau Ketik Kode</span>
+                        <div class="h-px bg-yellow-300 flex-1"></div>
+                    </div>
+                    
+                    <input type="text" id="bmVoucherCode" placeholder="Kode Fisik (Cth: X1Y2Z)" class="w-full border border-yellow-300 rounded-lg p-2.5 bg-white uppercase font-voucher focus:ring-yellow-500 transition text-center font-bold tracking-widest">
                 </div>
-                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 rounded-lg shadow-lg">Buat Pesanan & Ambil Antrean</button>
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg uppercase tracking-wider text-sm mt-2">Pesan & Ambil Antrean</button>
             </form>
         </div>
     </div>
@@ -250,11 +295,9 @@
         <!-- Section Photo of the Week -->
         <section id="photo-of-the-week" class="pt-20 pb-10 bg-gradient-to-b from-gray-900 to-gray-800 text-white border-t-8 border-yellow-500">
             <div class="max-w-7xl mx-auto px-4 text-center">
-                <div class="inline-block bg-yellow-500 text-gray-900 px-6 py-2 rounded-full font-bold text-xl mb-6 shadow-[0_0_15px_rgba(234,179,8,0.5)]">
-                    👑 PHOTO OF THE WEEK 👑
-                </div>
+                <div class="inline-block bg-gold-gradient px-6 py-2 rounded-full font-bold text-xl mb-6">👑 PHOTO OF THE WEEK 👑</div>
                 <h2 class="text-3xl font-bold mb-4">Top 5 Momen Paling Disukai</h2>
-                <p class="text-gray-300 mb-12">Berikan Like 👍 pada foto di galeri bawah. 5 Foto terbaik setiap pekannya akan tampil di sini dan mendapatkan Voucher Diskon 20%!</p>
+                <p class="text-gray-300 mb-12">Berikan Like 👍 pada foto di galeri bawah. 5 Foto terbaik setiap pekannya akan tampil di sini dan mendapatkan Voucher Emas Diskon 20%!</p>
                 
                 <div id="potwGalleryGrid" class="grid grid-cols-2 md:grid-cols-5 gap-4">
                     <div class="col-span-full text-center text-gray-400 py-10">Memuat jawara minggu ini...</div>
@@ -297,9 +340,7 @@
                 <div id="mainInterface" class="bg-white/10 backdrop-blur-md border border-white/20 p-8 rounded-3xl shadow-xl text-center">
                     <div class="flex flex-col md:flex-row gap-3 max-w-xl mx-auto">
                         <input type="text" id="voucherCode" placeholder="Masukkan Kode Voucher" class="flex-1 text-gray-900 font-voucher text-xl font-bold text-center border-none focus:ring-0 p-4 rounded-xl uppercase" autocomplete="off">
-                        <button id="validateVoucherBtn" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-4 px-8 rounded-xl transition shadow">
-                            Validasi Kode
-                        </button>
+                        <button id="validateVoucherBtn" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-4 px-8 rounded-xl transition shadow">Validasi Kode</button>
                     </div>
                     <p id="voucherMsg" class="mt-4 hidden"></p>
                 </div>
@@ -308,7 +349,7 @@
                 <div id="formInterface" class="hidden bg-white text-gray-800 rounded-3xl p-8 shadow-2xl mt-8 relative">
                     <div class="flex justify-between items-center mb-4 border-b pb-4">
                         <h3 class="text-2xl font-bold">Lengkapi Jadwal Anda</h3>
-                        <span class="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full border border-green-200">Voucher Aktif</span>
+                        <span class="bg-gold-gradient text-xs font-bold px-4 py-1 rounded-full">Voucher Aktif Terpasang</span>
                     </div>
 
                     <div id="existingUserPanel" class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex flex-col md:flex-row items-center justify-between gap-4">
@@ -316,9 +357,7 @@
                             <strong class="text-blue-800">Sudah punya akun?</strong><br>
                             <span class="text-gray-600">Login via Google agar tidak perlu ketik ulang nama & HP.</span>
                         </div>
-                        <button id="loginExistingBtn" type="button" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-bold text-sm whitespace-nowrap shadow">
-                            Login via Google
-                        </button>
+                        <button id="loginExistingBtn" type="button" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-bold text-sm whitespace-nowrap shadow">Login via Google</button>
                     </div>
 
                     <form id="registrationForm" class="space-y-5">
@@ -343,17 +382,10 @@
                             <input type="datetime-local" id="waktu" required class="w-full border border-gray-300 rounded-lg p-3 font-semibold text-gray-700">
                         </div>
                         
-                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 text-sm text-yellow-700">
-                            <strong>Catatan:</strong> Voucher tetap berlaku walaupun kedatangan melewati jadwal.
-                        </div>
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 text-sm text-yellow-700"><strong>Catatan:</strong> Voucher tetap berlaku walaupun kedatangan melewati jadwal.</div>
 
-                        <button id="btnDaftarBaru" type="button" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg shadow-lg flex justify-center text-lg">
-                            Daftar via Google & Konfirmasi Jadwal
-                        </button>
-                        
-                        <button id="btnSimpanJadwalSaja" type="submit" class="hidden w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg shadow-lg flex justify-center text-lg">
-                            Konfirmasi Jadwal
-                        </button>
+                        <button id="btnDaftarBaru" type="button" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg shadow-lg flex justify-center text-lg">Daftar via Google & Konfirmasi Jadwal</button>
+                        <button id="btnSimpanJadwalSaja" type="submit" class="hidden w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg shadow-lg flex justify-center text-lg">Konfirmasi Jadwal</button>
                     </form>
                 </div>
             </div>
@@ -382,40 +414,33 @@
         import { getDatabase, ref, get, set, push, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyDdM-1ziZLq2r8P1qpgHM763ke8GUPitvw",
-            authDomain: "dasborusaha.firebaseapp.com",
-            databaseURL: "https://dasborusaha-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "dasborusaha",
-            storageBucket: "dasborusaha.firebasestorage.app",
-            messagingSenderId: "427165972600",
-            appId: "1:427165972600:web:a0731cbf737717d567558d",
-            measurementId: "G-TL37HXZ834"
+            apiKey: "AIzaSyDdM-1ziZLq2r8P1qpgHM763ke8GUPitvw", authDomain: "dasborusaha.firebaseapp.com",
+            databaseURL: "https://dasborusaha-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "dasborusaha",
+            storageBucket: "dasborusaha.firebasestorage.app", messagingSenderId: "427165972600",
+            appId: "1:427165972600:web:a0731cbf737717d567558d", measurementId: "G-TL37HXZ834"
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
-        const provider = new GoogleAuthProvider();
+        const auth = getAuth(app); const db = getDatabase(app); const provider = new GoogleAuthProvider();
         
         let validVoucherCode = "";
         let currentUserData = null;
         let globalUserRating = 5;
-        let currentProfileInfo = { nohp: '', ig: '' };
+        let currentProfileInfo = { nohp: '', ig: '', hasTestimonial: false };
         let userCloudinaryPhotos = [];
         let selectedProfilImgTemp = "";
+        let globalPaketPrices = {}; // Untuk simpan referensi harga paket
+        let claimedRewardThresholds = 0; // Track reward transaksi
         const cloudName = 'y2k0oqrl';
 
         // ==========================================
-        // 0. FIX NAVIGASI HEADER Mulus
+        // 0. FIX NAVIGASI HEADER
         // ==========================================
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetId = link.getAttribute('href');
-                document.getElementById('pelanggan-dashboard').classList.add('hidden');
-                document.getElementById('mainWebsiteContent').classList.remove('hidden');
-                window.location.hash = ''; 
-                document.querySelector(targetId).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                e.preventDefault(); const targetId = link.getAttribute('href');
+                document.getElementById('pelanggan-dashboard').classList.add('hidden'); document.getElementById('mainWebsiteContent').classList.remove('hidden');
+                window.location.hash = ''; document.querySelector(targetId).scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
         });
 
@@ -425,20 +450,18 @@
         async function loadPaketData() {
             try {
                 const snap = await get(ref(db, 'settings/paket'));
-                const sel = document.getElementById('paket'); 
-                const cont = document.getElementById('pricingContainer');
-                const bmSel = document.getElementById('bmPaket'); 
+                const sel = document.getElementById('paket'); const cont = document.getElementById('pricingContainer'); const bmSel = document.getElementById('bmPaket'); 
                 
                 if (snap.exists()) {
-                    sel.innerHTML = '<option value="">Pilih Paket Photobooth...</option>'; 
-                    bmSel.innerHTML = '<option value="">Pilih Paket Photobooth...</option>';
-                    cont.innerHTML = '';
+                    sel.innerHTML = '<option value="">Pilih Paket Photobooth...</option>'; bmSel.innerHTML = '<option value="">Pilih Paket Photobooth...</option>'; cont.innerHTML = '';
                     snap.forEach(child => {
                         const data = child.val();
                         const nama = typeof data === 'object' ? data.nama : data;
-                        const harga = typeof data === 'object' && data.harga ? data.harga : 0;
+                        const harga = typeof data === 'object' && data.harga ? parseInt(data.harga) : 0;
                         const deskripsi = typeof data === 'object' && data.deskripsi ? data.deskripsi : '-';
-                        const hRp = harga > 0 ? `Rp ${parseInt(harga).toLocaleString('id-ID')}` : 'Hubungi Admin';
+                        const hRp = harga > 0 ? `Rp ${harga.toLocaleString('id-ID')}` : 'Hubungi Admin';
+                        
+                        globalPaketPrices[nama] = harga; // Simpan untuk kalkulasi Total Belanja
                         
                         sel.innerHTML += `<option value="${nama}">${nama} (${hRp})</option>`;
                         bmSel.innerHTML += `<option value="${nama}">${nama} (${hRp})</option>`;
@@ -457,17 +480,14 @@
             onValue(ref(db, 'testimonials'), (snap) => {
                 const cont = document.getElementById('testimoniContainer'); cont.innerHTML = '';
                 if(snap.exists()) {
-                    let has5Star = false;
-                    const tests = []; snap.forEach(c => tests.push(c.val()));
+                    let has5Star = false; const tests = []; snap.forEach(c => tests.push(c.val()));
                     tests.reverse().forEach(t => {
                         if(t.rating === 5) { 
                             has5Star = true;
                             cont.innerHTML += `
                                 <div class="bg-gray-50 border border-gray-100 rounded-2xl p-6 shadow-sm relative text-left">
-                                    <div class="text-yellow-400 text-2xl mb-2">★★★★★</div>
-                                    <p class="text-gray-600 italic mb-4">"${t.teks}"</p>
-                                    <p class="font-bold text-gray-900">- ${t.nama}</p>
-                                    <div class="absolute top-4 right-4 text-4xl opacity-10">💬</div>
+                                    <div class="text-yellow-400 text-2xl mb-2">★★★★★</div><p class="text-gray-600 italic mb-4">"${t.teks}"</p>
+                                    <p class="font-bold text-gray-900">- ${t.nama}</p><div class="absolute top-4 right-4 text-4xl opacity-10">💬</div>
                                 </div>`;
                         }
                     });
@@ -479,7 +499,7 @@
         loadPaketData(); loadTestimonials(); loadPublicGallery();
 
         // ==========================================
-        // 2. ADMIN LOGIN & VOUCHER SYSTEM
+        // 2. ADMIN LOGIN & VOUCHER VALIDATOR
         // ==========================================
         document.getElementById('openAdminModalBtn').addEventListener('click', () => document.getElementById('adminModal').classList.remove('hidden'));
         document.getElementById('closeAdminModalBtn').addEventListener('click', () => document.getElementById('adminModal').classList.add('hidden'));
@@ -502,8 +522,8 @@
                     if (vData.status === 'aktif' && vData.expired >= today) {
                         validVoucherCode = code;
                         let besaran = vData.jenis === "Diskon %" ? vData.besaran+"%" : "Rp "+parseInt(vData.besaran).toLocaleString('id-ID');
-                        msg.className = "mt-4 font-semibold inline-block px-4 py-2 rounded-lg text-green-900 bg-green-200 shadow";
-                        msg.innerHTML = `✅ <strong>Valid!</strong> ${vData.jenis}: ${besaran}`;
+                        msg.className = "mt-4 font-semibold inline-block px-4 py-2 rounded-lg text-green-900 bg-gold-gradient shadow";
+                        msg.innerHTML = `✅ <strong>Voucher Berlaku!</strong> ${vData.jenis}: ${besaran}`;
                         setTimeout(() => { document.getElementById('mainInterface').classList.add('hidden'); document.getElementById('formInterface').classList.remove('hidden'); }, 1000);
                     } else { msg.className = "mt-4 font-voucher text-red-900 bg-red-200 px-4 py-2 rounded shadow"; msg.innerText = "❌ Voucher tidak berlaku."; }
                 } else { msg.className = "mt-4 font-voucher text-red-900 bg-red-200 px-4 py-2 rounded shadow"; msg.innerText = "❌ Kode tidak ditemukan."; }
@@ -516,47 +536,32 @@
         document.getElementById('ig').addEventListener('input', (e) => document.getElementById('lombaDiv').classList.toggle('hidden', e.target.value.trim() === ""));
 
         async function simpanPendaftaran(email, sourceData = null) {
-            let tglPilih, paketVal, nohpVal, igVal, lombaVal, originType;
+            let tglPilih, paketVal, nohpVal, igVal, lombaVal, originType, finalVoucher = validVoucherCode;
             
             if (sourceData) {
-                tglPilih = sourceData.waktu.split('T')[0];
-                paketVal = sourceData.paket;
-                nohpVal = currentProfileInfo.nohp || '000'; 
-                igVal = currentProfileInfo.ig || '';
-                lombaVal = false; 
-                originType = 'Mandiri';
+                tglPilih = sourceData.waktu.split('T')[0]; paketVal = sourceData.paket;
+                nohpVal = currentProfileInfo.nohp || '000'; igVal = currentProfileInfo.ig || ''; lombaVal = false; 
+                originType = 'Mandiri'; finalVoucher = sourceData.voucherDipilih;
             } else {
-                tglPilih = document.getElementById('waktu').value.split('T')[0];
-                paketVal = document.getElementById('paket').value;
-                nohpVal = document.getElementById('nohp').value;
-                igVal = document.getElementById('ig').value;
-                lombaVal = document.getElementById('persetujuanLomba').checked;
-                originType = 'Voucher Awal';
-                
-                const safeEmail = formatSafeEmail(email);
-                await update(ref(db, 'users/' + safeEmail), { nohp: nohpVal, ig: igVal });
+                tglPilih = document.getElementById('waktu').value.split('T')[0]; paketVal = document.getElementById('paket').value;
+                nohpVal = document.getElementById('nohp').value; igVal = document.getElementById('ig').value;
+                lombaVal = document.getElementById('persetujuanLomba').checked; originType = 'Voucher Awal';
+                await update(ref(db, 'users/' + formatSafeEmail(email)), { nohp: nohpVal, ig: igVal });
             }
             
             const snapAll = await get(ref(db, 'pendaftaran'));
             let antreanKe = 1;
-            if(snapAll.exists()) {
-                snapAll.forEach(c => { if(c.val().waktu && c.val().waktu.startsWith(tglPilih)) antreanKe++; });
-            }
+            if(snapAll.exists()) { snapAll.forEach(c => { if(c.val().waktu && c.val().waktu.startsWith(tglPilih)) antreanKe++; }); }
             const nomorAntreanStr = "A-" + antreanKe.toString().padStart(3, '0');
 
             const dataToSave = {
-                antrean: nomorAntreanStr,
-                nama: auth.currentUser ? auth.currentUser.displayName : document.getElementById('nama').value, 
-                nohp: nohpVal, ig: igVal, lomba: lombaVal,
-                paket: paketVal, waktu: sourceData ? sourceData.waktu : document.getElementById('waktu').value,
-                voucher: validVoucherCode, email: email, status: 'Menunggu', tipe: originType, timestamp: Date.now()
+                antrean: nomorAntreanStr, nama: auth.currentUser ? auth.currentUser.displayName : document.getElementById('nama').value, 
+                nohp: nohpVal, ig: igVal, lomba: lombaVal, paket: paketVal, waktu: sourceData ? sourceData.waktu : document.getElementById('waktu').value,
+                voucher: finalVoucher, email: email, status: 'Menunggu', tipe: originType, timestamp: Date.now()
             };
 
             await push(ref(db, 'pendaftaran'), dataToSave);
-            
-            if(validVoucherCode) {
-                await update(ref(db, 'vouchers/' + validVoucherCode), { status: 'terpakai', digunakanOleh: email });
-            }
+            if(finalVoucher) await update(ref(db, 'vouchers/' + finalVoucher), { status: 'terpakai', digunakanOleh: email });
             
             alert(`Berhasil! Nomor Antrean Anda: ${nomorAntreanStr}. Silakan cek Dasbor Anda.`);
             window.location.hash = "#pelanggan-dashboard"; window.location.reload();
@@ -564,8 +569,7 @@
 
         document.getElementById('btnDaftarBaru').addEventListener('click', async () => {
             if(!document.getElementById('paket').value || !document.getElementById('waktu').value) return alert("Pilih paket & jadwal!");
-            try { const result = await signInWithPopup(auth, provider); await simpanPendaftaran(result.user.email); } 
-            catch (e) { alert("Login dibatalkan"); }
+            try { const result = await signInWithPopup(auth, provider); await simpanPendaftaran(result.user.email); } catch (e) {}
         });
 
         document.getElementById('loginExistingBtn').addEventListener('click', async () => {
@@ -593,196 +597,219 @@
         onAuthStateChanged(auth, (user) => { if (user && window.location.hash === "#pelanggan-dashboard") { document.getElementById('navLoginPelangganBtn').innerText = "Dasbor Saya"; tampilkanDasbor(user); } });
         function formatSafeEmail(email) { return email.replace(/[@.]/g, '_'); }
 
-        // Fitur Tombol Sync
         document.getElementById('btnSyncDash').addEventListener('click', () => {
             const btn = document.getElementById('btnSyncDash'); btn.innerHTML = '🔄 Syncing...';
             if(auth.currentUser) { tampilkanDasbor(auth.currentUser); setTimeout(() => { btn.innerHTML = '🔄 Sync'; }, 1000); }
         });
 
-        // Fitur Edit Profil & Picker Foto
+        // EDIT PROFIL & PILIH FOTO DARI GALERI CLOUDINARY
         document.getElementById('btnEditProfil').addEventListener('click', () => {
             document.getElementById('profilModal').classList.remove('hidden');
             document.getElementById('profilHP').value = currentProfileInfo.nohp || '';
             document.getElementById('profilIG').value = currentProfileInfo.ig || '';
-            renderPhotoPickerForProfile();
+            
+            const picker = document.getElementById('profilPhotoPicker'); picker.innerHTML = ''; selectedProfilImgTemp = "";
+            if(userCloudinaryPhotos.length === 0) { picker.innerHTML = '<p class="text-xs text-gray-400 w-full text-center p-4">Anda belum memiliki foto photobooth untuk dijadikan profil.</p>'; return; }
+            userCloudinaryPhotos.forEach(url => { picker.innerHTML += `<img src="${url}" class="w-16 h-16 object-cover rounded cursor-pointer border-4 border-transparent hover:border-blue-400 transition" onclick="selectProfilPhoto(this, '${url}')">`; });
         });
         document.getElementById('closeProfilModalBtn').addEventListener('click', () => document.getElementById('profilModal').classList.add('hidden'));
         
-        function renderPhotoPickerForProfile() {
-            const picker = document.getElementById('profilPhotoPicker');
-            picker.innerHTML = ''; selectedProfilImgTemp = "";
-            if(userCloudinaryPhotos.length === 0) {
-                picker.innerHTML = '<p class="text-xs text-gray-400">Belum ada foto photobooth Anda yang tersedia.</p>'; return;
-            }
-            userCloudinaryPhotos.forEach(url => {
-                picker.innerHTML += `<img src="${url}" class="w-16 h-16 object-cover rounded cursor-pointer border-2 border-transparent hover:border-blue-400 transition" onclick="selectProfilPhoto(this, '${url}')">`;
-            });
-        }
-
         window.selectProfilPhoto = function(imgElement, url) {
             document.querySelectorAll('#profilPhotoPicker img').forEach(el => el.classList.remove('border-blue-600', 'shadow-md'));
-            imgElement.classList.add('border-blue-600', 'shadow-md');
-            selectedProfilImgTemp = url;
+            imgElement.classList.add('border-blue-600', 'shadow-md'); selectedProfilImgTemp = url;
         }
 
         document.getElementById('profilForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const safeEmail = formatSafeEmail(auth.currentUser.email);
-            const nohp = document.getElementById('profilHP').value; const ig = document.getElementById('profilIG').value;
-            
-            let updates = { nohp: nohp, ig: ig };
+            e.preventDefault(); const safeEmail = formatSafeEmail(auth.currentUser.email);
+            let updates = { nohp: document.getElementById('profilHP').value, ig: document.getElementById('profilIG').value };
             if (selectedProfilImgTemp !== "") { updates.profilePic = selectedProfilImgTemp; document.getElementById('dashProfilePic').src = selectedProfilImgTemp; }
-            
             await update(ref(db, 'users/' + safeEmail), updates);
-            alert('Profil berhasil diperbarui!');
-            document.getElementById('profilModal').classList.add('hidden');
+            alert('Profil berhasil diperbarui!'); document.getElementById('profilModal').classList.add('hidden');
+            tampilkanDasbor(auth.currentUser); // Refresh
         });
 
-        // Fitur Booking Mandiri & Kolom Voucher
+        // BOOKING MANDIRI LOGIC (1 Voucher Constraint)
+        const bmDigi = document.getElementById('bmDigitalVoucher');
+        const bmFisik = document.getElementById('bmVoucherCode');
+        
+        bmDigi.addEventListener('change', () => { if(bmDigi.value !== "") { bmFisik.value = ""; bmFisik.disabled = true; bmFisik.classList.add('opacity-50'); } else { bmFisik.disabled = false; bmFisik.classList.remove('opacity-50'); } });
+        bmFisik.addEventListener('input', () => { if(bmFisik.value.trim() !== "") { bmDigi.value = ""; bmDigi.disabled = true; bmDigi.classList.add('opacity-50'); } else { bmDigi.disabled = false; bmDigi.classList.remove('opacity-50'); } });
+
         document.getElementById('btnBookingMandiri').addEventListener('click', () => {
-            if(!currentProfileInfo.nohp) {
-                alert("Harap lengkapi Profil (Nomor HP) Anda terlebih dahulu sebelum memesan.");
-                document.getElementById('btnEditProfil').click();
-                return;
-            }
+            if(!currentProfileInfo.nohp) { alert("Harap lengkapi Profil (Nomor HP) Anda terlebih dahulu sebelum memesan."); document.getElementById('btnEditProfil').click(); return; }
             document.getElementById('bookingMandiriModal').classList.remove('hidden');
         });
         document.getElementById('closeBookingMandiriBtn').addEventListener('click', () => document.getElementById('bookingMandiriModal').classList.add('hidden'));
         
         document.getElementById('bookingMandiriForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            btn.innerHTML = 'Memproses...'; btn.disabled = true;
+            const btn = e.target.querySelector('button[type="submit"]'); btn.innerHTML = 'Memproses...'; btn.disabled = true;
 
-            const bmVoucher = document.getElementById('bmVoucherCode').value.trim().toUpperCase();
-            if (bmVoucher) {
-                const snap = await get(ref(db, 'vouchers/' + bmVoucher));
+            let finalVoucher = "";
+            let codeToCheck = bmDigi.value || bmFisik.value.trim().toUpperCase();
+            
+            if (codeToCheck) {
+                const snap = await get(ref(db, 'vouchers/' + codeToCheck));
                 if(snap.exists()) {
                     const v = snap.val(); const today = new Date().toISOString().split('T')[0];
-                    if (v.status === 'aktif' && v.expired >= today) validVoucherCode = bmVoucher;
-                    else { alert("Voucher tidak valid atau kedaluwarsa."); btn.innerHTML = 'Buat Pesanan & Ambil Antrean'; btn.disabled = false; return; }
-                } else { alert("Kode voucher tidak ditemukan."); btn.innerHTML = 'Buat Pesanan & Ambil Antrean'; btn.disabled = false; return; }
-            } else { validVoucherCode = ""; }
+                    if (v.status === 'aktif' && v.expired >= today && (v.pemilik === auth.currentUser.email || !v.pemilik)) { finalVoucher = codeToCheck; } 
+                    else { alert("Voucher tidak valid atau sudah kedaluwarsa."); btn.innerHTML = 'Pesan & Ambil Antrean'; btn.disabled = false; return; }
+                } else { alert("Kode voucher tidak ditemukan."); btn.innerHTML = 'Pesan & Ambil Antrean'; btn.disabled = false; return; }
+            }
 
-            const sourceData = { paket: document.getElementById('bmPaket').value, waktu: document.getElementById('bmWaktu').value };
+            const sourceData = { paket: document.getElementById('bmPaket').value, waktu: document.getElementById('bmWaktu').value, voucherDipilih: finalVoucher };
             document.getElementById('bookingMandiriModal').classList.add('hidden');
             await simpanPendaftaran(auth.currentUser.email, sourceData);
-            btn.innerHTML = 'Buat Pesanan & Ambil Antrean'; btn.disabled = false;
+            btn.innerHTML = 'Pesan & Ambil Antrean'; btn.disabled = false;
         });
 
-        // TAMPILKAN DASBOR & TIER PELANGGAN
+        // TAMPILKAN DASBOR & KALKULASI TIER, TRANSAKSI, REWARD
         async function tampilkanDasbor(user) {
             document.getElementById('mainWebsiteContent').classList.add('hidden'); document.getElementById('pelanggan-dashboard').classList.remove('hidden');
             document.getElementById('dashCustomerName').innerText = user.displayName; document.getElementById('dashCustomerEmail').innerText = user.email;
             const safeEmail = formatSafeEmail(user.email);
             
-            // A. Ambil Profil Khusus
             onValue(ref(db, 'users/' + safeEmail), (snap) => {
                 if(snap.exists()) {
                     const ud = snap.val();
                     if(ud.profilePic) document.getElementById('dashProfilePic').src = ud.profilePic;
                     if(ud.rating) globalUserRating = ud.rating;
-                    
                     currentProfileInfo.nohp = ud.nohp || ''; currentProfileInfo.ig = ud.ig || '';
+                    currentProfileInfo.hasTestimonial = ud.hasTestimonial || false;
+                    claimedRewardThresholds = ud.claimedThresholds || 0;
+                    
                     document.getElementById('dashCustomerPhone').innerText = ud.nohp || 'Belum diisi';
                     document.getElementById('dashCustomerIG').innerText = ud.ig || 'Belum diisi';
                 }
             });
 
-            // B. Cek Antrean Terbaru, Riwayat, & Tingkatan Pelanggan
             onValue(ref(db, 'pendaftaran'), (snap) => {
-                let latestBooking = null; let bookingCount = 0;
+                let latestBooking = null; let countSelesai = 0; let totalBelanja = 0;
+                const vTerpakaiList = document.getElementById('voucherTerpakaiList'); vTerpakaiList.innerHTML = ''; let hasV = false;
+                const rSelesaiList = document.getElementById('riwayatSelesaiList'); rSelesaiList.innerHTML = '';
 
                 snap.forEach(child => {
                     const data = child.val();
                     if(data.email === user.email) {
-                        bookingCount++;
+                        // Cek Booking Terbaru (Antrean)
                         if(!latestBooking || data.timestamp > latestBooking.timestamp) latestBooking = data;
+                        
+                        // Riwayat Selesai & Kalkulasi Belanja
+                        if(data.status === 'Selesai') {
+                            countSelesai++;
+                            let harga = globalPaketPrices[data.paket] || 0; totalBelanja += harga;
+                            rSelesaiList.innerHTML += `<div class="bg-gray-50 p-2 rounded border border-gray-200"><strong class="text-blue-700">${data.paket}</strong> <br><span class="text-[10px] text-gray-500">${new Date(data.waktu).toLocaleString('id-ID')}</span></div>`;
+                        }
+
+                        // Logika Riwayat Voucher Detail
+                        if(data.voucher) {
+                            hasV = true; 
+                            // Untuk cari jenis diskonnya di DB, karena datanya sudah "terpakai", kita panggil get()
+                            get(ref(db, 'vouchers/' + data.voucher)).then(vSnap => {
+                                let jenis = "Diskon"; let detail = "";
+                                if(vSnap.exists()) { const vv = vSnap.val(); jenis = vv.jenis; detail = vv.jenis === "Diskon %" ? vv.besaran+"%" : "Rp "+parseInt(vv.besaran).toLocaleString('id-ID'); }
+                                vTerpakaiList.innerHTML += `<li class="bg-gray-50 border border-gray-200 p-2 rounded text-xs text-gray-500 line-through">🎟️ KODE: <span class="font-voucher font-bold">${data.voucher}</span> <span class="ml-1 text-[10px] text-red-400">(${jenis} ${detail})</span></li>`;
+                            });
+                        }
                     }
                 });
                 
-                // Set Customer Tier based on booking count
-                let tierText = "Pelanggan Baru"; let tierClass = "bg-gray-100 text-gray-600 border-gray-200"; let imgBorder = "border-gray-200 shadow-sm";
-                if(bookingCount >= 10) { tierText = "Pelanggan VIP 👑"; tierClass = "bg-yellow-100 text-yellow-800 border-yellow-400"; imgBorder = "border-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.6)]"; }
-                else if(bookingCount >= 5) { tierText = "Pelanggan Setia"; tierClass = "bg-slate-200 text-slate-800 border-slate-400"; imgBorder = "border-slate-400"; }
-                else if(bookingCount >= 2) { tierText = "Pelanggan Reguler"; tierClass = "bg-orange-100 text-orange-800 border-orange-400"; imgBorder = "border-orange-400"; }
+                if(!hasV) vTerpakaiList.innerHTML = "Belum ada riwayat penggunaan voucher.";
+                if(countSelesai === 0) rSelesaiList.innerHTML = '<div class="text-gray-400 italic text-center text-xs mt-4">Belum ada riwayat selesai.</div>';
                 
-                const tierEl = document.getElementById('dashCustomerTier');
-                tierEl.innerText = tierText; tierEl.className = `text-xs font-bold inline-block px-3 py-1 rounded-full border mb-2 ${tierClass}`;
-                document.getElementById('dashProfilePic').className = `w-24 h-24 rounded-full object-cover border-4 transition-all duration-300 ${imgBorder}`;
+                document.getElementById('dashTotalBelanja').innerText = `Rp ${totalBelanja.toLocaleString('id-ID')}`;
                 
-                // Tampilkan Nomor Antrean
-                const qBox = document.getElementById('queueBoxContainer');
-                const pkgText = document.getElementById('dashAntreanPaket');
+                // SISTEM REWARD TRANSAKSI (Misal Threshold Rp 100.000)
+                const REWARD_THRESHOLD = 100000; 
+                const eligibleRewards = Math.floor(totalBelanja / REWARD_THRESHOLD);
+                if (eligibleRewards > claimedRewardThresholds) {
+                    berikanRewardTransaksi(safeEmail, user.email, eligibleRewards);
+                }
+                
+                let sisaKeReward = REWARD_THRESHOLD - (totalBelanja % REWARD_THRESHOLD);
+                document.getElementById('dashRewardProgress').innerText = `Belanja Rp ${sisaKeReward.toLocaleString('id-ID')} lagi untuk dapat Voucher Emas!`;
 
-                if(latestBooking && latestBooking.antrean) {
-                    document.getElementById('dashAntreanNumber').innerText = latestBooking.antrean;
-                    pkgText.classList.remove('hidden'); pkgText.innerText = `📦 ${latestBooking.paket}`;
+                // TIERING & PROGRESS BAR LOGIC (Dihitung dari Jumlah Selesai)
+                let tName = "Baru", tClass = "bg-gray-100 text-gray-600 border-gray-200", imgB = "border-gray-200", pMin=0, pMax=2;
+                if(countSelesai >= 16) { tName="VIP 👑"; tClass="bg-gold-gradient"; imgB="border-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.6)]"; pMin=16; pMax=16;}
+                else if(countSelesai >= 9) { tName="Setia"; tClass="bg-slate-200 text-slate-800 border-slate-400"; imgB="border-slate-400"; pMin=9; pMax=15;}
+                else if(countSelesai >= 3) { tName="Reguler"; tClass="bg-orange-100 text-orange-800 border-orange-400"; imgB="border-orange-400"; pMin=3; pMax=8;}
+                
+                document.getElementById('dashCustomerTier').innerText = tName; document.getElementById('dashCustomerTier').className = `text-xs font-bold inline-block px-4 py-1 rounded-full mb-1 ${tClass}`;
+                document.getElementById('dashProfilePic').className = `w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 transition-all duration-500 z-10 relative bg-white ${imgB}`;
+                
+                let progBar = document.getElementById('tierProgressBar'); let progText = document.getElementById('tierProgressText');
+                if(tName === "VIP 👑") { progBar.style.width = "100%"; progText.innerText = "Level Tertinggi Dicapai!"; }
+                else { let pct = ((countSelesai - pMin) / ((pMax+1) - pMin)) * 100; progBar.style.width = `${pct}%`; progText.innerText = `${countSelesai} / ${pMax+1} Pesanan menuju level selanjutnya`; }
+                
+                // Tampilkan Antrean
+                const qBox = document.getElementById('queueBoxContainer'); const pkgText = document.getElementById('dashAntreanPaket');
+                if(latestBooking && latestBooking.antrean && latestBooking.status !== 'Selesai') {
+                    document.getElementById('dashAntreanNumber').innerText = latestBooking.antrean; pkgText.classList.remove('hidden'); pkgText.innerText = `📦 ${latestBooking.paket}`;
                     let statusText = `Jadwal: ${new Date(latestBooking.waktu).toLocaleString('id-ID')}`;
-                    
                     if (latestBooking.status && latestBooking.status.includes('Telat')) {
-                        statusText = `<span class="text-yellow-100 font-bold block bg-red-700/50 p-2 rounded text-xs mt-1 border border-red-400">⚠️ ${latestBooking.pesanAdmin || 'Jadwal Anda di-reschedule karena telat.'}</span>`;
+                        statusText = `<span class="text-yellow-100 font-bold block bg-red-700/50 p-2 rounded text-xs mt-1 border border-red-400">⚠️ ${latestBooking.pesanAdmin || 'Di-reschedule karena telat.'}</span>`;
                         qBox.className = "bg-red-600 rounded-2xl shadow p-6 md:col-span-1 text-white flex flex-col items-center justify-center text-center relative overflow-hidden transition-colors duration-500";
-                    } else if (latestBooking.status === 'Selesai') {
-                        statusText = `<span class="text-green-100 font-bold bg-green-700/50 p-1 px-3 rounded-full mt-2 inline-block shadow-sm">✅ Sesi Selesai</span>`;
-                        qBox.className = "bg-green-600 rounded-2xl shadow p-6 md:col-span-1 text-white flex flex-col items-center justify-center text-center relative overflow-hidden transition-colors duration-500";
-                    } else {
-                        qBox.className = "bg-blue-600 rounded-2xl shadow p-6 md:col-span-1 text-white flex flex-col items-center justify-center text-center relative overflow-hidden transition-colors duration-500";
-                    }
+                    } else { qBox.className = "bg-blue-600 rounded-2xl shadow p-6 md:col-span-1 text-white flex flex-col items-center justify-center text-center relative overflow-hidden transition-colors duration-500"; }
                     document.getElementById('dashAntreanWaktu').innerHTML = statusText;
                 } else {
-                    document.getElementById('dashAntreanNumber').innerText = '-';
-                    pkgText.classList.add('hidden'); document.getElementById('dashAntreanWaktu').innerText = "Belum ada pesanan aktif";
+                    document.getElementById('dashAntreanNumber').innerText = '-'; pkgText.classList.add('hidden'); document.getElementById('dashAntreanWaktu').innerText = "Belum ada pesanan aktif";
                     qBox.className = "bg-blue-600 rounded-2xl shadow p-6 md:col-span-1 text-white flex flex-col items-center justify-center text-center relative overflow-hidden transition-colors duration-500";
                 }
             });
 
-            // C. Riwayat Voucher Detail
+            // C. Voucher Aktif & Dropdown Mandiri
             onValue(ref(db, 'vouchers'), (snap) => {
-                const vAktifList = document.getElementById('voucherAktifList'); vAktifList.innerHTML = ''; 
-                const vTerpakaiList = document.getElementById('voucherTerpakaiList'); vTerpakaiList.innerHTML = '';
-                let hasAktif = false, hasTerpakai = false;
-                
+                const vAktifList = document.getElementById('voucherAktifList'); vAktifList.innerHTML = ''; let hasAktif = false;
+                const bmDigi = document.getElementById('bmDigitalVoucher'); bmDigi.innerHTML = '<option value="">-- Tidak pakai voucher digital --</option>';
+
                 snap.forEach(child => {
                     const v = child.val();
-                    let b = v.jenis === "Diskon %" ? v.besaran+"%" : "Rp "+parseInt(v.besaran).toLocaleString('id-ID');
-                    
                     if(v.pemilik === user.email && v.status === 'aktif') {
-                        hasAktif = true;
-                        vAktifList.innerHTML += `<li class="bg-green-50 border border-green-200 p-2 rounded text-xs text-green-800">KODE: <span class="font-voucher font-bold text-sm bg-white px-2 py-0.5 rounded shadow-sm border">${child.key}</span> (${b})</li>`;
-                    }
-                    else if(v.digunakanOleh === user.email && v.status === 'terpakai') {
-                        hasTerpakai = true;
-                        vTerpakaiList.innerHTML += `<li class="bg-gray-50 border border-gray-200 p-2 rounded text-xs text-gray-500 line-through">KODE: <span class="font-voucher font-bold">${child.key}</span> (${b})</li>`;
+                        hasAktif = true; let b = v.jenis === "Diskon %" ? v.besaran+"%" : "Rp "+parseInt(v.besaran).toLocaleString('id-ID');
+                        vAktifList.innerHTML += `<li class="bg-gold-gradient p-2 rounded text-xs font-bold">KODE: <span class="font-voucher font-bold text-sm bg-white px-2 py-0.5 rounded shadow-sm border text-gray-900">${child.key}</span> (${b})</li>`;
+                        bmDigi.innerHTML += `<option value="${child.key}">[${b}] Kode: ${child.key}</option>`;
                     }
                 });
                 if(!hasAktif) vAktifList.innerHTML = "<span class='text-xs'>Tidak ada voucher aktif.</span>";
-                if(!hasTerpakai) vTerpakaiList.innerHTML = "<span class='text-xs'>Belum ada riwayat penggunaan voucher.</span>";
             });
 
             loadCloudinaryPhotos(user.email); window.scrollTo(0,0);
         }
 
+        async function berikanRewardTransaksi(safeEmail, email, targetThresholds) {
+            const vCode = "V-" + Math.floor(100 + Math.random() * 900) + "TX"; 
+            const expDate = new Date(); expDate.setMonth(expDate.getMonth() + 1); 
+            await set(ref(db, 'vouchers/' + vCode), { status: 'aktif', pemilik: email, jenis: 'Diskon Nominal', besaran: '15000', expired: expDate.toISOString().split('T')[0] });
+            await update(ref(db, 'users/' + safeEmail), { claimedThresholds: targetThresholds });
+            alert("🎉 SELAMAT! Total transaksi Anda mencapai target. Anda mendapat Voucher Potongan Rp 15.000!");
+        }
+
         // ==========================================
-        // 5. TESTIMONI & REWARD
+        // 5. TESTIMONI & REWARD 1X KLAIM
         // ==========================================
         const starRadios = document.querySelectorAll('.star-rating input');
         starRadios.forEach(radio => radio.addEventListener('change', (e) => document.getElementById('ratingWarning').classList.toggle('hidden', parseInt(e.target.value) > 3)));
 
         document.getElementById('testimoniForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if(currentProfileInfo.hasTestimonial) return alert("Anda sudah pernah memberikan ulasan sebelumnya. Terima kasih!");
+            if(userCloudinaryPhotos.length === 0) return alert("Harap lakukan minimal 1 sesi foto photobooth (dan foto tersedia di galeri) untuk memberikan ulasan.");
+
             const rating = parseInt(document.querySelector('input[name="rating"]:checked')?.value || 5);
             const teks = document.getElementById('testimoniTeks').value; const email = auth.currentUser.email; const safeEmail = formatSafeEmail(email);
-            await update(ref(db, 'users/' + safeEmail), { rating: rating });
+            
+            await update(ref(db, 'users/' + safeEmail), { rating: rating, hasTestimonial: true });
             await push(ref(db, 'testimonials'), { email: email, nama: auth.currentUser.displayName, rating: rating, teks: teks, waktu: Date.now() });
 
             if(rating === 5) {
                 const vCode = "V-" + Math.floor(100 + Math.random() * 900) + "RV"; 
                 const expDate = new Date(); expDate.setMonth(expDate.getMonth() + 1); 
                 await set(ref(db, 'vouchers/' + vCode), { status: 'aktif', pemilik: email, jenis: 'Diskon %', besaran: '20', max_diskon: 15000, expired: expDate.toISOString().split('T')[0] });
-                alert(`Terima kasih! Anda mendapat Voucher Diskon 20%. Kode: ${vCode} (Cek di Dasbor)`);
+                alert(`Terima kasih! Anda mendapat Voucher Emas Diskon 20%. Cek di Dasbor (Klaim 1x Berhasil).`);
             } else { alert('Terima kasih atas ulasan Anda!'); }
-            e.target.reset(); document.getElementById('ratingWarning').classList.add('hidden');
+            
+            e.target.reset(); document.getElementById('testimoniWrapper').innerHTML = `<p class="text-sm text-green-600 font-bold bg-green-50 p-4 rounded-xl border border-green-200 shadow-inner">Terima kasih banyak! Ulasan Anda telah kami terima.</p>`;
         });
 
         // ==========================================
@@ -819,14 +846,21 @@
                             </div>
                         </div>`;
                 });
-                if(!found) grid.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10">Belum ada foto yang ditampilkan.</div>`;
-            } catch(e) { grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">Foto belum tersedia / Error sinkronisasi Cloudinary.</div>`; }
+                
+                if(!found) {
+                    grid.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10">Belum ada foto yang ditampilkan.</div>`;
+                    if(!currentProfileInfo.hasTestimonial) document.getElementById('testimoniWrapper').innerHTML = `<p class="text-sm text-red-500 font-bold bg-red-50 p-4 rounded-xl border border-red-200">Anda harus memiliki minimal 1 foto di Galeri untuk memberikan Testimoni.</p>`;
+                } else if(currentProfileInfo.hasTestimonial) {
+                    document.getElementById('testimoniWrapper').innerHTML = `<p class="text-sm text-green-600 font-bold bg-green-50 p-4 rounded-xl border border-green-200">Terima kasih! Anda sudah memberikan ulasan pada kami.</p>`;
+                }
+            } catch(e) { 
+                grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">Belum ada foto di Database Server.</div>`;
+                if(!currentProfileInfo.hasTestimonial) document.getElementById('testimoniWrapper').innerHTML = `<p class="text-sm text-red-500 font-bold bg-red-50 p-4 rounded-xl border border-red-200">Anda harus memiliki minimal 1 foto di Galeri untuk memberikan Testimoni.</p>`;
+            }
         }
 
         let cViewUrl = "", cDlUrl = "";
-        window.openPhotoModal = function(view, dl) {
-            cViewUrl = view; cDlUrl = dl; document.getElementById('fullViewImg').src = view; document.getElementById('photoModal').classList.remove('hidden');
-        }
+        window.openPhotoModal = function(view, dl) { cViewUrl = view; cDlUrl = dl; document.getElementById('fullViewImg').src = view; document.getElementById('photoModal').classList.remove('hidden'); }
         document.getElementById('closePhotoModalBtn').addEventListener('click', () => document.getElementById('photoModal').classList.add('hidden'));
 
         document.getElementById('setProfileBtn').addEventListener('click', async () => { await update(ref(db, 'users/' + formatSafeEmail(auth.currentUser.email)), { profilePic: cViewUrl }); document.getElementById('dashProfilePic').src = cViewUrl; alert("Foto profil diperbarui!"); });
@@ -859,13 +893,13 @@
                                     ${index === 0 ? '<div class="absolute top-2 left-2 bg-yellow-500 text-xs text-gray-900 font-bold px-2 py-1 rounded-full z-10 shadow">#1 JUARA</div>' : ''}
                                     <img src="${p.url}" class="w-full h-full object-cover">
                                     <div class="absolute bottom-0 w-full bg-gradient-to-t from-black/80 to-transparent p-3 text-left">
-                                        <p class="font-bold text-sm">${p.ownerName}</p>
+                                        <p class="font-bold text-sm text-white">${p.ownerName}</p>
                                         <p class="text-xs text-yellow-400">❤️ ${p.likes} Suka</p>
                                     </div>
                                 </div>`;
                             if(auth.currentUser && auth.currentUser.email === p.ownerEmail) { cekDanBerikanRewardPOTW(p.key, p.ownerEmail); }
                         });
-                    } else { potwGrid.innerHTML = `<div class="col-span-full text-gray-400 py-5">Belum ada foto yang mendapat Like minggu ini.</div>`; }
+                    } else { potwGrid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-5">Belum ada foto yang mendapat Like minggu ini.</div>`; }
 
                     photos.sort((a,b) => b.timestamp - a.timestamp).forEach(p => {
                         const curUserEmail = auth.currentUser ? formatSafeEmail(auth.currentUser.email) : null;
@@ -879,7 +913,7 @@
                                     <img src="${p.url}" class="w-full h-full object-cover">
                                 </div>
                                 <div class="px-3 pt-3 flex justify-between items-center">
-                                    <span class="text-xs font-bold text-gray-800 truncate">${p.ownerName}</span>
+                                    <span class="text-xs font-bold text-gray-800 truncate pr-2">${p.ownerName}</span>
                                     <div class="flex gap-1">
                                         <button onclick="votePhoto('${p.key}', 'like')" class="${likeColor} text-xs font-bold px-2 py-1 rounded transition flex items-center gap-1">👍 ${p.likes||0}</button>
                                         <button onclick="votePhoto('${p.key}', 'dislike')" class="${dislikeColor} text-xs font-bold px-2 py-1 rounded transition flex items-center gap-1">👎 ${p.dislikes||0}</button>
@@ -887,7 +921,7 @@
                                 </div>
                             </div>`;
                     });
-                } else { pGrid.innerHTML = `<div class="col-span-full text-gray-400 py-10">Belum ada foto pelanggan yang dibagikan.</div>`; }
+                } else { pGrid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-10">Belum ada foto pelanggan yang dibagikan.</div>`; }
             });
         }
 
