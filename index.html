@@ -6,8 +6,10 @@
     <title>Canon-Ipad Booth by WAWANCELLCOMP</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet"> <!-- Font Khusus Voucher -->
     <style>
         body { font-family: 'Poppins', sans-serif; }
+        .font-voucher { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; }
         .hero-bg {
             background-image: linear-gradient(rgba(17, 24, 39, 0.7), rgba(17, 24, 39, 0.7)), url('https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1920&q=80');
             background-size: cover;
@@ -30,17 +32,18 @@
                     📸 CANON-IPAD BOOTH
                 </div>
                 <div class="hidden md:flex space-x-6 items-center">
-                    <a href="#beranda" class="text-gray-700 hover:text-blue-600 font-medium text-sm">Beranda</a>
-                    <a href="#paket-harga" class="text-gray-700 hover:text-blue-600 font-medium text-sm">Paket Harga</a>
-                    <a href="#galeri-publik" class="text-gray-700 hover:text-blue-600 font-medium text-sm">Galeri</a>
-                    <a href="#voucher-section" class="text-gray-700 hover:text-blue-600 font-medium text-sm">Tukar Voucher</a>
-                    <button id="navLoginPelangganBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full font-bold text-sm transition">
+                    <a href="#beranda" class="nav-link text-gray-700 hover:text-blue-600 font-medium text-sm">Beranda</a>
+                    <a href="#paket-harga" class="nav-link text-gray-700 hover:text-blue-600 font-medium text-sm">Paket Harga</a>
+                    <a href="#photo-of-the-week" class="nav-link text-gray-700 hover:text-blue-600 font-medium text-sm">Galeri</a>
+                    <a href="#testimoni-publik" class="nav-link text-gray-700 hover:text-blue-600 font-medium text-sm">Testimoni</a>
+                    <a href="#voucher-section" class="nav-link text-gray-700 hover:text-blue-600 font-medium text-sm">Tukar Voucher</a>
+                    <button id="navLoginPelangganBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full font-bold text-sm transition shadow-sm">
                         Masuk / Galeri Saya
                     </button>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button id="mobileNavLoginBtn" class="md:hidden bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold">Galeri</button>
-                    <button id="openAdminModalBtn" class="text-xs font-semibold text-gray-400 hover:text-gray-800 transition border rounded px-3 py-1">
+                    <button id="mobileNavLoginBtn" class="md:hidden bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold">Masuk</button>
+                    <button id="openAdminModalBtn" class="text-xs font-semibold text-gray-400 hover:text-gray-800 transition border rounded px-3 py-1 hidden md:block">
                         Admin
                     </button>
                 </div>
@@ -52,7 +55,7 @@
     <div id="adminModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
         <div class="bg-white rounded-2xl p-8 w-full max-w-sm shadow-2xl relative">
             <button id="closeAdminModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 text-xl">&times;</button>
-            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Masuk Dasbor</h2>
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Masuk Dasbor Admin</h2>
             <form id="adminLoginForm" class="space-y-4">
                 <input type="email" id="adminEmail" placeholder="Email Admin" required class="w-full border border-gray-300 rounded-lg p-3">
                 <input type="password" id="adminPassword" placeholder="Password" required class="w-full border border-gray-300 rounded-lg p-3">
@@ -61,7 +64,9 @@
         </div>
     </div>
 
-    <!-- DASBOR PELANGGAN (Hidden by default) -->
+    <!-- ============================================== -->
+    <!-- DASBOR PELANGGAN (Hidden by default)           -->
+    <!-- ============================================== -->
     <section id="pelanggan-dashboard" class="hidden pt-24 pb-20 bg-gray-50 min-h-screen">
         <div class="max-w-7xl mx-auto px-4 space-y-6">
             
@@ -76,27 +81,26 @@
                 <button id="btnLogoutPelanggan" class="bg-red-100 text-red-600 hover:bg-red-200 font-bold px-5 py-2 rounded-lg transition shadow-sm">Keluar Akun</button>
             </div>
 
-            <!-- Grid Riwayat & Testimoni -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Data Riwayat Pendaftaran -->
-                <div class="bg-white rounded-2xl shadow p-6 md:col-span-1">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Riwayat Pemesanan</h3>
-                    <ul id="historyPemesananList" class="space-y-3 text-sm text-gray-600 max-h-48 overflow-y-auto pr-2">
-                        <li>Memuat riwayat...</li>
-                    </ul>
+                <!-- BOX NOMOR ANTREAN (TERBARU) -->
+                <div class="bg-blue-600 rounded-2xl shadow p-6 md:col-span-1 text-white flex flex-col items-center justify-center text-center relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-20 text-6xl">🎟️</div>
+                    <h3 class="text-lg font-medium text-blue-100 mb-1 z-10">Nomor Antrean Anda</h3>
+                    <p id="dashAntreanNumber" class="text-5xl font-voucher font-bold my-2 z-10">-</p>
+                    <p id="dashAntreanWaktu" class="text-sm text-blue-200 z-10">Belum ada pesanan aktif</p>
                 </div>
 
                 <!-- Data Voucher -->
-                <div class="bg-white rounded-2xl shadow p-6 md:col-span-1">
+                <div class="bg-white rounded-2xl shadow p-6 md:col-span-1 border border-gray-100">
                     <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Voucher Saya</h3>
                     <div class="space-y-4 text-sm">
                         <div>
-                            <strong class="text-green-600 block mb-1">Belum Digunakan (Aktif)</strong>
-                            <ul id="voucherAktifList" class="space-y-2 text-gray-700 max-h-24 overflow-y-auto"></ul>
+                            <strong class="text-green-600 block mb-1">Aktif (Belum Digunakan)</strong>
+                            <ul id="voucherAktifList" class="space-y-2 text-gray-700 max-h-24 overflow-y-auto pr-2"></ul>
                         </div>
                         <div>
-                            <strong class="text-gray-500 block mb-1">Riwayat Terpakai</strong>
-                            <ul id="voucherTerpakaiList" class="space-y-1 text-gray-400 text-xs max-h-24 overflow-y-auto"></ul>
+                            <strong class="text-gray-400 block mb-1">Riwayat Terpakai</strong>
+                            <ul id="voucherTerpakaiList" class="space-y-1 text-gray-400 text-xs max-h-24 overflow-y-auto pr-2"></ul>
                         </div>
                     </div>
                 </div>
@@ -107,7 +111,6 @@
                     <p class="text-xs text-gray-500 mb-4">Dapatkan voucher <span class="font-bold text-blue-600">Diskon 20% (Max 15rb)</span> untuk rating 5 Bintang!</p>
                     
                     <form id="testimoniForm" class="space-y-3">
-                        <!-- Bintang (Reverse order for CSS trick) -->
                         <div class="star-rating flex flex-row-reverse justify-end gap-1" id="starContainer">
                             <input type="radio" id="star5" name="rating" value="5"><label for="star5">★</label>
                             <input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
@@ -119,7 +122,7 @@
                             ⚠️ Bintang 3 ke bawah: Fitur "Tampilkan Foto di Beranda" akan dinonaktifkan.
                         </p>
                         <textarea id="testimoniTeks" placeholder="Bagaimana pengalaman Anda?" required class="w-full border border-gray-300 rounded-lg p-2 text-sm bg-white"></textarea>
-                        <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 rounded-lg text-sm shadow">Kirim Testimoni</button>
+                        <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2 rounded-lg text-sm shadow">Kirim Testimoni</button>
                     </form>
                 </div>
             </div>
@@ -130,9 +133,7 @@
                 <p class="text-sm text-gray-500 mb-6">Klik foto untuk aksi: Jadikan Profil, Tampilkan ke Beranda Publik, Download, atau Hapus.</p>
                 
                 <div id="cloudinaryGalleryGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="col-span-full text-center py-10 text-gray-400" id="galleryLoadingMsg">
-                        Memuat foto dari galeri...
-                    </div>
+                    <div class="col-span-full text-center py-10 text-gray-400" id="galleryLoadingMsg">Memuat foto dari galeri...</div>
                 </div>
             </div>
         </div>
@@ -148,22 +149,29 @@
                 <button id="setProfileBtn" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded shadow transition">👤 Jadikan Profil</button>
                 <button id="setBerandaBtn" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 text-sm font-bold py-2 px-4 rounded shadow transition">🌟 Tampil di Beranda</button>
                 <button id="downloadPhotoBtn" class="bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2 px-4 rounded shadow transition">⬇️ Download</button>
-                <button id="sharePhotoBtn" class="bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold py-2 px-4 rounded shadow transition">↗️ Share</button>
-                <button id="hidePhotoBtn" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded shadow transition">🗑️ Hapus</button>
+                <button id="hidePhotoBtn" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded shadow transition">🗑️ Sembunyikan</button>
             </div>
         </div>
     </div>
 
-    <!-- WRAPPER KONTEN UTAMA WEBSITE -->
+    <!-- ============================================== -->
+    <!-- WRAPPER KONTEN UTAMA WEBSITE                   -->
+    <!-- ============================================== -->
     <div id="mainWebsiteContent">
         <!-- Hero Section -->
-        <section id="beranda" class="hero-bg h-screen flex items-center justify-center text-center px-4">
-            <div class="max-w-3xl">
+        <section id="beranda" class="hero-bg h-screen flex flex-col items-center justify-center text-center px-4 relative">
+            <div class="max-w-3xl z-10 mt-16">
                 <h1 class="text-4xl md:text-6xl font-bold text-white mb-6">Abadikan Momen Manismu di Sini!</h1>
                 <p class="text-lg md:text-xl text-gray-200 mb-8">Photobooth rumahan berkualitas studio dengan properti seru, cetak instan, dan *soft file* gratis.</p>
-                <a href="#voucher-section" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 px-8 rounded-full transition transform hover:scale-105 shadow-lg inline-block">
-                    Punya Voucher Diskon? Tukar Di Sini
-                </a>
+                
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+                    <a href="#voucher-section" class="nav-link bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 px-8 rounded-full transition transform hover:scale-105 shadow-lg w-full sm:w-auto">
+                        🎫 Tukar Voucher Diskon
+                    </a>
+                    <button id="heroLoginBtn" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-full transition transform hover:scale-105 shadow-lg border-2 border-blue-500 w-full sm:w-auto">
+                        👤 Login Akun
+                    </button>
+                </div>
             </div>
         </section>
 
@@ -177,14 +185,41 @@
             </div>
         </section>
 
-        <!-- Section Galeri Publik Beranda (Otomatis dari Pelanggan) -->
-        <section id="galeri-publik" class="py-20 bg-gray-50">
+        <!-- Section Photo of the Week -->
+        <section id="photo-of-the-week" class="pt-20 pb-10 bg-gradient-to-b from-gray-900 to-gray-800 text-white border-t-8 border-yellow-500">
+            <div class="max-w-7xl mx-auto px-4 text-center">
+                <div class="inline-block bg-yellow-500 text-gray-900 px-6 py-2 rounded-full font-bold text-xl mb-6 shadow-[0_0_15px_rgba(234,179,8,0.5)]">
+                    👑 PHOTO OF THE WEEK 👑
+                </div>
+                <h2 class="text-3xl font-bold mb-4">Top 5 Momen Paling Disukai</h2>
+                <p class="text-gray-300 mb-12">Berikan Like 👍 pada foto di galeri bawah. 5 Foto terbaik setiap pekannya akan tampil di sini dan mendapatkan Voucher Diskon 20%!</p>
+                
+                <div id="potwGalleryGrid" class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div class="col-span-full text-center text-gray-400 py-10">Memuat jawara minggu ini...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Galeri Publik (Like/Dislike) -->
+        <section id="galeri-publik" class="py-16 bg-gray-50">
             <div class="max-w-7xl mx-auto px-4 text-center">
                 <h2 class="text-3xl font-bold text-gray-900 mb-4">Galeri Momen Keseruan</h2>
-                <p class="text-gray-500 mb-12">Foto-foto menakjubkan pelanggan kami yang dibagikan secara publik.</p>
+                <p class="text-gray-500 mb-10">Dukung foto favoritmu! Login untuk memberikan Like atau Dislike.</p>
                 
-                <div id="publicGalleryGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div id="publicGalleryGrid" class="grid grid-cols-2 md:grid-cols-4 gap-6">
                     <div class="col-span-full text-center text-gray-400 py-10">Memuat foto publik...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Testimoni Bintang 5 -->
+        <section id="testimoni-publik" class="py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4 text-center">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Kata Mereka Tentang Kami</h2>
+                <p class="text-gray-500 mb-12">Ulasan jujur dari pelanggan setia Canon-Ipad Booth.</p>
+                
+                <div id="testimoniContainer" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="col-span-full text-center text-gray-400">Memuat ulasan...</div>
                 </div>
             </div>
         </section>
@@ -194,29 +229,30 @@
             <div class="max-w-4xl mx-auto px-4">
                 <div class="text-center mb-10">
                     <h2 class="text-3xl font-bold mb-4">Klaim Voucher Diskonmu!</h2>
-                    <p class="text-blue-100">Dapat voucher dari Warung Seblak atau Testimoni? Masukkan kodenya di sini.</p>
+                    <p class="text-blue-100">Dapat voucher dari Warung Seblak atau Event? Masukkan kodenya di sini.</p>
                 </div>
 
                 <div id="mainInterface" class="bg-white/10 backdrop-blur-md border border-white/20 p-8 rounded-3xl shadow-xl text-center">
                     <div class="flex flex-col md:flex-row gap-3 max-w-xl mx-auto">
-                        <input type="text" id="voucherCode" placeholder="Masukkan Kode Voucher" class="flex-1 text-gray-900 text-lg font-semibold text-center md:text-left border-none focus:ring-0 p-4 rounded-xl" autocomplete="off">
-                        <button id="validateVoucherBtn" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-4 px-8 rounded-xl transition">
-                            Validasi Voucher
+                        <input type="text" id="voucherCode" placeholder="Masukkan Kode Voucher" class="flex-1 text-gray-900 font-voucher text-xl font-bold text-center border-none focus:ring-0 p-4 rounded-xl uppercase" autocomplete="off">
+                        <button id="validateVoucherBtn" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-4 px-8 rounded-xl transition shadow">
+                            Validasi Kode
                         </button>
                     </div>
                     <p id="voucherMsg" class="mt-4 hidden"></p>
                 </div>
 
+                <!-- Form Registrasi Setelah Voucher Valid -->
                 <div id="formInterface" class="hidden bg-white text-gray-800 rounded-3xl p-8 shadow-2xl mt-8 relative">
                     <div class="flex justify-between items-center mb-4 border-b pb-4">
                         <h3 class="text-2xl font-bold">Lengkapi Jadwal Anda</h3>
-                        <span class="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full">Voucher: AKTIF</span>
+                        <span class="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full border border-green-200">Voucher Aktif</span>
                     </div>
 
                     <div id="existingUserPanel" class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex flex-col md:flex-row items-center justify-between gap-4">
                         <div class="text-sm">
-                            <strong class="text-blue-800">Sudah punya akun / pernah daftar?</strong><br>
-                            <span class="text-gray-600">Login via Google agar tidak perlu isi form identitas lagi.</span>
+                            <strong class="text-blue-800">Sudah punya akun?</strong><br>
+                            <span class="text-gray-600">Login via Google agar tidak perlu ketik ulang nama & HP.</span>
                         </div>
                         <button id="loginExistingBtn" type="button" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-bold text-sm whitespace-nowrap shadow">
                             Login via Google
@@ -236,7 +272,7 @@
                             </div>
                             <div id="lombaDiv" class="hidden flex items-start p-4 bg-yellow-50 rounded-lg border border-yellow-200">
                                 <input type="checkbox" id="persetujuanLomba" class="mt-1 w-4 h-4 text-blue-600 rounded">
-                                <label for="persetujuanLomba" class="ml-3 text-sm text-gray-700">Saya menyetujui hasil foto dipublikasikan untuk keperluan lomba.</label>
+                                <label for="persetujuanLomba" class="ml-3 text-sm text-gray-700">Saya menyetujui hasil foto dipublikasikan untuk lomba / publik.</label>
                             </div>
                         </div>
 
@@ -249,11 +285,11 @@
                             <strong>Catatan:</strong> Voucher tetap berlaku walaupun kedatangan melewati jadwal.
                         </div>
 
-                        <button id="btnDaftarBaru" type="button" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg shadow-lg flex justify-center">
-                            Daftar via Google & Simpan
+                        <button id="btnDaftarBaru" type="button" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg shadow-lg flex justify-center text-lg">
+                            Daftar via Google & Konfirmasi Jadwal
                         </button>
                         
-                        <button id="btnSimpanJadwalSaja" type="submit" class="hidden w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg shadow-lg flex justify-center">
+                        <button id="btnSimpanJadwalSaja" type="submit" class="hidden w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg shadow-lg flex justify-center text-lg">
                             Konfirmasi Jadwal
                         </button>
                     </form>
@@ -277,7 +313,7 @@
         </div>
     </footer>
 
-    <!-- Firebase Scripts -->
+    <!-- Firebase Scripts & App Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -301,88 +337,129 @@
         
         let validVoucherCode = "";
         let currentUserData = null;
-        let globalUserRating = 5; // default
+        let globalUserRating = 5;
         const cloudName = 'y2k0oqrl';
 
-        // Load Paket Global
+        // ==========================================
+        // 0. FIX NAVIGASI HEADER Mulus
+        // ==========================================
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href');
+                
+                // Tutup dasbor jika sedang terbuka
+                document.getElementById('pelanggan-dashboard').classList.add('hidden');
+                document.getElementById('mainWebsiteContent').classList.remove('hidden');
+                window.location.hash = ''; // Bersihkan hash agar tidak memicu auth ulang ke dasbor
+                
+                // Gulir perlahan
+                document.querySelector(targetId).scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // ==========================================
+        // 1. DATA AWAL BERANDA (Paket & Testimoni)
+        // ==========================================
         async function loadPaketData() {
             try {
                 const snap = await get(ref(db, 'settings/paket'));
-                const selectDropdown = document.getElementById('paket');
-                const pricingContainer = document.getElementById('pricingContainer');
-                
+                const sel = document.getElementById('paket'); const cont = document.getElementById('pricingContainer');
                 if (snap.exists()) {
-                    selectDropdown.innerHTML = '<option value="">Pilih Paket Photobooth...</option>';
-                    pricingContainer.innerHTML = '';
+                    sel.innerHTML = '<option value="">Pilih Paket Photobooth...</option>'; cont.innerHTML = '';
                     snap.forEach(child => {
                         const data = child.val();
                         const nama = typeof data === 'object' ? data.nama : data;
                         const harga = typeof data === 'object' && data.harga ? data.harga : 0;
-                        const deskripsi = typeof data === 'object' && data.deskripsi ? data.deskripsi : 'Tidak ada deskripsi.';
-                        const hargaRp = harga > 0 ? `Rp ${parseInt(harga).toLocaleString('id-ID')}` : 'Hubungi Admin';
-                        
-                        selectDropdown.innerHTML += `<option value="${nama}">${nama} (${hargaRp})</option>`;
-                        pricingContainer.innerHTML += `
+                        const deskripsi = typeof data === 'object' && data.deskripsi ? data.deskripsi : '-';
+                        const hRp = harga > 0 ? `Rp ${parseInt(harga).toLocaleString('id-ID')}` : 'Hubungi Admin';
+                        sel.innerHTML += `<option value="${nama}">${nama} (${hRp})</option>`;
+                        cont.innerHTML += `
                             <div class="border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-xl transition bg-white text-left">
                                 <h3 class="text-xl font-bold mb-2 text-gray-800">${nama}</h3>
-                                <p class="text-3xl font-bold text-blue-600 mb-4">${hargaRp}</p>
+                                <p class="text-3xl font-bold text-blue-600 mb-4">${hRp}</p>
                                 <p class="text-gray-600 text-sm whitespace-pre-line">${deskripsi}</p>
                             </div>`;
                     });
                 }
-            } catch (error) { console.error("Error loading paket"); }
+            } catch (error) {}
         }
-        loadPaketData();
-        loadPublicGallery();
+        
+        function loadTestimonials() {
+            onValue(ref(db, 'testimonials'), (snap) => {
+                const cont = document.getElementById('testimoniContainer'); cont.innerHTML = '';
+                if(snap.exists()) {
+                    let has5Star = false;
+                    const tests = []; snap.forEach(c => tests.push(c.val()));
+                    tests.reverse().forEach(t => {
+                        if(t.rating === 5) { // Hanya tampilkan Bintang 5
+                            has5Star = true;
+                            cont.innerHTML += `
+                                <div class="bg-gray-50 border border-gray-100 rounded-2xl p-6 shadow-sm relative text-left">
+                                    <div class="text-yellow-400 text-2xl mb-2">★★★★★</div>
+                                    <p class="text-gray-600 italic mb-4">"${t.teks}"</p>
+                                    <p class="font-bold text-gray-900">- ${t.nama}</p>
+                                    <div class="absolute top-4 right-4 text-4xl opacity-10">💬</div>
+                                </div>`;
+                        }
+                    });
+                    if(!has5Star) cont.innerHTML = `<div class="col-span-full text-gray-400">Belum ada ulasan bintang 5.</div>`;
+                } else { cont.innerHTML = `<div class="col-span-full text-gray-400">Belum ada ulasan.</div>`; }
+            });
+        }
+        
+        loadPaketData(); loadTestimonials(); loadPublicGallery(); // Panggil di awal
 
-        // 1. ADMIN LOGIN
+        // ==========================================
+        // 2. ADMIN LOGIN & VOUCHER SYSTEM
+        // ==========================================
         document.getElementById('openAdminModalBtn').addEventListener('click', () => document.getElementById('adminModal').classList.remove('hidden'));
         document.getElementById('closeAdminModalBtn').addEventListener('click', () => document.getElementById('adminModal').classList.add('hidden'));
         document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            try {
-                await signInWithEmailAndPassword(auth, document.getElementById('adminEmail').value, document.getElementById('adminPassword').value);
-                window.location.href = 'setting.html';
-            } catch (error) { alert("Login Gagal!"); }
+            try { await signInWithEmailAndPassword(auth, document.getElementById('adminEmail').value, document.getElementById('adminPassword').value); window.location.href = 'setting.html'; } 
+            catch (error) { alert("Login Gagal!"); }
         });
 
-        // 2. VOUCHER SYSTEM
         document.getElementById('validateVoucherBtn').addEventListener('click', async () => {
-            const code = document.getElementById('voucherCode').value.trim();
+            const code = document.getElementById('voucherCode').value.trim().toUpperCase(); // Format kapital
             if(!code) return;
             const msg = document.getElementById('voucherMsg');
-            msg.classList.remove('hidden');
-            msg.className = "mt-4 font-semibold inline-block px-4 py-2 rounded-lg text-white bg-blue-600/80 shadow";
-            msg.innerText = "Memeriksa...";
+            msg.classList.remove('hidden'); msg.className = "mt-4 font-semibold inline-block px-4 py-2 rounded-lg text-white bg-blue-600/80 shadow"; msg.innerText = "Memeriksa...";
 
             try {
                 const snap = await get(ref(db, 'vouchers/' + code));
                 if (snap.exists()) {
-                    const vData = snap.val();
-                    const today = new Date().toISOString().split('T')[0];
-                    if (vData.status === 'aktif') {
-                        if (vData.expired >= today) {
-                            validVoucherCode = code;
-                            let besaran = vData.jenis === "Diskon %" ? vData.besaran + "%" : "Rp " + parseInt(vData.besaran).toLocaleString('id-ID');
-                            msg.className = "mt-4 font-semibold inline-block px-4 py-2 rounded-lg text-green-900 bg-green-200 shadow";
-                            msg.innerHTML = `✅ <strong>Valid!</strong> ${vData.jenis}: ${besaran}`;
-                            setTimeout(() => {
-                                document.getElementById('mainInterface').classList.add('hidden');
-                                document.getElementById('formInterface').classList.remove('hidden');
-                            }, 1000);
-                        } else { msg.className = "mt-4 text-red-900 bg-red-200 px-4 py-2 rounded shadow"; msg.innerText = "❌ Kedaluwarsa."; }
-                    } else { msg.className = "mt-4 text-red-900 bg-red-200 px-4 py-2 rounded shadow"; msg.innerText = "❌ Voucher sudah terpakai."; }
-                } else { msg.className = "mt-4 text-red-900 bg-red-200 px-4 py-2 rounded shadow"; msg.innerText = "❌ Voucher tidak ditemukan."; }
+                    const vData = snap.val(); const today = new Date().toISOString().split('T')[0];
+                    if (vData.status === 'aktif' && vData.expired >= today) {
+                        validVoucherCode = code;
+                        let besaran = vData.jenis === "Diskon %" ? vData.besaran+"%" : "Rp "+parseInt(vData.besaran).toLocaleString('id-ID');
+                        msg.className = "mt-4 font-semibold inline-block px-4 py-2 rounded-lg text-green-900 bg-green-200 shadow";
+                        msg.innerHTML = `✅ <strong>Valid!</strong> ${vData.jenis}: ${besaran}`;
+                        setTimeout(() => { document.getElementById('mainInterface').classList.add('hidden'); document.getElementById('formInterface').classList.remove('hidden'); }, 1000);
+                    } else { msg.className = "mt-4 font-voucher text-red-900 bg-red-200 px-4 py-2 rounded shadow"; msg.innerText = "❌ Voucher tidak berlaku."; }
+                } else { msg.className = "mt-4 font-voucher text-red-900 bg-red-200 px-4 py-2 rounded shadow"; msg.innerText = "❌ Kode tidak ditemukan."; }
             } catch (error) { msg.innerText = "Error jaringan."; }
         });
 
-        // 3. REGISTRASI & GOOGLE AUTH
-        document.getElementById('ig').addEventListener('input', (e) => {
-            document.getElementById('lombaDiv').classList.toggle('hidden', e.target.value.trim() === "");
-        });
+        // ==========================================
+        // 3. REGISTRASI & AUTO-ANTREAN
+        // ==========================================
+        document.getElementById('ig').addEventListener('input', (e) => document.getElementById('lombaDiv').classList.toggle('hidden', e.target.value.trim() === ""));
 
         async function simpanPendaftaran(email) {
+            const tglPilih = document.getElementById('waktu').value.split('T')[0];
+            
+            // Generate Nomor Antrean berdasarkan Hari
+            const snapAll = await get(ref(db, 'pendaftaran'));
+            let antreanKe = 1;
+            if(snapAll.exists()) {
+                snapAll.forEach(c => { if(c.val().waktu.startsWith(tglPilih)) antreanKe++; });
+            }
+            const nomorAntreanStr = "A-" + antreanKe.toString().padStart(3, '0');
+
             const data = {
+                antrean: nomorAntreanStr, // Simpan Antrean
                 nama: document.getElementById('nama').value, nohp: document.getElementById('nohp').value,
                 ig: document.getElementById('ig').value, lomba: document.getElementById('persetujuanLomba').checked,
                 paket: document.getElementById('paket').value, waktu: document.getElementById('waktu').value,
@@ -390,13 +467,12 @@
             };
             await push(ref(db, 'pendaftaran'), data);
             if(validVoucherCode) await update(ref(db, 'vouchers/' + validVoucherCode), { status: 'terpakai', digunakanOleh: email });
-            alert('Berhasil! Menuju Dasbor...');
-            window.location.hash = "#pelanggan-dashboard";
-            window.location.reload();
+            alert(`Berhasil! Nomor Antrean Anda: ${nomorAntreanStr}. Menuju Dasbor...`);
+            window.location.hash = "#pelanggan-dashboard"; window.location.reload();
         }
 
         document.getElementById('btnDaftarBaru').addEventListener('click', async () => {
-            if(!document.getElementById('paket').value) return alert("Pilih paket & isi data!");
+            if(!document.getElementById('paket').value || !document.getElementById('waktu').value) return alert("Pilih paket & jadwal!");
             try { const result = await signInWithPopup(auth, provider); await simpanPendaftaran(result.user.email); } 
             catch (e) { alert("Login dibatalkan"); }
         });
@@ -404,46 +480,31 @@
         document.getElementById('loginExistingBtn').addEventListener('click', async () => {
             try {
                 const res = await signInWithPopup(auth, provider); currentUserData = res.user;
-                document.getElementById('existingUserPanel').classList.add('hidden');
-                document.getElementById('dataDiriGroup').classList.add('hidden');
-                document.getElementById('btnDaftarBaru').classList.add('hidden');
-                document.getElementById('btnSimpanJadwalSaja').classList.remove('hidden');
-                document.getElementById('userGreeting').classList.remove('hidden');
+                document.getElementById('existingUserPanel').classList.add('hidden'); document.getElementById('dataDiriGroup').classList.add('hidden'); document.getElementById('btnDaftarBaru').classList.add('hidden');
+                document.getElementById('btnSimpanJadwalSaja').classList.remove('hidden'); document.getElementById('userGreeting').classList.remove('hidden');
                 document.getElementById('userGreeting').innerText = `✅ Halo, ${currentUserData.displayName}. Pilih Jadwal Anda:`;
                 document.getElementById('nama').value = currentUserData.displayName; document.getElementById('nohp').value = "000";
             } catch(e) {}
         });
 
-        document.getElementById('registrationForm').addEventListener('submit', async (e) => {
-            e.preventDefault(); if(currentUserData) await simpanPendaftaran(currentUserData.email);
-        });
+        document.getElementById('registrationForm').addEventListener('submit', async (e) => { e.preventDefault(); if(currentUserData) await simpanPendaftaran(currentUserData.email); });
 
         // ==========================================
-        // 4. DASBOR PELANGGAN & FITUR BARU
+        // 4. LOGIN GLOBAL & DASBOR PELANGGAN
         // ==========================================
-        const navGaleriBtns = [document.getElementById('navLoginPelangganBtn'), document.getElementById('mobileNavLoginBtn')];
-        navGaleriBtns.forEach(btn => btn.addEventListener('click', async () => {
-            if(!auth.currentUser) try { await signInWithPopup(auth, provider); } catch(e) { return; }
+        const navBtns = [document.getElementById('navLoginPelangganBtn'), document.getElementById('mobileNavLoginBtn'), document.getElementById('heroLoginBtn')];
+        navBtns.forEach(btn => btn.addEventListener('click', async () => {
+            if(!auth.currentUser) { try { await signInWithPopup(auth, provider); } catch(e) { return; } }
             tampilkanDasbor(auth.currentUser);
         }));
 
         document.getElementById('btnLogoutPelanggan').addEventListener('click', () => signOut(auth).then(() => window.location.reload()));
-
-        onAuthStateChanged(auth, (user) => {
-            if (user && window.location.hash === "#pelanggan-dashboard") {
-                document.getElementById('navLoginPelangganBtn').innerText = "Dasbor Saya";
-                tampilkanDasbor(user);
-            }
-        });
-
+        onAuthStateChanged(auth, (user) => { if (user && window.location.hash === "#pelanggan-dashboard") { document.getElementById('navLoginPelangganBtn').innerText = "Dasbor Saya"; tampilkanDasbor(user); } });
         function formatSafeEmail(email) { return email.replace(/[@.]/g, '_'); }
 
         async function tampilkanDasbor(user) {
-            document.getElementById('mainWebsiteContent').classList.add('hidden');
-            document.getElementById('pelanggan-dashboard').classList.remove('hidden');
-            document.getElementById('dashCustomerName').innerText = user.displayName;
-            document.getElementById('dashCustomerEmail').innerText = user.email;
-            
+            document.getElementById('mainWebsiteContent').classList.add('hidden'); document.getElementById('pelanggan-dashboard').classList.remove('hidden');
+            document.getElementById('dashCustomerName').innerText = user.displayName; document.getElementById('dashCustomerEmail').innerText = user.email;
             const safeEmail = formatSafeEmail(user.email);
             
             // A. Ambil Profil Khusus
@@ -455,94 +516,73 @@
                 }
             });
 
-            // B. Ambil Riwayat Pendaftaran & Voucher Terpakai
+            // B. Cek Antrean Terbaru & Riwayat Voucher
             onValue(ref(db, 'pendaftaran'), (snap) => {
-                const histList = document.getElementById('historyPemesananList');
-                const vTerpakaiList = document.getElementById('voucherTerpakaiList');
-                histList.innerHTML = ''; vTerpakaiList.innerHTML = '';
-                let hasHist = false, hasV = false;
+                const vTerpakaiList = document.getElementById('voucherTerpakaiList'); vTerpakaiList.innerHTML = '';
+                let hasV = false; let latestBooking = null;
 
                 snap.forEach(child => {
                     const data = child.val();
                     if(data.email === user.email) {
-                        hasHist = true;
-                        histList.innerHTML += `<li class="border-b pb-1">📸 ${data.paket} <br><span class="text-xs text-gray-400">${new Date(data.waktu).toLocaleString('id-ID')}</span></li>`;
-                        if(data.voucher) {
-                            hasV = true;
-                            vTerpakaiList.innerHTML += `<li>🎟️ ${data.voucher} <span class="text-green-500">(Dipakai)</span></li>`;
-                        }
+                        // Cari pemesanan terbaru untuk nampil antrean
+                        if(!latestBooking || data.timestamp > latestBooking.timestamp) latestBooking = data;
+                        if(data.voucher) { hasV = true; vTerpakaiList.innerHTML += `<li class="font-voucher tracking-widest text-gray-500">🎟️ ${data.voucher} <span class="text-green-500 text-[10px] ml-1">(Dipakai)</span></li>`; }
                     }
                 });
-                if(!hasHist) histList.innerHTML = "Belum ada riwayat pesanan.";
                 if(!hasV) vTerpakaiList.innerHTML = "Belum ada voucher yang dipakai.";
+                
+                // Tampilkan Nomor Antrean Besar
+                if(latestBooking && latestBooking.antrean) {
+                    document.getElementById('dashAntreanNumber').innerText = latestBooking.antrean;
+                    document.getElementById('dashAntreanWaktu').innerText = `Jadwal: ${new Date(latestBooking.waktu).toLocaleString('id-ID')}`;
+                }
             });
 
-            // C. Ambil Voucher Aktif (Dimiliki user ini)
+            // C. Voucher Aktif
             onValue(ref(db, 'vouchers'), (snap) => {
-                const vAktifList = document.getElementById('voucherAktifList');
-                vAktifList.innerHTML = ''; let hasAktif = false;
+                const vAktifList = document.getElementById('voucherAktifList'); vAktifList.innerHTML = ''; let hasAktif = false;
                 snap.forEach(child => {
                     const v = child.val();
                     if(v.pemilik === user.email && v.status === 'aktif') {
-                        hasAktif = true;
-                        let b = v.jenis === "Diskon %" ? v.besaran+"%" : "Rp "+v.besaran;
-                        vAktifList.innerHTML += `<li class="bg-green-50 border border-green-200 p-2 rounded text-xs font-bold text-green-800">KODE: ${child.key} (${b})</li>`;
+                        hasAktif = true; let b = v.jenis === "Diskon %" ? v.besaran+"%" : "Rp "+v.besaran;
+                        vAktifList.innerHTML += `<li class="bg-green-50 border border-green-200 p-2 rounded text-xs text-green-800">KODE: <span class="font-voucher font-bold text-sm bg-white px-2 py-0.5 rounded shadow-sm">${child.key}</span> (${b})</li>`;
                     }
                 });
                 if(!hasAktif) vAktifList.innerHTML = "<span class='text-xs'>Tidak ada voucher aktif.</span>";
             });
 
-            loadCloudinaryPhotos(user.email);
-            window.scrollTo(0,0);
+            loadCloudinaryPhotos(user.email); window.scrollTo(0,0);
         }
 
         // ==========================================
-        // 5. TESTIMONI & REWARD SYSTEM
+        // 5. TESTIMONI & REWARD
         // ==========================================
         const starRadios = document.querySelectorAll('.star-rating input');
-        starRadios.forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                const val = parseInt(e.target.value);
-                document.getElementById('ratingWarning').classList.toggle('hidden', val > 3);
-            });
-        });
+        starRadios.forEach(radio => radio.addEventListener('change', (e) => document.getElementById('ratingWarning').classList.toggle('hidden', parseInt(e.target.value) > 3)));
 
         document.getElementById('testimoniForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const rating = parseInt(document.querySelector('input[name="rating"]:checked')?.value || 5);
-            const teks = document.getElementById('testimoniTeks').value;
-            const email = auth.currentUser.email;
-            const safeEmail = formatSafeEmail(email);
-
-            // Update user rating di DB
+            const teks = document.getElementById('testimoniTeks').value; const email = auth.currentUser.email; const safeEmail = formatSafeEmail(email);
             await update(ref(db, 'users/' + safeEmail), { rating: rating });
-            
-            // Simpan Testimoni
             await push(ref(db, 'testimonials'), { email: email, nama: auth.currentUser.displayName, rating: rating, teks: teks, waktu: Date.now() });
 
-            // Cek Reward Bintang 5
             if(rating === 5) {
-                const vCode = "V-REW" + Math.floor(1000 + Math.random() * 9000);
-                const expDate = new Date(); expDate.setMonth(expDate.getMonth() + 1); // Berlaku 1 bln
-                await set(ref(db, 'vouchers/' + vCode), {
-                    status: 'aktif', pemilik: email, jenis: 'Diskon %', besaran: '20', 
-                    max_diskon: 15000, expired: expDate.toISOString().split('T')[0]
-                });
-                alert('Terima kasih atas bintang 5! Anda mendapat Voucher Diskon 20%. Cek kolom Voucher Aktif.');
-            } else {
-                alert('Terima kasih atas ulasan Anda!');
-            }
+                // Generate Voucher 20% khusus user ini
+                const vCode = "V-" + Math.floor(100 + Math.random() * 900) + "RV"; // Format Pendek
+                const expDate = new Date(); expDate.setMonth(expDate.getMonth() + 1); 
+                await set(ref(db, 'vouchers/' + vCode), { status: 'aktif', pemilik: email, jenis: 'Diskon %', besaran: '20', expired: expDate.toISOString().split('T')[0] });
+                alert(`Terima kasih! Anda mendapat Voucher Diskon 20%. Kode: ${vCode} (Cek di Dasbor)`);
+            } else { alert('Terima kasih atas ulasan Anda!'); }
             e.target.reset(); document.getElementById('ratingWarning').classList.add('hidden');
         });
 
         // ==========================================
-        // 6. CLOUDINARY GALERI & MANAJEMEN FOTO
+        // 6. CLOUDINARY & AKSI FOTO
         // ==========================================
         let hiddenPhotosList = [];
-        
         async function loadCloudinaryPhotos(email) {
             const safeEmail = formatSafeEmail(email);
-            // Ambil daftar foto yang disembunyikan/dihapus user dari firebase
             onValue(ref(db, 'hidden_photos/' + safeEmail), async (snap) => {
                 hiddenPhotosList = snap.exists() ? Object.values(snap.val()) : [];
                 renderCloudinary(safeEmail);
@@ -553,91 +593,140 @@
             const grid = document.getElementById('cloudinaryGalleryGrid');
             try {
                 const res = await fetch(`https://res.cloudinary.com/${cloudName}/image/list/${safeEmail}.json`);
-                if(!res.ok) throw new Error("List Not Found");
-                const data = await res.json();
-                grid.innerHTML = '';
-                
+                if(!res.ok) throw new Error("List Not Found"); const data = await res.json(); grid.innerHTML = '';
                 let found = false;
                 data.resources.forEach(img => {
                     const imgUrl = `https://res.cloudinary.com/${cloudName}/image/upload/v${img.version}/${img.public_id}.${img.format}`;
-                    // Skip jika foto masuk daftar hidden
                     if(hiddenPhotosList.includes(imgUrl)) return;
-                    
-                    found = true;
-                    const dlUrl = `https://res.cloudinary.com/${cloudName}/image/upload/fl_attachment/v${img.version}/${img.public_id}.${img.format}`;
+                    found = true; const dlUrl = `https://res.cloudinary.com/${cloudName}/image/upload/fl_attachment/v${img.version}/${img.public_id}.${img.format}`;
                     grid.innerHTML += `
                         <div class="relative group overflow-hidden rounded-xl shadow-md cursor-pointer aspect-square bg-gray-200" onclick="openPhotoModal('${imgUrl}', '${dlUrl}')">
                             <img src="${imgUrl}" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-300" loading="lazy">
-                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition">
-                                <span class="text-white font-bold text-sm bg-blue-600 px-3 py-1 rounded-full">Kelola Foto</span>
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+                                <span class="text-white font-bold text-sm bg-blue-600 px-3 py-1 rounded-full shadow">Kelola</span>
                             </div>
                         </div>`;
                 });
                 if(!found) grid.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10">Belum ada foto yang ditampilkan.</div>`;
-            } catch(e) {
-                grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">Foto belum tersedia / Error sinkronisasi Cloudinary.</div>`;
-            }
+            } catch(e) { grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">Foto belum tersedia / Error sinkronisasi Cloudinary.</div>`; }
         }
 
-        // AKSI DALAM MODAL FOTO
         let cViewUrl = "", cDlUrl = "";
         window.openPhotoModal = function(view, dl) {
-            cViewUrl = view; cDlUrl = dl;
-            document.getElementById('fullViewImg').src = view;
-            document.getElementById('photoModal').classList.remove('hidden');
+            cViewUrl = view; cDlUrl = dl; document.getElementById('fullViewImg').src = view; document.getElementById('photoModal').classList.remove('hidden');
         }
         document.getElementById('closePhotoModalBtn').addEventListener('click', () => document.getElementById('photoModal').classList.add('hidden'));
-        document.getElementById('downloadPhotoBtn').addEventListener('click', () => window.open(cDlUrl, '_blank'));
 
-        // Jadikan Profil
-        document.getElementById('setProfileBtn').addEventListener('click', async () => {
-            const safeEmail = formatSafeEmail(auth.currentUser.email);
-            await update(ref(db, 'users/' + safeEmail), { profilePic: cViewUrl });
-            document.getElementById('dashProfilePic').src = cViewUrl;
-            alert("Foto profil berhasil diperbarui!");
-        });
-
-        // Tampilkan di Beranda
+        document.getElementById('setProfileBtn').addEventListener('click', async () => { await update(ref(db, 'users/' + formatSafeEmail(auth.currentUser.email)), { profilePic: cViewUrl }); document.getElementById('dashProfilePic').src = cViewUrl; alert("Foto profil diperbarui!"); });
+        document.getElementById('hidePhotoBtn').addEventListener('click', async () => { if(confirm("Yakin sembunyikan foto?")) { await push(ref(db, 'hidden_photos/' + formatSafeEmail(auth.currentUser.email)), cViewUrl); document.getElementById('photoModal').classList.add('hidden'); loadCloudinaryPhotos(auth.currentUser.email); }});
+        
+        // Push ke Galeri Publik
         document.getElementById('setBerandaBtn').addEventListener('click', async () => {
-            if(globalUserRating <= 3) {
-                alert("Maaf, fitur ini dinonaktifkan karena rating testimoni Anda 3 Bintang ke bawah."); return;
-            }
-            // Push URL ke node public homepage
-            await push(ref(db, 'homepage_photos'), { url: cViewUrl, owner: auth.currentUser.displayName });
-            alert("Foto berhasil ditambahkan ke Galeri Publik Beranda!");
+            if(globalUserRating <= 3) return alert("Fitur ini dinonaktifkan karena rating Anda 3 Bintang ke bawah.");
+            // Generate Key Publik
+            const pk = 'PUB-' + Date.now();
+            await set(ref(db, 'homepage_photos/' + pk), { url: cViewUrl, ownerName: auth.currentUser.displayName, ownerEmail: auth.currentUser.email, likes: 0, dislikes: 0, timestamp: Date.now() });
+            alert("Berhasil dikirim ke Galeri Publik! Tunggu Like dari orang lain untuk masuk Photo of The Week.");
             loadPublicGallery();
         });
 
-        // Hapus (Sembunyikan) Foto
-        document.getElementById('hidePhotoBtn').addEventListener('click', async () => {
-            if(confirm("Yakin ingin menyembunyikan foto ini dari Dasbor Anda?")) {
-                const safeEmail = formatSafeEmail(auth.currentUser.email);
-                await push(ref(db, 'hidden_photos/' + safeEmail), cViewUrl);
-                document.getElementById('photoModal').classList.add('hidden');
-                loadCloudinaryPhotos(auth.currentUser.email); // Reload galeri lokal
-            }
-        });
-
         // ==========================================
-        // 7. LOAD GALERI PUBLIK (BERANDA LUAR)
+        // 7. GALERI PUBLIK, LIKE/DISLIKE & PHOTO OF THE WEEK
         // ==========================================
         function loadPublicGallery() {
             onValue(ref(db, 'homepage_photos'), (snap) => {
-                const grid = document.getElementById('publicGalleryGrid');
-                grid.innerHTML = '';
+                const pGrid = document.getElementById('publicGalleryGrid'); const potwGrid = document.getElementById('potwGalleryGrid');
+                pGrid.innerHTML = ''; potwGrid.innerHTML = '';
                 if(snap.exists()) {
-                    // Reverse to show newest first
-                    const photos = []; snap.forEach(c => photos.push(c.val()));
-                    photos.reverse().slice(0, 8).forEach(p => {
-                        grid.innerHTML += `
-                            <div class="rounded-xl overflow-hidden shadow-sm aspect-square bg-gray-200">
-                                <img src="${p.url}" alt="${p.owner}" class="w-full h-full object-cover">
+                    let photos = [];
+                    snap.forEach(c => { let p = c.val(); p.key = c.key; photos.push(p); });
+                    
+                    // Sort untuk POTW (Berdasarkan Likes Terbanyak)
+                    let sortedForPotw = [...photos].sort((a,b) => (b.likes||0) - (a.likes||0));
+                    let top5 = sortedForPotw.slice(0, 5).filter(p => (p.likes||0) > 0); // Minimal 1 like untuk masuk TOP 5
+
+                    // Render POTW (Jawara)
+                    if(top5.length > 0) {
+                        top5.forEach((p, index) => {
+                            potwGrid.innerHTML += `
+                                <div class="rounded-xl overflow-hidden shadow-lg aspect-square bg-gray-800 relative border-2 border-yellow-500 transform ${index===0 ? 'scale-105' : ''}">
+                                    ${index === 0 ? '<div class="absolute top-2 left-2 bg-yellow-500 text-xs text-gray-900 font-bold px-2 py-1 rounded-full z-10 shadow">#1 JUARA</div>' : ''}
+                                    <img src="${p.url}" class="w-full h-full object-cover">
+                                    <div class="absolute bottom-0 w-full bg-gradient-to-t from-black/80 to-transparent p-3 text-left">
+                                        <p class="font-bold text-sm">${p.ownerName}</p>
+                                        <p class="text-xs text-yellow-400">❤️ ${p.likes} Suka</p>
+                                    </div>
+                                </div>`;
+                            
+                            // Logika Berikan Hadiah Voucher Otomatis Jika Login == Pemilik Foto Top 5
+                            if(auth.currentUser && auth.currentUser.email === p.ownerEmail) {
+                                cekDanBerikanRewardPOTW(p.key, p.ownerEmail);
+                            }
+                        });
+                    } else { potwGrid.innerHTML = `<div class="col-span-full text-gray-400 py-5">Belum ada foto yang mendapat Like minggu ini.</div>`; }
+
+                    // Render Galeri Publik Biasa (Berdasarkan Waktu Terbaru)
+                    photos.sort((a,b) => b.timestamp - a.timestamp).forEach(p => {
+                        const curUserEmail = auth.currentUser ? formatSafeEmail(auth.currentUser.email) : null;
+                        const userVote = (curUserEmail && p.voters && p.voters[curUserEmail]) ? p.voters[curUserEmail] : null;
+                        const likeColor = userVote === 'like' ? 'text-blue-600 bg-blue-100' : 'text-gray-500 bg-gray-100 hover:bg-gray-200';
+                        const dislikeColor = userVote === 'dislike' ? 'text-red-600 bg-red-100' : 'text-gray-500 bg-gray-100 hover:bg-gray-200';
+
+                        pGrid.innerHTML += `
+                            <div class="bg-white rounded-xl overflow-hidden shadow-sm border pb-2">
+                                <div class="aspect-square bg-gray-200 relative">
+                                    <img src="${p.url}" class="w-full h-full object-cover">
+                                </div>
+                                <div class="px-3 pt-3 flex justify-between items-center">
+                                    <span class="text-xs font-bold text-gray-800 truncate">${p.ownerName}</span>
+                                    <div class="flex gap-1">
+                                        <button onclick="votePhoto('${p.key}', 'like')" class="${likeColor} text-xs font-bold px-2 py-1 rounded transition flex items-center gap-1">👍 ${p.likes||0}</button>
+                                        <button onclick="votePhoto('${p.key}', 'dislike')" class="${dislikeColor} text-xs font-bold px-2 py-1 rounded transition flex items-center gap-1">👎 ${p.dislikes||0}</button>
+                                    </div>
+                                </div>
                             </div>`;
                     });
-                } else {
-                    grid.innerHTML = `<div class="col-span-full text-gray-400 py-10">Belum ada foto pelanggan yang dibagikan ke publik.</div>`;
-                }
+                } else { pGrid.innerHTML = `<div class="col-span-full text-gray-400 py-10">Belum ada foto pelanggan yang dibagikan.</div>`; }
             });
+        }
+
+        // Sistem Voting (Like/Dislike)
+        window.votePhoto = async function(photoKey, type) {
+            if(!auth.currentUser) return alert("Silakan Login Akun terlebih dahulu untuk memberikan dukungan!");
+            const safeEmail = formatSafeEmail(auth.currentUser.email);
+            
+            // Baca data vote lama
+            const snap = await get(ref(db, `homepage_photos/${photoKey}`));
+            if(!snap.exists()) return;
+            const p = snap.val();
+            let voters = p.voters || {};
+            let l = p.likes || 0; let d = p.dislikes || 0;
+            
+            const oldVote = voters[safeEmail];
+            if(oldVote === type) return; // Jika klik yg sama, diamkan
+            
+            // Revert vote lama
+            if(oldVote === 'like') l--;
+            if(oldVote === 'dislike') d--;
+            
+            // Terapkan vote baru
+            if(type === 'like') l++;
+            if(type === 'dislike') d++;
+            voters[safeEmail] = type;
+            
+            await update(ref(db, `homepage_photos/${photoKey}`), { likes: l, dislikes: d, voters: voters });
+        }
+
+        // Cek dan Berikan Hadiah POTW (Dipanggil saat render Top 5)
+        async function cekDanBerikanRewardPOTW(photoKey, ownerEmail) {
+            const vCode = "T5-" + photoKey.substring(photoKey.length - 4); // ID Unik agar tidak duplicate reward
+            const snap = await get(ref(db, 'vouchers/' + vCode));
+            if(!snap.exists()) {
+                const expDate = new Date(); expDate.setMonth(expDate.getMonth() + 1); 
+                await set(ref(db, 'vouchers/' + vCode), { status: 'aktif', pemilik: ownerEmail, jenis: 'Diskon %', besaran: '20', max_diskon: 15000, expired: expDate.toISOString().split('T')[0] });
+                // Notifikasi 1 kali
+                alert("🎉 SELAMAT! Foto Anda masuk Top 5 Photo of the Week! Anda mendapat hadiah Voucher 20%. Cek di Dasbor.");
+            }
         }
     </script>
 </body>
