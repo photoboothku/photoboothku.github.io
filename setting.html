@@ -29,7 +29,7 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- ROW 1: PENGATURAN GLOBAL & PAKET           -->
+        <!-- ROW 1: PENGATURAN GLOBAL, PAKET & ADD-ONS  -->
         <!-- ========================================== -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Pengaturan Global Web & Dasbor -->
@@ -64,29 +64,65 @@
                 </form>
             </div>
 
-            <!-- Manajemen Paket Photobooth -->
-            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-green-500">
-                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-box-open text-green-500 mr-2"></i>Paket Harga</h2>
-                <div class="mb-4 space-y-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
-                    <input type="hidden" id="paketId">
-                    <input type="text" id="namaPaket" placeholder="Nama Paket (cth: Paket Grup)" required class="border border-gray-300 p-2 w-full rounded-lg text-sm">
-                    <input type="number" id="hargaPaket" placeholder="Harga (Rp)" required class="border border-gray-300 p-2 w-full rounded-lg text-sm">
-                    <textarea id="deskripsiPaket" placeholder="Deskripsi/Detail paket..." rows="2" class="border border-gray-300 p-2 w-full rounded-lg text-sm"></textarea>
-                    <div class="flex gap-2">
-                        <button id="savePaketBtn" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-bold shadow text-sm transition">Simpan</button>
-                        <button id="cancelEditBtn" class="hidden bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-bold text-sm">Batal</button>
+            <!-- Harga Tambahan (Add-ons) Baru -->
+            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-pink-500 lg:col-span-1">
+                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-plus-circle text-pink-500 mr-2"></i>Harga Tambahan (Add-ons)</h2>
+                <form id="addonForm" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Tambah Orang (Rp/Orang)</label>
+                        <input type="number" id="hargaOrang" class="w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50" placeholder="Contoh: 10000" value="0" required>
                     </div>
-                </div>
-                <ul id="paketList" class="space-y-3 max-h-40 overflow-y-auto pr-2 custom-scrollbar"></ul>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Tambah Lembar Cetak (Rp/Lembar)</label>
+                        <input type="number" id="hargaLembar" class="w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50" placeholder="Contoh: 15000" value="0" required>
+                    </div>
+                    <div class="border-t border-gray-200 pt-3 mt-2">
+                        <label class="block text-xs font-bold text-gray-800 mb-2">Biaya Upgrade Ukuran Cetak</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="block text-[10px] text-gray-500">2R (Default)</label>
+                                <input type="number" id="harga2R" class="w-full border border-gray-300 rounded p-1.5 text-xs bg-gray-100" value="0" readonly title="Ukuran standar gratis">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-gray-500">4R (+Rp)</label>
+                                <input type="number" id="harga4R" class="w-full border border-gray-300 rounded p-1.5 text-xs bg-gray-50" placeholder="5000" value="0" required>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-gray-500">10 Inci (+Rp)</label>
+                                <input type="number" id="harga10Inci" class="w-full border border-gray-300 rounded p-1.5 text-xs bg-gray-50" placeholder="20000" value="0" required>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 rounded-lg text-sm shadow transition mt-2"><i class="fas fa-save mr-1"></i> Simpan Add-ons</button>
+                </form>
             </div>
         </div>
 
         <!-- ========================================== -->
-        <!-- ROW 2: VOUCHER                             -->
+        <!-- ROW 1.5: PAKET & VOUCHER GENERATOR         -->
         <!-- ========================================== -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Manajemen Paket Photobooth -->
+            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-green-500 lg:col-span-2">
+                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-box-open text-green-500 mr-2"></i>Daftar Paket Harga (Utama)</h2>
+                <div class="mb-4 space-y-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <input type="hidden" id="paketId">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <input type="text" id="namaPaket" placeholder="Nama Paket (cth: Paket Grup)" required class="border border-gray-300 p-2 w-full rounded-lg text-sm">
+                        <input type="number" id="hargaPaket" placeholder="Harga (Rp)" required class="border border-gray-300 p-2 w-full rounded-lg text-sm">
+                    </div>
+                    <textarea id="deskripsiPaket" placeholder="Deskripsi/Detail paket..." rows="2" class="border border-gray-300 p-2 w-full rounded-lg text-sm"></textarea>
+                    <div class="flex gap-2">
+                        <button id="savePaketBtn" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-bold shadow text-sm transition">Simpan Paket</button>
+                        <button id="cancelEditBtn" class="hidden bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-bold text-sm">Batal</button>
+                    </div>
+                </div>
+                <ul id="paketList" class="space-y-3 max-h-40 overflow-y-auto pr-2 custom-scrollbar grid grid-cols-1 md:grid-cols-2 gap-3"></ul>
+            </div>
+
+            <!-- Panel Generator Voucher (Kiri) -->
             <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-yellow-500 lg:col-span-1">
-                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-ticket-alt text-yellow-500 mr-2"></i>Buat Voucher</h2>
+                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-ticket-alt text-yellow-500 mr-2"></i>Buat Voucher Sistem</h2>
                 <form id="voucherGeneratorForm" class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1">Jenis Voucher</label>
@@ -110,23 +146,26 @@
                     <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2.5 rounded-lg transition shadow-md">Generate Kode</button>
                 </form>
             </div>
+        </div>
 
-            <div class="bg-white p-6 rounded-2xl shadow lg:col-span-2">
-                <h2 class="text-xl font-bold mb-4 text-gray-800">Daftar Voucher Sistem</h2>
-                <div class="overflow-x-auto h-80 border border-gray-200 rounded-xl custom-scrollbar">
-                    <table class="min-w-full table-auto text-sm">
-                        <thead class="bg-gray-100 sticky top-0 z-10 shadow-sm">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-gray-600 font-bold">Kode Voucher</th>
-                                <th class="px-4 py-3 text-left text-gray-600 font-bold">Jenis & Besaran</th>
-                                <th class="px-4 py-3 text-left text-gray-600 font-bold">Berlaku s/d</th>
-                                <th class="px-4 py-3 text-left text-gray-600 font-bold">Status & Pemilik</th>
-                                <th class="px-4 py-3 text-center text-gray-600 font-bold">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="voucherList" class="divide-y divide-gray-100"></tbody>
-                    </table>
-                </div>
+        <!-- ========================================== -->
+        <!-- ROW 2: VOUCHER LIST                        -->
+        <!-- ========================================== -->
+        <div class="bg-white p-6 rounded-2xl shadow">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Daftar Voucher Sistem</h2>
+            <div class="overflow-x-auto h-80 border border-gray-200 rounded-xl custom-scrollbar">
+                <table class="min-w-full table-auto text-sm">
+                    <thead class="bg-gray-100 sticky top-0 z-10 shadow-sm">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-gray-600 font-bold">Kode Voucher</th>
+                            <th class="px-4 py-3 text-left text-gray-600 font-bold">Jenis & Besaran</th>
+                            <th class="px-4 py-3 text-left text-gray-600 font-bold">Berlaku s/d</th>
+                            <th class="px-4 py-3 text-left text-gray-600 font-bold">Status & Pemilik</th>
+                            <th class="px-4 py-3 text-center text-gray-600 font-bold">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="voucherList" class="divide-y divide-gray-100"></tbody>
+                </table>
             </div>
         </div>
 
@@ -151,7 +190,7 @@
                         <tr>
                             <th class="px-4 py-3 text-center text-gray-600 font-bold border-b">Antrean</th>
                             <th class="px-4 py-3 text-left text-gray-600 font-bold border-b">Pelanggan & Kontak WA</th>
-                            <th class="px-4 py-3 text-left text-gray-600 font-bold border-b">Paket, Voucher & Waktu</th>
+                            <th class="px-4 py-3 text-left text-gray-600 font-bold border-b w-64">Paket, Addons & Waktu</th>
                             <th class="px-4 py-3 text-center text-gray-600 font-bold border-b w-40">Status / Aksi</th>
                         </tr>
                     </thead>
@@ -207,7 +246,7 @@
                 <ul id="testimoniListAdmin" class="space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar"></ul>
             </div>
 
-            <!-- Kotak Saran (Baru Ditambahkan) -->
+            <!-- Kotak Saran -->
             <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-purple-500">
                 <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-envelope-open-text text-purple-500 mr-2"></i>Kotak Saran & Kritik</h2>
                 <ul id="saranListAdmin" class="space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar"></ul>
@@ -216,24 +255,48 @@
 
     </div>
 
-    <!-- Modal Booking Offline -->
+    <!-- Modal Booking Offline (Walk-in) dengan Addons -->
     <div id="offlineModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl relative border-t-8 border-yellow-500">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl relative border-t-8 border-yellow-500 max-h-[90vh] overflow-y-auto">
             <button id="closeOfflineModal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl"><i class="fas fa-times"></i></button>
             <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-walking text-yellow-500 mr-2"></i> Input Walk-in Offline</h2>
-            <form id="offlineForm" class="space-y-4">
-                <input type="text" id="offNama" placeholder="Nama Pelanggan" required class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white transition">
+            <form id="offlineForm" class="space-y-3">
+                <input type="text" id="offNama" placeholder="Nama Pelanggan" required class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white transition text-sm">
                 <div class="relative">
-                    <span class="absolute left-3 top-3.5 text-gray-400"><i class="fab fa-whatsapp"></i></span>
-                    <input type="tel" id="offWA" placeholder="Nomor WA (contoh: 0812...)" required class="w-full border border-gray-300 rounded-lg p-3 pl-10 bg-gray-50 focus:bg-white transition">
+                    <span class="absolute left-3 top-3 text-gray-400"><i class="fab fa-whatsapp"></i></span>
+                    <input type="tel" id="offWA" placeholder="Nomor WA (contoh: 0812...)" required class="w-full border border-gray-300 rounded-lg p-3 pl-10 bg-gray-50 focus:bg-white transition text-sm">
                 </div>
-                <select id="offPaket" required class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white text-gray-700 transition">
+                <select id="offPaket" required class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white text-gray-700 transition text-sm">
                     <option value="">Memuat Paket...</option>
                 </select>
-                <div class="bg-blue-50 p-3 rounded-lg text-xs text-blue-800 border border-blue-200 shadow-inner">
+
+                <!-- Pilihan Tambahan Addons -->
+                <div class="bg-pink-50 border border-pink-200 rounded-lg p-3 mt-2 shadow-inner">
+                    <h3 class="text-xs font-bold text-pink-800 mb-2 border-b border-pink-200 pb-1">Spesifikasi Cetak & Add-ons</h3>
+                    <div class="grid grid-cols-2 gap-3 mb-2">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-600 mb-1">Tambah Orang</label>
+                            <input type="number" id="offOrang" value="0" min="0" class="w-full border border-gray-300 rounded p-1.5 text-xs bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-600 mb-1">Tambah Cetak (Lbr)</label>
+                            <input type="number" id="offCetak" value="0" min="0" class="w-full border border-gray-300 rounded p-1.5 text-xs bg-white">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-600 mb-1">Ukuran Cetak</label>
+                        <select id="offUkuran" class="w-full border border-gray-300 rounded p-1.5 text-xs bg-white text-gray-700">
+                            <option value="2R">2R (Default)</option>
+                            <option value="4R">4R</option>
+                            <option value="10 Inci">10 Inci</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 p-3 rounded-lg text-xs text-blue-800 border border-blue-200 shadow-inner mt-2">
                     <i class="fas fa-info-circle mr-1"></i> Jadwal otomatis dibuat hari ini, saat ini juga.
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg transition">Simpan & Beri Nomor Antrean</button>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg transition mt-2">Simpan & Beri Antrean</button>
             </form>
         </div>
     </div>
@@ -264,7 +327,7 @@
         function formatSafeEmail(email) { return email.replace(/[@.]/g, '_'); }
 
         // ==========================================
-        // 0. PENGATURAN GLOBAL DASBOR & WEB (CLOUDINARY BANNER)
+        // 0. PENGATURAN GLOBAL DASBOR & WEB
         // ==========================================
         onValue(ref(db, 'settings/global'), (snap) => {
             if(snap.exists()) {
@@ -288,15 +351,35 @@
             alert("Pengaturan Global Berhasil Disimpan!");
         });
 
-        // Widget Upload Cloudinary untuk Banner
         document.getElementById('btnUploadBannerPromo').addEventListener('click', () => {
-            cloudinary.createUploadWidget({
-                cloudName: 'y2k0oqrl', uploadPreset: 'photobooth', sources: ['local', 'url', 'camera']
-            }, (error, result) => {
-                if (!error && result && result.event === "success") {
-                    document.getElementById('setBannerUrl').value = result.info.secure_url;
-                }
+            cloudinary.createUploadWidget({ cloudName: 'y2k0oqrl', uploadPreset: 'photobooth', sources: ['local', 'url', 'camera'] }, (error, result) => {
+                if (!error && result && result.event === "success") document.getElementById('setBannerUrl').value = result.info.secure_url;
             }).open();
+        });
+
+        // Pengaturan Harga Add-ons
+        onValue(ref(db, 'settings/addons'), (snap) => {
+            if(snap.exists()) {
+                const d = snap.val();
+                document.getElementById('hargaOrang').value = d.hargaOrang || 0;
+                document.getElementById('hargaLembar').value = d.hargaLembar || 0;
+                document.getElementById('harga2R').value = d.harga2R || 0;
+                document.getElementById('harga4R').value = d.harga4R || 0;
+                document.getElementById('harga10Inci').value = d.harga10Inci || 0;
+            }
+        });
+
+        document.getElementById('addonForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                hargaOrang: parseInt(document.getElementById('hargaOrang').value) || 0,
+                hargaLembar: parseInt(document.getElementById('hargaLembar').value) || 0,
+                harga2R: parseInt(document.getElementById('harga2R').value) || 0,
+                harga4R: parseInt(document.getElementById('harga4R').value) || 0,
+                harga10Inci: parseInt(document.getElementById('harga10Inci').value) || 0
+            };
+            await set(ref(db, 'settings/addons'), data);
+            alert("Pengaturan Harga Add-ons berhasil disimpan!");
         });
 
         // ==========================================
@@ -347,12 +430,7 @@
                     </tr>`;
             });
             
-            document.querySelectorAll('.delete-voucher').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    const id = e.currentTarget.getAttribute('data-id');
-                    if(confirm(`Yakin menghapus voucher ${id}?`)) await remove(ref(db, 'vouchers/' + id));
-                });
-            });
+            document.querySelectorAll('.delete-voucher').forEach(btn => { btn.addEventListener('click', async (e) => { const id = e.currentTarget.getAttribute('data-id'); if(confirm(`Yakin menghapus voucher ${id}?`)) await remove(ref(db, 'vouchers/' + id)); }); });
         });
 
         // ==========================================
@@ -362,10 +440,7 @@
         const paketIdInput = document.getElementById('paketId'); const namaPaketInput = document.getElementById('namaPaket');
         const hargaPaketInput = document.getElementById('hargaPaket'); const deskripsiPaketInput = document.getElementById('deskripsiPaket');
 
-        function resetPaketForm() {
-            paketIdInput.value = ''; namaPaketInput.value = ''; hargaPaketInput.value = ''; deskripsiPaketInput.value = '';
-            savePaketBtn.innerText = 'Simpan'; savePaketBtn.className = 'flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-bold shadow text-sm transition'; cancelEditBtn.classList.add('hidden');
-        }
+        function resetPaketForm() { paketIdInput.value = ''; namaPaketInput.value = ''; hargaPaketInput.value = ''; deskripsiPaketInput.value = ''; savePaketBtn.innerText = 'Simpan'; savePaketBtn.className = 'flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-bold shadow text-sm transition'; cancelEditBtn.classList.add('hidden'); }
         cancelEditBtn.addEventListener('click', resetPaketForm);
 
         savePaketBtn.addEventListener('click', async () => {
@@ -381,86 +456,49 @@
             const offPaket = document.getElementById('offPaket'); offPaket.innerHTML = '<option value="">Pilih Paket...</option>';
             
             snapshot.forEach((child) => {
-                const data = child.val();
-                const nama = typeof data === 'object' ? data.nama : data;
-                const harga = typeof data === 'object' && data.harga ? data.harga : 0;
-                const deskripsi = typeof data === 'object' && data.deskripsi ? data.deskripsi : "-";
+                const data = child.val(); const nama = typeof data === 'object' ? data.nama : data; const harga = typeof data === 'object' && data.harga ? data.harga : 0; const deskripsi = typeof data === 'object' && data.deskripsi ? data.deskripsi : "-";
                 
                 offPaket.innerHTML += `<option value="${nama}">${nama} (Rp ${parseInt(harga).toLocaleString('id-ID')})</option>`;
                 list.innerHTML += `
-                    <li class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex flex-col gap-2 transition hover:shadow-md">
-                        <div>
-                            <div class="flex justify-between items-start">
-                                <span class="font-bold text-gray-800 text-sm">${nama}</span>
-                                <span class="text-blue-600 font-black text-sm">Rp ${parseInt(harga).toLocaleString('id-ID')}</span>
-                            </div>
-                        </div>
+                    <li class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex flex-col gap-1 transition hover:shadow-md">
+                        <div class="flex justify-between items-start"><span class="font-bold text-gray-800 text-sm">${nama}</span><span class="text-blue-600 font-black text-sm">Rp ${parseInt(harga).toLocaleString('id-ID')}</span></div>
                         <div class="flex justify-end gap-2 border-t border-gray-100 pt-2 mt-1">
                             <button class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1 rounded text-xs font-bold edit-paket transition" data-id="${child.key}" data-nama="${nama}" data-harga="${harga}" data-deskripsi="${deskripsi}">Edit</button>
                             <button class="bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1 rounded text-xs font-bold delete-paket transition" data-id="${child.key}">Hapus</button>
                         </div>
                     </li>`;
             });
-
             document.querySelectorAll('.delete-paket').forEach(btn => { btn.addEventListener('click', async (e) => { if(confirm("Hapus paket ini?")) await remove(ref(db, 'settings/paket/' + e.target.getAttribute('data-id'))); }); });
-            document.querySelectorAll('.edit-paket').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    paketIdInput.value = e.target.getAttribute('data-id'); namaPaketInput.value = e.target.getAttribute('data-nama');
-                    hargaPaketInput.value = e.target.getAttribute('data-harga'); deskripsiPaketInput.value = e.target.getAttribute('data-deskripsi');
-                    savePaketBtn.innerText = 'Update Paket'; savePaketBtn.className = 'flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold shadow text-sm transition';
-                    cancelEditBtn.classList.remove('hidden');
-                });
-            });
+            document.querySelectorAll('.edit-paket').forEach(btn => { btn.addEventListener('click', (e) => { paketIdInput.value = e.target.getAttribute('data-id'); namaPaketInput.value = e.target.getAttribute('data-nama'); hargaPaketInput.value = e.target.getAttribute('data-harga'); deskripsiPaketInput.value = e.target.getAttribute('data-deskripsi'); savePaketBtn.innerText = 'Update Paket'; savePaketBtn.className = 'flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold shadow text-sm transition'; cancelEditBtn.classList.remove('hidden'); }); });
         });
 
         // ==========================================
-        // 3. MANAJEMEN ANTREAN (NAIK TURUN & WA)
+        // 3. MANAJEMEN ANTREAN (DENGAN ADD-ONS)
         // ==========================================
-        window.tandaiSelesai = async function(key) {
-            if(confirm("Tandai sesi ini telah Selesai?")) await update(ref(db, 'pendaftaran/' + key), { status: 'Selesai' });
-        }
-
+        window.tandaiSelesai = async function(key) { if(confirm("Tandai sesi ini telah Selesai?")) await update(ref(db, 'pendaftaran/' + key), { status: 'Selesai' }); }
         window.tandaiTelat = async function(key, tglWaktuAsli) {
             if(!confirm("Pindahkan pelanggan ke antrean terakhir hari ini?")) return;
-            const tglPilih = tglWaktuAsli.split('T')[0];
-            const snapAll = await get(ref(db, 'pendaftaran'));
-            let maxQueue = 0;
-            if(snapAll.exists()) {
-                snapAll.forEach(c => {
-                    const d = c.val();
-                    if(d.waktu && d.waktu.startsWith(tglPilih) && d.antrean) {
-                        const numOnly = parseInt(d.antrean.replace('A-', ''));
-                        if(numOnly > maxQueue) maxQueue = numOnly;
-                    }
-                });
-            }
+            const tglPilih = tglWaktuAsli.split('T')[0]; const snapAll = await get(ref(db, 'pendaftaran')); let maxQueue = 0;
+            if(snapAll.exists()) { snapAll.forEach(c => { const d = c.val(); if(d.waktu && d.waktu.startsWith(tglPilih) && d.antrean) { const numOnly = parseInt(d.antrean.replace('A-', '')); if(numOnly > maxQueue) maxQueue = numOnly; } }); }
             const newAntreanStr = "A-" + (maxQueue + 1).toString().padStart(3, '0');
             await update(ref(db, 'pendaftaran/' + key), { status: 'Reschedule (Telat)', antrean: newAntreanStr, pesanAdmin: `Jadwal terlewat. Anda dipindah ke antrean akhir (${newAntreanStr}).` });
         }
 
         window.swapQueue = async function(currentIndex, direction) {
-            const waitingList = window.currentWaitingQueue;
-            const targetIndex = currentIndex + direction;
+            const waitingList = window.currentWaitingQueue; const targetIndex = currentIndex + direction;
             if(targetIndex < 0 || targetIndex >= waitingList.length) return; 
-
-            const item1 = waitingList[currentIndex];
-            const item2 = waitingList[targetIndex];
-            let updates = {};
-            updates['pendaftaran/' + item1.key + '/antrean'] = item2.antrean;
-            updates['pendaftaran/' + item2.key + '/antrean'] = item1.antrean;
+            const item1 = waitingList[currentIndex]; const item2 = waitingList[targetIndex];
+            let updates = {}; updates['pendaftaran/' + item1.key + '/antrean'] = item2.antrean; updates['pendaftaran/' + item2.key + '/antrean'] = item1.antrean;
             await update(ref(db), updates);
         }
 
         onValue(ref(db, 'pendaftaran'), (snapshot) => {
             const tbody = document.getElementById('pendaftarList'); tbody.innerHTML = '';
-            let listPendaftar = [];
-            snapshot.forEach(c => { let v = c.val(); v.key = c.key; listPendaftar.push(v); });
-            
+            let listPendaftar = []; snapshot.forEach(c => { let v = c.val(); v.key = c.key; listPendaftar.push(v); });
             const todayStr = new Date().toISOString().split('T')[0];
+            
             let waitingTodayList = listPendaftar.filter(p => !p.status?.includes('Selesai') && !p.status?.includes('Telat') && p.waktu.startsWith(todayStr));
-            waitingTodayList.sort((a,b) => a.antrean.localeCompare(b.antrean));
-            window.currentWaitingQueue = waitingTodayList;
-
+            waitingTodayList.sort((a,b) => a.antrean.localeCompare(b.antrean)); window.currentWaitingQueue = waitingTodayList;
             let otherList = listPendaftar.filter(p => !(!p.status?.includes('Selesai') && !p.status?.includes('Telat') && p.waktu.startsWith(todayStr)));
             otherList.sort((a,b) => b.timestamp - a.timestamp); 
 
@@ -477,33 +515,19 @@
                 if(isWaitingToday) {
                     const btnUpClass = currentIndex > 0 ? "hover:bg-gray-200 text-gray-700 cursor-pointer" : "text-gray-300 cursor-not-allowed opacity-50";
                     const btnDownClass = currentIndex < waitingTodayList.length - 1 ? "hover:bg-gray-200 text-gray-700 cursor-pointer" : "text-gray-300 cursor-not-allowed opacity-50";
-                    sortButtons = `
-                        <div class="flex flex-col ml-2 border border-gray-200 rounded overflow-hidden">
-                            <button ${currentIndex > 0 ? `onclick="swapQueue(${currentIndex}, -1)"` : 'disabled'} class="bg-gray-50 px-1.5 py-0.5 text-[10px] ${btnUpClass}"><i class="fas fa-chevron-up"></i></button>
-                            <button ${currentIndex < waitingTodayList.length - 1 ? `onclick="swapQueue(${currentIndex}, 1)"` : 'disabled'} class="bg-gray-50 px-1.5 py-0.5 text-[10px] border-t border-gray-200 ${btnDownClass}"><i class="fas fa-chevron-down"></i></button>
-                        </div>`;
+                    sortButtons = `<div class="flex flex-col ml-2 border border-gray-200 rounded overflow-hidden"><button ${currentIndex > 0 ? `onclick="swapQueue(${currentIndex}, -1)"` : 'disabled'} class="bg-gray-50 px-1.5 py-0.5 text-[10px] ${btnUpClass}"><i class="fas fa-chevron-up"></i></button><button ${currentIndex < waitingTodayList.length - 1 ? `onclick="swapQueue(${currentIndex}, 1)"` : 'disabled'} class="bg-gray-50 px-1.5 py-0.5 text-[10px] border-t border-gray-200 ${btnDownClass}"><i class="fas fa-chevron-down"></i></button></div>`;
                 }
 
-                const antreanBadge = data.antrean ? `
-                    <div class="flex justify-center items-center">
-                        <span class="font-voucher text-xl font-black text-blue-700 tracking-wider">${data.antrean}</span>
-                        ${sortButtons}
-                    </div>` : `<span class="text-gray-400">-</span>`;
+                const antreanBadge = data.antrean ? `<div class="flex justify-center items-center"><span class="font-voucher text-xl font-black text-blue-700 tracking-wider">${data.antrean}</span>${sortButtons}</div>` : `<span class="text-gray-400">-</span>`;
                 
                 let statusUI = `<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-bold border border-yellow-200 inline-block shadow-sm">Menunggu</span>`;
                 if(status.includes('Selesai')) statusUI = `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-[10px] font-bold border border-green-200 inline-block shadow-sm"><i class="fas fa-check-circle mr-1"></i>Selesai</span>`;
                 if(status.includes('Telat')) statusUI = `<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-[10px] font-bold border border-red-200 block shadow-sm"><i class="fas fa-exclamation-triangle"></i> Reschedule</span>`;
                 
-                let sisaAntreanInfo = "";
-                let waText = `Halo ${data.nama}, ini admin Canon-Ipad Booth Wawancellcomp.\nMengingatkan jadwal photobooth Anda: ${jadwal}.\n`;
+                let sisaAntreanInfo = ""; let waText = `Halo ${data.nama}, ini admin Canon-Ipad Booth Wawancellcomp.\nMengingatkan jadwal photobooth Anda: ${jadwal}.\n`;
                 if (isWaitingToday) {
-                    if (currentIndex > 0) {
-                        waText += `Saat ini ada *${currentIndex} antrean* lagi sebelum giliran Anda (Nomor ${data.antrean}). Segera bersiap ya!`;
-                        sisaAntreanInfo = `<span class="text-[10px] font-bold text-orange-500 block mt-1"><i class="fas fa-users"></i> Sisa antrean: ${currentIndex}</span>`;
-                    } else if (currentIndex === 0) {
-                        waText += `Giliran Anda (Nomor ${data.antrean}) adalah yang *SELANJUTNYA*. Silakan menuju booth sekarang!`;
-                        sisaAntreanInfo = `<span class="text-[10px] font-bold text-green-600 block mt-1 animate-pulse"><i class="fas fa-play-circle"></i> Giliran Berikutnya!</span>`;
-                    }
+                    if (currentIndex > 0) { waText += `Saat ini ada *${currentIndex} antrean* lagi sebelum giliran Anda (Nomor ${data.antrean}). Segera bersiap ya!`; sisaAntreanInfo = `<span class="text-[10px] font-bold text-orange-500 block mt-1"><i class="fas fa-users"></i> Sisa antrean: ${currentIndex}</span>`; } 
+                    else if (currentIndex === 0) { waText += `Giliran Anda (Nomor ${data.antrean}) adalah yang *SELANJUTNYA*. Silakan menuju booth sekarang!`; sisaAntreanInfo = `<span class="text-[10px] font-bold text-green-600 block mt-1 animate-pulse"><i class="fas fa-play-circle"></i> Giliran Berikutnya!</span>`; }
                 }
                 const waLink = `https://wa.me/${data.nohp}?text=${encodeURIComponent(waText)}`;
 
@@ -511,6 +535,8 @@
                 if(data.tipe === 'Offline') tipeBadge = `<span class="ml-2 bg-slate-200 text-slate-700 px-2 py-0.5 rounded text-[9px] font-bold uppercase">Walk-in</span>`;
                 if(data.tipe === 'Mandiri') tipeBadge = `<span class="ml-2 bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[9px] font-bold uppercase">Mandiri</span>`;
 
+                const addonsUI = data.ukuranCetak ? `<div class="mt-1.5 flex flex-wrap gap-1 text-[10px]"><span class="bg-pink-100 text-pink-800 border border-pink-200 px-1.5 py-0.5 rounded"><i class="fas fa-crop-alt mr-1"></i>${data.ukuranCetak}</span><span class="bg-pink-100 text-pink-800 border border-pink-200 px-1.5 py-0.5 rounded"><i class="fas fa-user-plus mr-1"></i>+${data.tambahOrang||0}</span><span class="bg-pink-100 text-pink-800 border border-pink-200 px-1.5 py-0.5 rounded"><i class="fas fa-print mr-1"></i>+${data.tambahCetak||0}</span></div>` : '';
+                
                 const aksiUI = status.includes('Selesai') ? `<span class="text-gray-400 italic text-[10px]"><i class="fas fa-lock mr-1"></i>Terkunci</span>` : `
                     <div class="flex flex-col gap-1.5 w-full">
                         <button onclick="tandaiSelesai('${data.key}')" class="w-full bg-green-500 hover:bg-green-600 text-white py-1.5 rounded text-xs font-bold shadow-sm transition"><i class="fas fa-check mr-1"></i>Selesai</button>
@@ -519,32 +545,15 @@
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-blue-50 transition border-b border-gray-100 bg-white">
-                        <td class="px-4 py-4 text-center align-middle bg-gray-50 border-r border-gray-100 w-32">
-                            ${antreanBadge}
-                            <div class="mt-2">${statusUI}</div>
-                            ${sisaAntreanInfo}
-                        </td>
-                        <td class="px-4 py-4">
-                            <div class="font-bold text-gray-900">${data.nama} ${tipeBadge}</div>
-                            <div class="mt-1">
-                                <a href="${waLink}" target="_blank" class="inline-flex items-center bg-green-100 text-green-700 hover:bg-green-200 px-2 py-1 rounded text-xs font-bold font-voucher transition shadow-sm border border-green-200">
-                                    <i class="fab fa-whatsapp text-sm mr-1"></i>${data.nohp}
-                                </a>
-                            </div>
-                        </td>
-                        <td class="px-4 py-4">
-                            <span class="font-bold text-blue-700 block">${data.paket}</span>
-                            <span class="text-xs text-gray-500 flex items-center mt-1"><i class="far fa-calendar-alt text-blue-400 mr-1"></i> ${jadwal}</span>
-                            ${data.voucher ? `<span class="inline-block mt-2 font-voucher bg-yellow-100 text-yellow-800 text-[10px] px-2 py-0.5 rounded font-bold border border-yellow-300"><i class="fas fa-ticket-alt mr-1"></i>${data.voucher}</span>` : ''}
-                        </td>
-                        <td class="px-4 py-4 align-middle">
-                            ${aksiUI}
-                        </td>
+                        <td class="px-4 py-4 text-center align-middle bg-gray-50 border-r border-gray-100 w-32">${antreanBadge}<div class="mt-2">${statusUI}</div>${sisaAntreanInfo}</td>
+                        <td class="px-4 py-4"><div class="font-bold text-gray-900">${data.nama} ${tipeBadge}</div><div class="mt-1"><a href="${waLink}" target="_blank" class="inline-flex items-center bg-green-100 text-green-700 hover:bg-green-200 px-2 py-1 rounded text-xs font-bold font-voucher transition shadow-sm border border-green-200"><i class="fab fa-whatsapp text-sm mr-1"></i>${data.nohp}</a></div></td>
+                        <td class="px-4 py-4"><span class="font-bold text-blue-700 block">${data.paket}</span><span class="text-xs text-gray-500 flex items-center mt-1"><i class="far fa-calendar-alt text-blue-400 mr-1"></i> ${jadwal}</span>${addonsUI}${data.voucher ? `<span class="inline-block mt-2 font-voucher bg-yellow-100 text-yellow-800 text-[10px] px-2 py-0.5 rounded font-bold border border-yellow-300"><i class="fas fa-ticket-alt mr-1"></i>${data.voucher}</span>` : ''}</td>
+                        <td class="px-4 py-4 align-middle">${aksiUI}</td>
                     </tr>`;
             });
         });
 
-        // Offline Walk-in Form
+        // Offline Walk-in Form (Dilengkapi Add-ons)
         document.getElementById('btnOpenOfflineModal').addEventListener('click', () => document.getElementById('offlineModal').classList.remove('hidden'));
         document.getElementById('closeOfflineModal').addEventListener('click', () => document.getElementById('offlineModal').classList.add('hidden'));
         document.getElementById('offlineForm').addEventListener('submit', async (e) => {
@@ -553,13 +562,15 @@
 
             const localISOTime = (new Date(new Date() - (new Date().getTimezoneOffset() * 60000))).toISOString().slice(0, 16);
             const tglPilih = localISOTime.split('T')[0];
-            const snapAll = await get(ref(db, 'pendaftaran'));
-            let antreanKe = 1;
-            if(snapAll.exists()) {
-                snapAll.forEach(c => { const d = c.val(); if(d.waktu && d.waktu.startsWith(tglPilih) && d.antrean) { const maxNum = parseInt(d.antrean.replace('A-', '')); if (maxNum >= antreanKe) antreanKe = maxNum + 1; } });
-            }
+            const snapAll = await get(ref(db, 'pendaftaran')); let antreanKe = 1;
+            if(snapAll.exists()) { snapAll.forEach(c => { const d = c.val(); if(d.waktu && d.waktu.startsWith(tglPilih) && d.antrean) { const maxNum = parseInt(d.antrean.replace('A-', '')); if (maxNum >= antreanKe) antreanKe = maxNum + 1; } }); }
             const antreanStr = "A-" + antreanKe.toString().padStart(3, '0');
-            const data = { antrean: antreanStr, nama: document.getElementById('offNama').value, nohp: document.getElementById('offWA').value, paket: document.getElementById('offPaket').value, waktu: localISOTime, tipe: 'Offline', status: 'Menunggu', timestamp: Date.now() };
+            
+            const data = { 
+                antrean: antreanStr, nama: document.getElementById('offNama').value, nohp: document.getElementById('offWA').value, 
+                paket: document.getElementById('offPaket').value, waktu: localISOTime, tipe: 'Offline', status: 'Menunggu', timestamp: Date.now(),
+                tambahOrang: parseInt(document.getElementById('offOrang').value), tambahCetak: parseInt(document.getElementById('offCetak').value), ukuranCetak: document.getElementById('offUkuran').value
+            };
 
             try { await push(ref(db, 'pendaftaran'), data); alert(`Booking Offline Berhasil!\nNomor Antrean: ${antreanStr}`); document.getElementById('offlineModal').classList.add('hidden'); e.target.reset(); } 
             catch (error) { alert("Error sistem."); } finally { btnSubmit.innerHTML = 'Simpan & Beri Nomor Antrean'; btnSubmit.disabled = false; }
@@ -569,27 +580,18 @@
         // 4. MANAJEMEN MEMBER / PELANGGAN
         // ==========================================
         window.bukaUploadModalCloudinary = function(safeEmail) {
-            cloudinary.createUploadWidget({
-                cloudName: 'y2k0oqrl', uploadPreset: 'photobooth', sources: ['local', 'url', 'camera']
-            }, async (error, result) => {
-                if (!error && result && result.event === "success") {
-                    await push(ref(db, `admin_uploaded_photos/${safeEmail}`), result.info.secure_url);
-                    alert("Foto berhasil diunggah ke Galeri Pelanggan bersangkutan!");
-                }
+            cloudinary.createUploadWidget({ cloudName: 'y2k0oqrl', uploadPreset: 'photobooth', sources: ['local', 'url', 'camera'] }, async (error, result) => {
+                if (!error && result && result.event === "success") { await push(ref(db, `admin_uploaded_photos/${safeEmail}`), result.info.secure_url); alert("Foto berhasil diunggah ke Galeri Pelanggan bersangkutan!"); }
             }).open();
         }
 
         document.getElementById('searchMember').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
-            document.querySelectorAll('#memberList tr').forEach(row => {
-                const text = row.innerText.toLowerCase();
-                row.style.display = text.includes(term) ? '' : 'none';
-            });
+            document.querySelectorAll('#memberList tr').forEach(row => { const text = row.innerText.toLowerCase(); row.style.display = text.includes(term) ? '' : 'none'; });
         });
 
         onValue(ref(db, 'pendaftaran'), async (snapPend) => {
-            if(!snapPend.exists()) return;
-            const pData = snapPend.val();
+            if(!snapPend.exists()) return; const pData = snapPend.val();
             const snapUsers = await get(ref(db, 'users')); const uData = snapUsers.exists() ? snapUsers.val() : {};
 
             let membersMap = {};
@@ -640,14 +642,7 @@
                 let tests = []; snap.forEach(c => tests.push(c.val()));
                 tests.sort((a,b) => b.waktu - a.waktu).forEach(t => {
                     if(t.rating === 5) {
-                        list.innerHTML += `
-                            <li class="bg-gray-50 p-3 rounded-xl border border-gray-100 shadow-sm text-sm">
-                                <div class="flex justify-between items-start mb-1">
-                                    <span class="font-bold text-gray-800">${t.nama}</span>
-                                    <span class="text-yellow-500 font-bold tracking-widest">★★★★★</span>
-                                </div>
-                                <p class="text-gray-600 text-xs italic">"${t.teks}"</p>
-                            </li>`;
+                        list.innerHTML += `<li class="bg-gray-50 p-3 rounded-xl border border-gray-100 shadow-sm text-sm"><div class="flex justify-between items-start mb-1"><span class="font-bold text-gray-800">${t.nama}</span><span class="text-yellow-500 font-bold tracking-widest">★★★★★</span></div><p class="text-gray-600 text-xs italic">"${t.teks}"</p></li>`;
                     }
                 });
             } else { list.innerHTML = '<li class="text-gray-400 text-sm">Belum ada ulasan.</li>'; }
@@ -659,15 +654,7 @@
                 let sarans = []; snap.forEach(c => sarans.push(c.val()));
                 sarans.sort((a,b) => b.timestamp - a.timestamp).forEach(s => {
                     const time = new Date(s.timestamp).toLocaleString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
-                    list.innerHTML += `
-                        <li class="bg-purple-50 p-3 rounded-xl border border-purple-100 shadow-sm text-sm">
-                            <div class="flex justify-between items-start mb-1">
-                                <span class="font-bold text-gray-800">${s.nama}</span>
-                                <span class="text-[10px] text-gray-500"><i class="far fa-clock"></i> ${time}</span>
-                            </div>
-                            <p class="text-gray-600 text-xs italic leading-relaxed">"${s.saran}"</p>
-                            <div class="text-[10px] text-purple-600 mt-2 flex items-center"><i class="fas fa-envelope mr-1"></i> ${s.email}</div>
-                        </li>`;
+                    list.innerHTML += `<li class="bg-purple-50 p-3 rounded-xl border border-purple-100 shadow-sm text-sm"><div class="flex justify-between items-start mb-1"><span class="font-bold text-gray-800">${s.nama}</span><span class="text-[10px] text-gray-500"><i class="far fa-clock"></i> ${time}</span></div><p class="text-gray-600 text-xs italic leading-relaxed">"${s.saran}"</p><div class="text-[10px] text-purple-600 mt-2 flex items-center"><i class="fas fa-envelope mr-1"></i> ${s.email}</div></li>`;
                 });
             } else { list.innerHTML = '<li class="text-gray-400 text-sm">Belum ada saran masuk.</li>'; }
         });
@@ -679,15 +666,7 @@
             if(snap.exists()) {
                 let photos = []; snap.forEach(c => { let p=c.val(); p.key=c.key; photos.push(p); });
                 photos.sort((a,b) => b.timestamp - a.timestamp).forEach(p => {
-                    grid.innerHTML += `
-                        <div class="relative group rounded-xl overflow-hidden aspect-square border border-gray-200">
-                            <img src="${p.url}" class="w-full h-full object-cover">
-                            <div class="absolute bottom-0 w-full bg-black/70 p-2 text-white text-[10px] flex justify-between">
-                                <span class="truncate pr-1">${p.ownerName}</span>
-                                <span class="text-yellow-400 font-bold">👍${p.likes||0}</span>
-                            </div>
-                            <button onclick="deletePublicPhoto('${p.key}')" class="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white w-7 h-7 rounded-full text-xs shadow-lg opacity-0 group-hover:opacity-100 transition transform hover:scale-110"><i class="fas fa-trash"></i></button>
-                        </div>`;
+                    grid.innerHTML += `<div class="relative group rounded-xl overflow-hidden aspect-square border border-gray-200"><img src="${p.url}" class="w-full h-full object-cover"><div class="absolute bottom-0 w-full bg-black/70 p-2 text-white text-[10px] flex justify-between"><span class="truncate pr-1">${p.ownerName}</span><span class="text-yellow-400 font-bold">👍${p.likes||0}</span></div><button onclick="deletePublicPhoto('${p.key}')" class="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white w-7 h-7 rounded-full text-xs shadow-lg opacity-0 group-hover:opacity-100 transition transform hover:scale-110"><i class="fas fa-trash"></i></button></div>`;
                 });
             } else { grid.innerHTML = '<div class="col-span-full text-gray-400 text-sm">Beranda publik kosong.</div>'; }
         });
