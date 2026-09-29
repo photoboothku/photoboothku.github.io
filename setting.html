@@ -8,6 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Script Cloudinary Upload Widget -->
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <style>
         body { font-family: 'Poppins', sans-serif; }
         .font-voucher { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; }
@@ -32,26 +34,29 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Pengaturan Global Web & Dasbor -->
             <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-indigo-500 lg:col-span-2">
-                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-sliders-h text-indigo-500 mr-2"></i>Pengaturan Global Website</h2>
+                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-sliders-h text-indigo-500 mr-2"></i>Pengaturan Dasbor & Promosi</h2>
                 <form id="globalSettingsForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Target Reward Belanja (Loyalty)</label>
-                        <div class="flex items-center bg-gray-50 border border-gray-300 rounded-lg p-2">
+                        <div class="flex items-center bg-gray-50 border border-gray-300 rounded-lg p-2 focus-within:ring-2 focus-within:ring-indigo-500">
                             <span class="text-gray-500 font-bold mr-2">Rp</span>
                             <input type="number" id="setTargetSpend" class="w-full bg-transparent focus:outline-none font-bold text-gray-800" placeholder="500000">
                         </div>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Batas Akhir Photo of the Week (Deadline)</label>
-                        <input type="datetime-local" id="setPotwDeadline" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50">
+                        <input type="datetime-local" id="setPotwDeadline" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 focus:ring-2 focus:ring-indigo-500">
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-xs font-bold text-gray-600 mb-1">URL Banner Promo (Tampil di Dasbor Pelanggan & Index)</label>
-                        <input type="text" id="setBannerUrl" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50" placeholder="https://contoh.com/banner.jpg">
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Upload Banner Promo (Tampil di Dasbor Pelanggan & Beranda)</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="setBannerUrl" readonly class="w-full border border-gray-300 rounded-lg p-2 bg-gray-100 text-gray-500 text-sm" placeholder="URL Banner akan muncul di sini setelah upload">
+                            <button type="button" id="btnUploadBannerPromo" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg shadow whitespace-nowrap transition"><i class="fas fa-cloud-upload-alt mr-2"></i>Upload Gambar</button>
+                        </div>
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Teks Promo & Penawaran Dasbor Pelanggan</label>
-                        <textarea id="setPromoText" rows="2" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50" placeholder="Ketik info promo untuk pelanggan di sini..."></textarea>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Teks Promo & Penawaran Khusus Dasbor Pelanggan</label>
+                        <textarea id="setPromoText" rows="2" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 focus:ring-2 focus:ring-indigo-500" placeholder="Ketik info promo untuk pelanggan di sini..."></textarea>
                     </div>
                     <div class="md:col-span-2 text-right">
                         <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg shadow transition">Simpan Pengaturan</button>
@@ -80,7 +85,6 @@
         <!-- ROW 2: VOUCHER                             -->
         <!-- ========================================== -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Panel Generator Voucher (Kiri) -->
             <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-yellow-500 lg:col-span-1">
                 <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-ticket-alt text-yellow-500 mr-2"></i>Buat Voucher</h2>
                 <form id="voucherGeneratorForm" class="space-y-4">
@@ -107,7 +111,6 @@
                 </form>
             </div>
 
-            <!-- Panel Daftar Voucher (Tengah) -->
             <div class="bg-white p-6 rounded-2xl shadow lg:col-span-2">
                 <h2 class="text-xl font-bold mb-4 text-gray-800">Daftar Voucher Sistem</h2>
                 <div class="overflow-x-auto h-80 border border-gray-200 rounded-xl custom-scrollbar">
@@ -134,9 +137,10 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
                     <h2 class="text-xl font-bold text-gray-800"><i class="fas fa-clipboard-list text-blue-500 mr-2"></i>Manajemen Antrean Pesanan</h2>
-                    <p class="text-xs text-gray-500">Klik ikon WhatsApp pada pelanggan Menunggu untuk mengirimkan sisa antrean otomatis.</p>
+                    <p class="text-xs text-gray-500 mt-1">Antrean diurutkan berdasarkan Nomor. Anda dapat memindahkan posisi antrean dengan tombol panah (↑/↓).</p>
                 </div>
                 <div class="flex gap-2 w-full md:w-auto">
+                    <a href="pos.html" target="_blank" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg font-bold text-sm shadow flex-1 md:flex-none text-center transition"><i class="fas fa-cash-register mr-1"></i> Buka POS</a>
                     <button id="btnOpenOfflineModal" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-lg font-bold text-sm shadow flex-1 md:flex-none transition"><i class="fas fa-walking mr-1"></i> Walk-in (Offline)</button>
                 </div>
             </div>
@@ -160,9 +164,15 @@
         <!-- ROW 4: DATA MEMBER PELANGGAN SETIA         -->
         <!-- ========================================== -->
         <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-orange-500">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-gray-800"><i class="fas fa-users text-orange-500 mr-2"></i>Data Member (Pelanggan)</h2>
-                <span class="text-xs font-bold text-white bg-orange-500 px-3 py-1 rounded-full shadow" id="totalMembers">Total: 0</span>
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-xl font-bold text-gray-800"><i class="fas fa-users text-orange-500"></i> Data Member</h2>
+                    <span class="text-xs font-bold text-white bg-orange-500 px-3 py-1 rounded-full shadow" id="totalMembers">Total: 0</span>
+                </div>
+                <div class="w-full md:w-64 relative">
+                    <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+                    <input type="text" id="searchMember" placeholder="Cari Nama / Email..." class="w-full border border-gray-300 rounded-lg p-2 pl-9 bg-gray-50 focus:ring-2 focus:ring-orange-500 focus:bg-white text-sm transition">
+                </div>
             </div>
             
             <div class="overflow-x-auto border border-gray-200 rounded-xl custom-scrollbar max-h-[400px]">
@@ -185,20 +195,17 @@
         <!-- ROW 5: MODERASI GALERI & TESTIMONI         -->
         <!-- ========================================== -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Moderasi Galeri Publik -->
             <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-red-500">
                 <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-images text-red-500 mr-2"></i>Moderasi Galeri Publik</h2>
                 <div id="publicGalleryModeration" class="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-80 overflow-y-auto p-1 custom-scrollbar"></div>
             </div>
-
-            <!-- Testimoni Bintang 5 -->
             <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-green-500">
-                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-star text-yellow-400 mr-2"></i>Ulasan Pelanggan</h2>
+                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-star text-yellow-400 mr-2"></i>Ulasan Pelanggan Bintang 5</h2>
                 <ul id="testimoniListAdmin" class="space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar"></ul>
             </div>
         </div>
 
-    </div> <!-- End Main Container -->
+    </div>
 
     <!-- Modal Booking Offline -->
     <div id="offlineModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
@@ -218,20 +225,6 @@
                     <i class="fas fa-info-circle mr-1"></i> Jadwal otomatis dibuat hari ini, saat ini juga.
                 </div>
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg transition">Simpan & Beri Nomor Antrean</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Upload Foto Admin ke Member -->
-    <div id="uploadFotoModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl relative border-t-4 border-indigo-500">
-            <button id="closeUploadModal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl"><i class="fas fa-times"></i></button>
-            <h2 class="text-xl font-bold mb-2 text-gray-800"><i class="fas fa-cloud-upload-alt text-indigo-500 mr-2"></i>Upload Foto Pelanggan</h2>
-            <p class="text-xs text-gray-500 mb-4">Tambahkan URL gambar (Cloudinary/Drive) ke galeri <strong id="uploadTargetEmail" class="text-indigo-600"></strong></p>
-            <form id="uploadFotoForm" class="space-y-4">
-                <input type="hidden" id="uploadSafeEmail">
-                <input type="url" id="uploadImgUrl" placeholder="https://res.cloudinary.com/.../image.jpg" required class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white text-sm">
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-lg transition">Simpan Foto ke Dasbor Pelanggan</button>
             </form>
         </div>
     </div>
@@ -262,7 +255,7 @@
         function formatSafeEmail(email) { return email.replace(/[@.]/g, '_'); }
 
         // ==========================================
-        // 0. PENGATURAN GLOBAL DASBOR & WEB
+        // 0. PENGATURAN GLOBAL DASBOR & WEB (CLOUDINARY BANNER)
         // ==========================================
         onValue(ref(db, 'settings/global'), (snap) => {
             if(snap.exists()) {
@@ -284,6 +277,17 @@
             };
             await set(ref(db, 'settings/global'), data);
             alert("Pengaturan Global Berhasil Disimpan!");
+        });
+
+        // Widget Upload Cloudinary untuk Banner
+        document.getElementById('btnUploadBannerPromo').addEventListener('click', () => {
+            cloudinary.createUploadWidget({
+                cloudName: 'y2k0oqrl', uploadPreset: 'photobooth', sources: ['local', 'url']
+            }, (error, result) => {
+                if (!error && result && result.event === "success") {
+                    document.getElementById('setBannerUrl').value = result.info.secure_url;
+                }
+            }).open();
         });
 
         // ==========================================
@@ -312,7 +316,6 @@
             snapshot.forEach((child) => {
                 const data = child.val(); let statusBadge = "";
                 
-                // Mengenali status Claimed atau Terpakai
                 if(data.status === 'terpakai' || data.status.includes('Claimed')) {
                     statusBadge = `<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-bold">Terpakai</span><div class="text-[10px] mt-1 text-gray-500">${data.digunakanOleh||data.pemilik||''}</div>`;
                 } else if (data.expired < today) {
@@ -338,7 +341,7 @@
             document.querySelectorAll('.delete-voucher').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     const id = e.currentTarget.getAttribute('data-id');
-                    if(confirm(`Yakin ingin menghapus voucher ${id}?`)) await remove(ref(db, 'vouchers/' + id));
+                    if(confirm(`Yakin menghapus voucher ${id}?`)) await remove(ref(db, 'vouchers/' + id));
                 });
             });
         });
@@ -352,7 +355,7 @@
 
         function resetPaketForm() {
             paketIdInput.value = ''; namaPaketInput.value = ''; hargaPaketInput.value = ''; deskripsiPaketInput.value = '';
-            savePaketBtn.innerText = 'Simpan'; savePaketBtn.className = 'flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-bold shadow text-sm'; cancelEditBtn.classList.add('hidden');
+            savePaketBtn.innerText = 'Simpan'; savePaketBtn.className = 'flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-bold shadow text-sm transition'; cancelEditBtn.classList.add('hidden');
         }
         cancelEditBtn.addEventListener('click', resetPaketForm);
 
@@ -390,9 +393,7 @@
                     </li>`;
             });
 
-            document.querySelectorAll('.delete-paket').forEach(btn => {
-                btn.addEventListener('click', async (e) => { if(confirm("Hapus paket ini?")) await remove(ref(db, 'settings/paket/' + e.target.getAttribute('data-id'))); });
-            });
+            document.querySelectorAll('.delete-paket').forEach(btn => { btn.addEventListener('click', async (e) => { if(confirm("Hapus paket ini?")) await remove(ref(db, 'settings/paket/' + e.target.getAttribute('data-id'))); }); });
             document.querySelectorAll('.edit-paket').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     paketIdInput.value = e.target.getAttribute('data-id'); namaPaketInput.value = e.target.getAttribute('data-nama');
@@ -404,7 +405,7 @@
         });
 
         // ==========================================
-        // 3. MANAJEMEN ANTREAN (DENGAN WA LINK PINTAR)
+        // 3. MANAJEMEN ANTREAN (NAIK TURUN & WA)
         // ==========================================
         window.tandaiSelesai = async function(key) {
             if(confirm("Tandai sesi ini telah Selesai?")) await update(ref(db, 'pendaftaran/' + key), { status: 'Selesai' });
@@ -426,7 +427,24 @@
             }
             const newAntreanStr = "A-" + (maxQueue + 1).toString().padStart(3, '0');
             await update(ref(db, 'pendaftaran/' + key), { status: 'Reschedule (Telat)', antrean: newAntreanStr, pesanAdmin: `Jadwal terlewat. Anda dipindah ke antrean akhir (${newAntreanStr}).` });
-            alert(`Dipindah ke antrean: ${newAntreanStr}`);
+        }
+
+        // Fungsi Menukar Posisi Antrean
+        window.swapQueue = async function(currentIndex, direction) {
+            const waitingList = window.currentWaitingQueue;
+            const targetIndex = currentIndex + direction;
+            
+            if(targetIndex < 0 || targetIndex >= waitingList.length) return; 
+
+            const item1 = waitingList[currentIndex];
+            const item2 = waitingList[targetIndex];
+
+            // Tukar value antrean di Firebase
+            let updates = {};
+            updates['pendaftaran/' + item1.key + '/antrean'] = item2.antrean;
+            updates['pendaftaran/' + item2.key + '/antrean'] = item1.antrean;
+            
+            await update(ref(db), updates);
         }
 
         onValue(ref(db, 'pendaftaran'), (snapshot) => {
@@ -434,30 +452,59 @@
             let listPendaftar = [];
             snapshot.forEach(c => { let v = c.val(); v.key = c.key; listPendaftar.push(v); });
             
-            // Sort by Waktu Pemesanan / Kedatangan
-            listPendaftar.sort((a,b) => new Date(a.waktu).getTime() - new Date(b.waktu).getTime());
-
             const todayStr = new Date().toISOString().split('T')[0];
-            let waitingTodayList = listPendaftar.filter(p => p.status !== 'Selesai' && !p.status?.includes('Claimed') && p.waktu.startsWith(todayStr));
+            
+            // Pisahkan yang Menunggu Hari Ini (Untuk di-Sort berdasarkan Nomor Antrean)
+            let waitingTodayList = listPendaftar.filter(p => !p.status?.includes('Selesai') && !p.status?.includes('Telat') && p.waktu.startsWith(todayStr));
+            waitingTodayList.sort((a,b) => a.antrean.localeCompare(b.antrean));
+            
+            // Simpan ke window agar bisa diakses fungsi swap
+            window.currentWaitingQueue = waitingTodayList;
 
-            listPendaftar.reverse().forEach((data) => {
+            // Yang Lainnya (Selesai, Telat, Beda Hari)
+            let otherList = listPendaftar.filter(p => !(!p.status?.includes('Selesai') && !p.status?.includes('Telat') && p.waktu.startsWith(todayStr)));
+            otherList.sort((a,b) => b.timestamp - a.timestamp); // Urutkan yang lain berdasar waktu masuk
+
+            // Gabungkan kembali untuk render
+            const renderList = [...waitingTodayList, ...otherList];
+
+            renderList.forEach((data) => {
+                const isWaitingToday = !data.status?.includes('Selesai') && !data.status?.includes('Telat') && data.waktu.startsWith(todayStr);
+                const currentIndex = waitingTodayList.findIndex(p => p.key === data.key);
+
                 const jadwal = data.waktu ? new Date(data.waktu).toLocaleString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) : '-';
                 const status = data.status || 'Menunggu';
-                const antreanBadge = data.antrean ? `<span class="font-voucher text-xl font-black text-blue-700 tracking-wider">${data.antrean}</span>` : `<span class="text-gray-400">-</span>`;
+                
+                // Tombol Naik Turun Antrean
+                let sortButtons = "";
+                if(isWaitingToday) {
+                    const btnUpClass = currentIndex > 0 ? "hover:bg-gray-200 text-gray-700 cursor-pointer" : "text-gray-300 cursor-not-allowed opacity-50";
+                    const btnDownClass = currentIndex < waitingTodayList.length - 1 ? "hover:bg-gray-200 text-gray-700 cursor-pointer" : "text-gray-300 cursor-not-allowed opacity-50";
+                    sortButtons = `
+                        <div class="flex flex-col ml-2 border border-gray-200 rounded overflow-hidden">
+                            <button ${currentIndex > 0 ? `onclick="swapQueue(${currentIndex}, -1)"` : 'disabled'} class="bg-gray-50 px-1.5 py-0.5 text-[10px] ${btnUpClass}"><i class="fas fa-chevron-up"></i></button>
+                            <button ${currentIndex < waitingTodayList.length - 1 ? `onclick="swapQueue(${currentIndex}, 1)"` : 'disabled'} class="bg-gray-50 px-1.5 py-0.5 text-[10px] border-t border-gray-200 ${btnDownClass}"><i class="fas fa-chevron-down"></i></button>
+                        </div>`;
+                }
+
+                const antreanBadge = data.antrean ? `
+                    <div class="flex justify-center items-center">
+                        <span class="font-voucher text-xl font-black text-blue-700 tracking-wider">${data.antrean}</span>
+                        ${sortButtons}
+                    </div>` : `<span class="text-gray-400">-</span>`;
                 
                 let statusUI = `<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-bold border border-yellow-200 inline-block shadow-sm">Menunggu</span>`;
                 if(status.includes('Selesai')) statusUI = `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-[10px] font-bold border border-green-200 inline-block shadow-sm"><i class="fas fa-check-circle mr-1"></i>Selesai</span>`;
                 if(status.includes('Telat')) statusUI = `<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-[10px] font-bold border border-red-200 block shadow-sm"><i class="fas fa-exclamation-triangle"></i> Reschedule</span>`;
                 
-                // KALKULASI SISA ANTREAN UNTUK PESAN WA
+                // KALKULASI SISA ANTREAN
                 let sisaAntreanInfo = "";
                 let waText = `Halo ${data.nama}, ini admin Canon-Ipad Booth Wawancellcomp.\nMengingatkan jadwal photobooth Anda: ${jadwal}.\n`;
-                if (status === 'Menunggu' && data.waktu.startsWith(todayStr)) {
-                    let indexOrangIni = waitingTodayList.findIndex(p => p.key === data.key);
-                    if (indexOrangIni > 0) {
-                        waText += `Saat ini ada *${indexOrangIni} antrean* lagi sebelum giliran Anda (Nomor ${data.antrean}). Segera bersiap ya!`;
-                        sisaAntreanInfo = `<span class="text-[10px] font-bold text-orange-500 block mt-1"><i class="fas fa-users"></i> Sisa antrean: ${indexOrangIni}</span>`;
-                    } else if (indexOrangIni === 0) {
+                if (isWaitingToday) {
+                    if (currentIndex > 0) {
+                        waText += `Saat ini ada *${currentIndex} antrean* lagi sebelum giliran Anda (Nomor ${data.antrean}). Segera bersiap ya!`;
+                        sisaAntreanInfo = `<span class="text-[10px] font-bold text-orange-500 block mt-1"><i class="fas fa-users"></i> Sisa antrean: ${currentIndex}</span>`;
+                    } else if (currentIndex === 0) {
                         waText += `Giliran Anda (Nomor ${data.antrean}) adalah yang *SELANJUTNYA*. Silakan menuju booth sekarang!`;
                         sisaAntreanInfo = `<span class="text-[10px] font-bold text-green-600 block mt-1 animate-pulse"><i class="fas fa-play-circle"></i> Giliran Berikutnya!</span>`;
                     }
@@ -476,7 +523,7 @@
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-blue-50 transition border-b border-gray-100 bg-white">
-                        <td class="px-4 py-4 text-center align-middle bg-gray-50 border-r border-gray-100 w-24">
+                        <td class="px-4 py-4 text-center align-middle bg-gray-50 border-r border-gray-100 w-32">
                             ${antreanBadge}
                             <div class="mt-2">${statusUI}</div>
                             ${sisaAntreanInfo}
@@ -525,40 +572,36 @@
         // ==========================================
         // 4. MANAJEMEN MEMBER / PELANGGAN
         // ==========================================
-        // Modal Upload Foto Admin
+        // Cloudinary Upload for Member
         window.bukaUploadModal = function(safeEmail) {
-            document.getElementById('uploadSafeEmail').value = safeEmail;
-            document.getElementById('uploadTargetEmail').innerText = safeEmail.replace(/_/g, '.');
-            document.getElementById('uploadFotoModal').classList.remove('hidden');
+            cloudinary.createUploadWidget({
+                cloudName: 'y2k0oqrl', uploadPreset: 'photobooth', sources: ['local', 'url']
+            }, async (error, result) => {
+                if (!error && result && result.event === "success") {
+                    await push(ref(db, `admin_uploaded_photos/${safeEmail}`), result.info.secure_url);
+                    alert("Foto berhasil diunggah ke Galeri Pelanggan!");
+                }
+            }).open();
         }
-        document.getElementById('closeUploadModal').addEventListener('click', () => document.getElementById('uploadFotoModal').classList.add('hidden'));
-        
-        document.getElementById('uploadFotoForm').addEventListener('submit', async(e) => {
-            e.preventDefault();
-            const sEmail = document.getElementById('uploadSafeEmail').value;
-            const url = document.getElementById('uploadImgUrl').value;
-            // Admin menambahkan foto langsung ke nodes rahasia yang dirender di pelanggan dashboard (index.html bisa disesuaikan nanti jika butuh, tp yg diminta push ke DB)
-            await push(ref(db, `admin_uploaded_photos/${sEmail}`), url);
-            alert("URL Gambar Berhasil ditambahkan ke Database untuk Pelanggan ini!");
-            document.getElementById('uploadFotoModal').classList.add('hidden');
-            e.target.reset();
+
+        // Search Filter
+        document.getElementById('searchMember').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            document.querySelectorAll('#memberList tr').forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(term) ? '' : 'none';
+            });
         });
 
-        // Render Member Table
         onValue(ref(db, 'pendaftaran'), async (snapPend) => {
             if(!snapPend.exists()) return;
             const pData = snapPend.val();
-            
-            const snapUsers = await get(ref(db, 'users'));
-            const uData = snapUsers.exists() ? snapUsers.val() : {};
+            const snapUsers = await get(ref(db, 'users')); const uData = snapUsers.exists() ? snapUsers.val() : {};
 
             let membersMap = {};
-            // Aggregation based on Email
             Object.values(pData).forEach(p => {
-                if(!p.email) return; // Skip walk-in without email for member tracking
-                if(!membersMap[p.email]) {
-                    membersMap[p.email] = { email: p.email, safeEmail: formatSafeEmail(p.email), nama: p.nama, nohp: p.nohp, totalSelesai: 0, lastActivity: p.timestamp };
-                }
+                if(!p.email) return; 
+                if(!membersMap[p.email]) membersMap[p.email] = { email: p.email, safeEmail: formatSafeEmail(p.email), nama: p.nama, nohp: p.nohp, totalSelesai: 0, lastActivity: p.timestamp };
                 if(p.status && p.status.includes('Selesai')) membersMap[p.email].totalSelesai++;
                 if(p.timestamp > membersMap[p.email].lastActivity) membersMap[p.email].lastActivity = p.timestamp;
             });
@@ -568,7 +611,6 @@
             document.getElementById('totalMembers').innerText = `Total: ${mArr.length} Member`;
 
             mArr.forEach(m => {
-                // Get updated NO HP from users node if exists
                 if(uData[m.safeEmail] && uData[m.safeEmail].nohp) m.nohp = uData[m.safeEmail].nohp;
 
                 let tierBadge = "";
@@ -588,7 +630,7 @@
                         <td class="px-4 py-3 text-center">
                             <div class="flex justify-center gap-2">
                                 <a href="${promoLink}" target="_blank" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded text-[10px] font-bold shadow-sm transition"><i class="fab fa-whatsapp mr-1"></i>Promo</a>
-                                <button onclick="bukaUploadModal('${m.safeEmail}')" class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1.5 rounded text-[10px] font-bold shadow-sm transition"><i class="fas fa-upload mr-1"></i>Foto</button>
+                                <button onclick="bukaUploadModal('${m.safeEmail}')" class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1.5 rounded text-[10px] font-bold shadow-sm transition"><i class="fas fa-cloud-upload-alt mr-1"></i>Upload Foto</button>
                             </div>
                         </td>
                     </tr>`;
@@ -598,30 +640,26 @@
         // ==========================================
         // 5. MODERASI GALERI & TESTIMONI
         // ==========================================
-        // Testimoni Reader
         onValue(ref(db, 'testimonials'), (snap) => {
             const list = document.getElementById('testimoniListAdmin'); list.innerHTML = '';
             if(snap.exists()) {
                 let tests = []; snap.forEach(c => tests.push(c.val()));
                 tests.sort((a,b) => b.waktu - a.waktu).forEach(t => {
-                    const stars = '★'.repeat(t.rating) + '☆'.repeat(5-t.rating);
-                    const color = t.rating === 5 ? 'text-yellow-500' : 'text-gray-400';
-                    list.innerHTML += `
-                        <li class="bg-gray-50 p-3 rounded-xl border border-gray-100 shadow-sm text-sm">
-                            <div class="flex justify-between items-start mb-1">
-                                <span class="font-bold text-gray-800">${t.nama}</span>
-                                <span class="${color} font-bold tracking-widest">${stars}</span>
-                            </div>
-                            <p class="text-gray-600 text-xs italic">"${t.teks}"</p>
-                        </li>`;
+                    if(t.rating === 5) {
+                        list.innerHTML += `
+                            <li class="bg-gray-50 p-3 rounded-xl border border-gray-100 shadow-sm text-sm">
+                                <div class="flex justify-between items-start mb-1">
+                                    <span class="font-bold text-gray-800">${t.nama}</span>
+                                    <span class="text-yellow-500 font-bold tracking-widest">★★★★★</span>
+                                </div>
+                                <p class="text-gray-600 text-xs italic">"${t.teks}"</p>
+                            </li>`;
+                    }
                 });
             } else { list.innerHTML = '<li class="text-gray-400 text-sm">Belum ada ulasan.</li>'; }
         });
 
-        // Public Gallery Moderation
-        window.deletePublicPhoto = async function(key) {
-            if(confirm("Hapus foto ini dari Beranda Publik?")) await remove(ref(db, 'homepage_photos/' + key));
-        }
+        window.deletePublicPhoto = async function(key) { if(confirm("Hapus foto ini dari Beranda Publik?")) await remove(ref(db, 'homepage_photos/' + key)); }
 
         onValue(ref(db, 'homepage_photos'), (snap) => {
             const grid = document.getElementById('publicGalleryModeration'); grid.innerHTML = '';
