@@ -19,7 +19,6 @@
         .star-rating label { cursor: pointer; color: #d1d5db; font-size: 2rem; transition: color 0.2s; }
         .star-rating input:checked ~ label, .star-rating label:hover, .star-rating label:hover ~ label { color: #fbbf24; }
         
-        /* Desain Voucher Emas Mengkilap */
         .voucher-gold {
             background: linear-gradient(135deg, #fef08a 0%, #eab308 50%, #ca8a04 100%);
             border: 1px solid #a16207;
@@ -33,7 +32,6 @@
         }
         @keyframes shine { 0% { transform: translateX(-100%) rotate(30deg); } 100% { transform: translateX(100%) rotate(30deg); } }
 
-        /* Tingkatan Pelanggan Borders */
         .tier-baru { border-color: #d1d5db; box-shadow: 0 0 5px rgba(209, 213, 219, 0.5); }
         .tier-reguler { border-color: #cd7f32; box-shadow: 0 0 10px rgba(205, 127, 50, 0.6); }
         .tier-setia { border-color: #94a3b8; box-shadow: 0 0 12px rgba(148, 163, 184, 0.7); }
@@ -141,6 +139,12 @@
                 </div>
             </div>
 
+            <!-- Banner Promo Global (Muncul Jika Diatur Admin) -->
+            <div id="promoBannerContainer" class="hidden rounded-2xl overflow-hidden shadow-md border border-gray-200 relative group bg-gradient-to-r from-blue-600 to-indigo-700">
+                <img id="dashPromoBanner" src="" alt="Promo Banner" class="w-full h-auto object-cover max-h-64 hidden">
+                <div id="dashPromoText" class="p-4 md:p-6 text-white font-bold text-center text-sm md:text-base leading-relaxed hidden"></div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- BOX NOMOR ANTREAN & BOOKING MANDIRI -->
                 <div id="queueBoxContainer" class="bg-blue-600 rounded-2xl shadow p-6 md:col-span-1 text-white flex flex-col items-center justify-center text-center relative overflow-hidden transition-colors duration-500">
@@ -163,7 +167,7 @@
                     <div class="mb-4 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
                         <div class="flex justify-between text-xs font-bold text-gray-700 mb-1">
                             <span>Target Reward Transaksi</span>
-                            <span id="spendProgressText">Rp 0 / Rp 500rb</span>
+                            <span id="spendProgressText">Rp 0 / Rp 0</span>
                         </div>
                         <div class="w-full bg-yellow-200 rounded-full h-2 mb-2">
                             <div id="spendProgressBar" class="bg-yellow-500 h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
@@ -173,25 +177,22 @@
                         </button>
                     </div>
 
-                    <ul id="historyPemesananList" class="space-y-3 text-sm text-gray-600 flex-1 overflow-y-auto pr-2 max-h-32">
+                    <ul id="historyPemesananList" class="space-y-3 text-sm text-gray-600 flex-1 overflow-y-auto pr-2 max-h-32 custom-scrollbar">
                         <li class="text-center text-gray-400 py-4"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat riwayat...</li>
                     </ul>
                 </div>
 
-                <!-- Data Voucher & Testimoni -->
-                <div class="space-y-6 md:col-span-1 flex flex-col">
-                    <!-- Voucher Card -->
-                    <div class="bg-white rounded-2xl shadow p-5 border border-gray-100 flex-1">
-                        <h3 class="text-lg font-bold text-gray-800 mb-3 border-b pb-2"><i class="fas fa-ticket-alt text-yellow-500 mr-2"></i>Voucher Saya</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <strong class="text-green-600 block mb-2 text-sm">Siap Digunakan</strong>
-                                <ul id="voucherAktifList" class="space-y-2 max-h-32 overflow-y-auto pr-2"></ul>
-                            </div>
-                            <div>
-                                <strong class="text-gray-400 block mb-1 text-xs">Riwayat Terpakai</strong>
-                                <ul id="voucherTerpakaiList" class="space-y-1 text-xs max-h-20 overflow-y-auto pr-2"></ul>
-                            </div>
+                <!-- Data Voucher -->
+                <div class="bg-white rounded-2xl shadow p-6 md:col-span-1 border border-gray-100 flex flex-col">
+                    <h3 class="text-lg font-bold text-gray-800 mb-3 border-b pb-2"><i class="fas fa-ticket-alt text-yellow-500 mr-2"></i>Voucher Saya</h3>
+                    <div class="space-y-4 flex-1">
+                        <div>
+                            <strong class="text-green-600 block mb-2 text-sm">Siap Digunakan</strong>
+                            <ul id="voucherAktifList" class="space-y-2 max-h-32 overflow-y-auto pr-2 custom-scrollbar"></ul>
+                        </div>
+                        <div>
+                            <strong class="text-gray-400 block mb-1 text-xs">Riwayat Terpakai</strong>
+                            <ul id="voucherTerpakaiList" class="space-y-1 text-xs max-h-20 overflow-y-auto pr-2 custom-scrollbar"></ul>
                         </div>
                     </div>
                 </div>
@@ -223,7 +224,7 @@
                                 ⚠️ Bintang 3 ke bawah: Fitur "Tampil Beranda" dinonaktifkan.
                             </p>
                             <textarea id="testimoniTeks" placeholder="Bagaimana hasil cetakan dan propertinya?" required class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 transition"></textarea>
-                            <button type="submit" id="btnSubmitTestimoni" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2.5 rounded-lg text-sm shadow transition font-bold"><i class="fas fa-paper-plane mr-2"></i>Kirim Testimoni & Ambil Hadiah</button>
+                            <button type="submit" id="btnSubmitTestimoni" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2.5 rounded-lg text-sm shadow transition"><i class="fas fa-paper-plane mr-2"></i>Kirim Testimoni & Ambil Hadiah</button>
                         </form>
                         <div id="testimoniSuccessMsg" class="hidden text-center bg-green-50 text-green-700 p-4 rounded-xl border border-green-200 font-bold">
                             <i class="fas fa-check-circle text-2xl mb-2"></i><br>Terima kasih! Anda sudah memberikan testimoni.
@@ -290,7 +291,6 @@
                 
                 <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
                     <label class="block text-sm font-bold text-blue-800 mb-2"><i class="fas fa-tags mr-2"></i>Gunakan Voucher (Pilih Salah Satu)</label>
-                    
                     <div class="space-y-3">
                         <div>
                             <span class="text-xs font-semibold text-gray-600 block mb-1">1. Pilih Voucher Digital Anda</span>
@@ -347,11 +347,7 @@
                     </button>
                 </div>
             </div>
-            
-            <!-- Mouse Scroll Indicator -->
-            <div class="absolute bottom-10 animate-bounce text-white/50 text-3xl">
-                <i class="fas fa-angle-double-down"></i>
-            </div>
+            <div class="absolute bottom-10 animate-bounce text-white/50 text-3xl"><i class="fas fa-angle-double-down"></i></div>
         </section>
 
         <!-- Section Paket Harga -->
@@ -373,7 +369,8 @@
                     <i class="fas fa-crown mr-2"></i> PHOTO OF THE WEEK <i class="fas fa-crown ml-2"></i>
                 </div>
                 <h2 class="text-3xl md:text-4xl font-bold mb-4 text-white drop-shadow-md">Top 5 Momen Paling Disukai</h2>
-                <p class="text-gray-300 mb-12 max-w-2xl mx-auto">Berikan dukungan <i class="fas fa-thumbs-up text-blue-400 mx-1"></i> pada foto di galeri publik. 5 Foto terbaik setiap pekannya otomatis tampil di sini dan mendapatkan <strong class="text-yellow-400">Voucher Diskon 20%</strong>!</p>
+                <p class="text-gray-300 mb-4 max-w-2xl mx-auto">Berikan dukungan <i class="fas fa-thumbs-up text-blue-400 mx-1"></i> pada foto di galeri publik. 5 Foto terbaik setiap pekannya otomatis tampil di sini dan mendapatkan <strong class="text-yellow-400">Voucher Diskon 20%</strong>!</p>
+                <p class="text-yellow-300 font-bold mb-12 text-sm" id="potwDeadlineText"></p>
                 
                 <div id="potwGalleryGrid" class="grid grid-cols-2 md:grid-cols-5 gap-4">
                     <div class="col-span-full text-center text-gray-400 py-10"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat jawara minggu ini...</div>
@@ -547,28 +544,52 @@
         let hasGivenTestimonial = false;
 
         const cloudName = 'y2k0oqrl';
-        const TARGET_SPEND_REWARD = 500000; // Target total belanja untuk dapat voucher
-        let paketPricesMap = {}; // Untuk kalkulasi spend
+        let TARGET_SPEND_REWARD = 500000; 
+        let paketPricesMap = {};
+
+        // ==========================================
+        // 0. LOAD PENGATURAN GLOBAL DARI FIREBASE (DASBOR ADMIN)
+        // ==========================================
+        onValue(ref(db, 'settings/global'), (snap) => {
+            if(snap.exists()) {
+                const data = snap.val();
+                if(data.targetSpend) TARGET_SPEND_REWARD = parseInt(data.targetSpend);
+                
+                // Update Banner Promo Dasbor Pelanggan
+                const bannerContainer = document.getElementById('promoBannerContainer');
+                const bannerImg = document.getElementById('dashPromoBanner');
+                const promoText = document.getElementById('dashPromoText');
+                
+                if (data.bannerUrl || data.promoText) {
+                    bannerContainer.classList.remove('hidden');
+                    if (data.bannerUrl) { bannerImg.src = data.bannerUrl; bannerImg.classList.remove('hidden'); } 
+                    else { bannerImg.classList.add('hidden'); }
+                    
+                    if (data.promoText) {
+                        promoText.innerHTML = data.promoText.replace(/\n/g, '<br>'); promoText.classList.remove('hidden');
+                        if(!data.bannerUrl) { promoText.classList.replace('absolute', 'relative'); promoText.className = "bg-blue-600 p-4 md:p-6 text-white font-bold text-center text-sm md:text-base leading-relaxed"; }
+                    }
+                } else { bannerContainer.classList.add('hidden'); }
+
+                // Update POTW Deadline
+                if (data.potwDeadline) {
+                    const dateObj = new Date(data.potwDeadline);
+                    document.getElementById('potwDeadlineText').innerText = `⏳ Batas Penilaian Sesi Ini: ${dateObj.toLocaleString('id-ID', {weekday:'long', day:'numeric', month:'long', hour:'2-digit', minute:'2-digit'})} WIB`;
+                }
+            }
+        });
 
         // ==========================================
         // 0. UI HELPERS & MOBILE MENU
         // ==========================================
-        document.getElementById('mobileMenuToggleBtn').addEventListener('click', () => {
-            document.getElementById('mobileMenuDropdown').classList.toggle('hidden');
-        });
-        document.getElementById('mobileAdminBtn').addEventListener('click', () => {
-            document.getElementById('mobileMenuDropdown').classList.add('hidden');
-            document.getElementById('adminModal').classList.remove('hidden');
-        });
+        document.getElementById('mobileMenuToggleBtn').addEventListener('click', () => { document.getElementById('mobileMenuDropdown').classList.toggle('hidden'); });
+        document.getElementById('mobileAdminBtn').addEventListener('click', () => { document.getElementById('mobileMenuDropdown').classList.add('hidden'); document.getElementById('adminModal').classList.remove('hidden'); });
 
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
-                document.getElementById('mobileMenuDropdown').classList.add('hidden');
-                document.getElementById('pelanggan-dashboard').classList.add('hidden');
-                document.getElementById('mainWebsiteContent').classList.remove('hidden');
-                window.location.hash = ''; 
-                document.querySelector(link.getAttribute('href')).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                document.getElementById('mobileMenuDropdown').classList.add('hidden'); document.getElementById('pelanggan-dashboard').classList.add('hidden'); document.getElementById('mainWebsiteContent').classList.remove('hidden');
+                window.location.hash = ''; document.querySelector(link.getAttribute('href')).scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
         });
 
@@ -580,27 +601,16 @@
         async function loadPaketData() {
             try {
                 const snap = await get(ref(db, 'settings/paket'));
-                const sel = document.getElementById('paket'); 
-                const cont = document.getElementById('pricingContainer');
-                const bmSel = document.getElementById('bmPaket'); 
+                const sel = document.getElementById('paket'); const cont = document.getElementById('pricingContainer'); const bmSel = document.getElementById('bmPaket'); 
                 
                 if (snap.exists()) {
-                    sel.innerHTML = '<option value="">-- Pilih Paket Photobooth --</option>'; 
-                    bmSel.innerHTML = '<option value="">-- Pilih Paket Photobooth --</option>';
-                    cont.innerHTML = '';
+                    sel.innerHTML = '<option value="">-- Pilih Paket Photobooth --</option>'; bmSel.innerHTML = '<option value="">-- Pilih Paket Photobooth --</option>'; cont.innerHTML = '';
                     snap.forEach(child => {
-                        const data = child.val();
-                        const nama = typeof data === 'object' ? data.nama : data;
-                        const harga = typeof data === 'object' && data.harga ? parseInt(data.harga) : 0;
-                        const deskripsi = typeof data === 'object' && data.deskripsi ? data.deskripsi : '-';
+                        const data = child.val(); const nama = typeof data === 'object' ? data.nama : data; const harga = typeof data === 'object' && data.harga ? parseInt(data.harga) : 0; const deskripsi = typeof data === 'object' && data.deskripsi ? data.deskripsi : '-';
                         const hRp = harga > 0 ? `Rp ${harga.toLocaleString('id-ID')}` : 'Hubungi Admin';
-                        
-                        paketPricesMap[nama] = harga; // Simpan untuk kalkulasi spend
+                        paketPricesMap[nama] = harga;
 
-                        sel.innerHTML += `<option value="${nama}">${nama} (${hRp})</option>`;
-                        bmSel.innerHTML += `<option value="${nama}">${nama} (${hRp})</option>`;
-                        
-                        // Render Kartu di Homepage dengan tombol Booking
+                        sel.innerHTML += `<option value="${nama}">${nama} (${hRp})</option>`; bmSel.innerHTML += `<option value="${nama}">${nama} (${hRp})</option>`;
                         cont.innerHTML += `
                             <div class="border border-gray-100 rounded-2xl p-8 shadow-sm hover:shadow-xl transition bg-white text-left flex flex-col h-full transform hover:-translate-y-1">
                                 <div class="flex-1">
@@ -617,35 +627,27 @@
             } catch (error) {}
         }
         
-        // Fungsi Booking dari Homepage Card
         window.bookPackageFromHome = async function(paketName) {
             if(!auth.currentUser) {
                 alert("Silakan Login Akun Anda terlebih dahulu untuk membooking paket ini.");
                 try {
-                    await signInWithPopup(auth, provider);
-                    tampilkanDasbor(auth.currentUser);
+                    await signInWithPopup(auth, provider); tampilkanDasbor(auth.currentUser);
                     setTimeout(() => { openBookingMandiriWithPaket(paketName); }, 1500);
                 } catch(e) { return; }
-            } else {
-                document.getElementById('navLoginPelangganBtn').click(); // Buka Dasbor
-                setTimeout(() => { openBookingMandiriWithPaket(paketName); }, 500);
-            }
+            } else { document.getElementById('navLoginPelangganBtn').click(); setTimeout(() => { openBookingMandiriWithPaket(paketName); }, 500); }
         }
 
         function openBookingMandiriWithPaket(paketName) {
             document.getElementById('btnOpenBookingMandiri').click();
             const bmSel = document.getElementById('bmPaket');
-            for(let i=0; i<bmSel.options.length; i++) {
-                if(bmSel.options[i].value === paketName) { bmSel.selectedIndex = i; break; }
-            }
+            for(let i=0; i<bmSel.options.length; i++) { if(bmSel.options[i].value === paketName) { bmSel.selectedIndex = i; break; } }
         }
 
         function loadTestimonials() {
             onValue(ref(db, 'testimonials'), (snap) => {
                 const cont = document.getElementById('testimoniContainer'); cont.innerHTML = '';
                 if(snap.exists()) {
-                    let has5Star = false;
-                    const tests = []; snap.forEach(c => tests.push(c.val()));
+                    let has5Star = false; const tests = []; snap.forEach(c => tests.push(c.val()));
                     tests.reverse().forEach(t => {
                         if(t.rating === 5) { 
                             has5Star = true;
@@ -674,9 +676,7 @@
         document.getElementById('openAdminModalBtn').addEventListener('click', () => document.getElementById('adminModal').classList.remove('hidden'));
         document.getElementById('closeAdminModalBtn').addEventListener('click', () => document.getElementById('adminModal').classList.add('hidden'));
         document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            try { await signInWithEmailAndPassword(auth, document.getElementById('adminEmail').value, document.getElementById('adminPassword').value); window.location.href = 'setting.html'; } 
-            catch (error) { alert("Login Gagal!"); }
+            e.preventDefault(); try { await signInWithEmailAndPassword(auth, document.getElementById('adminEmail').value, document.getElementById('adminPassword').value); window.location.href = 'setting.html'; } catch (error) { alert("Login Gagal!"); }
         });
 
         document.getElementById('validateVoucherBtn').addEventListener('click', async () => {
@@ -709,57 +709,32 @@
             let tglPilih, paketVal, nohpVal, igVal, lombaVal, originType, finalVoucherCode;
             
             if (sourceData) {
-                // Booking Mandiri
-                tglPilih = sourceData.waktu.split('T')[0];
-                paketVal = sourceData.paket;
-                nohpVal = currentProfileInfo.nohp || '000'; 
-                igVal = currentProfileInfo.ig || '';
-                lombaVal = false; 
-                originType = 'Mandiri';
-                finalVoucherCode = sourceData.voucher; // dari form mandiri
+                tglPilih = sourceData.waktu.split('T')[0]; paketVal = sourceData.paket; nohpVal = currentProfileInfo.nohp || '000'; igVal = currentProfileInfo.ig || '';
+                lombaVal = false; originType = 'Mandiri'; finalVoucherCode = sourceData.voucher; 
             } else {
-                // Form Voucher Utama
-                tglPilih = document.getElementById('waktu').value.split('T')[0];
-                paketVal = document.getElementById('paket').value;
-                nohpVal = document.getElementById('nohp').value;
-                igVal = document.getElementById('ig').value;
-                lombaVal = document.getElementById('persetujuanLomba').checked;
-                originType = 'Voucher Awal';
-                finalVoucherCode = validVoucherCode;
-                
-                const safeEmail = formatSafeEmail(email);
-                await update(ref(db, 'users/' + safeEmail), { nohp: nohpVal, ig: igVal });
+                tglPilih = document.getElementById('waktu').value.split('T')[0]; paketVal = document.getElementById('paket').value; nohpVal = document.getElementById('nohp').value;
+                igVal = document.getElementById('ig').value; lombaVal = document.getElementById('persetujuanLomba').checked; originType = 'Voucher Awal'; finalVoucherCode = validVoucherCode;
+                const safeEmail = formatSafeEmail(email); await update(ref(db, 'users/' + safeEmail), { nohp: nohpVal, ig: igVal });
             }
             
-            const snapAll = await get(ref(db, 'pendaftaran'));
-            let antreanKe = 1;
-            if(snapAll.exists()) {
-                snapAll.forEach(c => { if(c.val().waktu && c.val().waktu.startsWith(tglPilih) && c.val().antrean) antreanKe++; });
-            }
+            const snapAll = await get(ref(db, 'pendaftaran')); let antreanKe = 1;
+            if(snapAll.exists()) { snapAll.forEach(c => { if(c.val().waktu && c.val().waktu.startsWith(tglPilih) && c.val().antrean) antreanKe++; }); }
             const nomorAntreanStr = "A-" + antreanKe.toString().padStart(3, '0');
 
             const dataToSave = {
-                antrean: nomorAntreanStr,
-                nama: auth.currentUser ? auth.currentUser.displayName : document.getElementById('nama').value, 
-                nohp: nohpVal, ig: igVal, lomba: lombaVal,
-                paket: paketVal, waktu: sourceData ? sourceData.waktu : document.getElementById('waktu').value,
-                voucher: finalVoucherCode, email: email, status: 'Menunggu', tipe: originType, timestamp: Date.now()
+                antrean: nomorAntreanStr, nama: auth.currentUser ? auth.currentUser.displayName : document.getElementById('nama').value, nohp: nohpVal, ig: igVal, lomba: lombaVal,
+                paket: paketVal, waktu: sourceData ? sourceData.waktu : document.getElementById('waktu').value, voucher: finalVoucherCode, email: email, status: 'Menunggu', tipe: originType, timestamp: Date.now()
             };
 
             await push(ref(db, 'pendaftaran'), dataToSave);
-            
-            if(finalVoucherCode) {
-                await update(ref(db, 'vouchers/' + finalVoucherCode), { status: 'terpakai', digunakanOleh: email });
-            }
-            
+            if(finalVoucherCode) { await update(ref(db, 'vouchers/' + finalVoucherCode), { status: 'terpakai', digunakanOleh: email }); }
             alert(`Pemesanan Berhasil!\n\nPaket: ${paketVal}\nNomor Antrean Anda: ${nomorAntreanStr}\n\nSilakan cek Dasbor Anda untuk detail.`);
             window.location.hash = "#pelanggan-dashboard"; window.location.reload();
         }
 
         document.getElementById('btnDaftarBaru').addEventListener('click', async () => {
             if(!document.getElementById('paket').value || !document.getElementById('waktu').value) return alert("Pilih paket & jadwal!");
-            try { const result = await signInWithPopup(auth, provider); await simpanPendaftaran(result.user.email); } 
-            catch (e) { alert("Login dibatalkan"); }
+            try { const result = await signInWithPopup(auth, provider); await simpanPendaftaran(result.user.email); } catch (e) { alert("Login dibatalkan"); }
         });
 
         document.getElementById('loginExistingBtn').addEventListener('click', async () => {
@@ -779,17 +754,14 @@
         // ==========================================
         const navBtns = [document.getElementById('navLoginPelangganBtn'), document.getElementById('mobileNavLoginBtn'), document.getElementById('heroLoginBtn')];
         navBtns.forEach(btn => btn.addEventListener('click', async () => {
-            document.getElementById('mobileMenuDropdown').classList.add('hidden'); // Tutup menu jika di mobile
+            document.getElementById('mobileMenuDropdown').classList.add('hidden'); 
             if(!auth.currentUser) { try { await signInWithPopup(auth, provider); } catch(e) { return; } }
             tampilkanDasbor(auth.currentUser);
         }));
 
         document.getElementById('btnLogoutPelanggan').addEventListener('click', () => signOut(auth).then(() => window.location.reload()));
         onAuthStateChanged(auth, (user) => { 
-            if (user && window.location.hash === "#pelanggan-dashboard") { 
-                document.getElementById('navLoginPelangganBtn').innerHTML = "<i class='fas fa-user mr-2'></i>Dasbor Saya"; 
-                tampilkanDasbor(user); 
-            } 
+            if (user && window.location.hash === "#pelanggan-dashboard") { document.getElementById('navLoginPelangganBtn').innerHTML = "<i class='fas fa-user mr-2'></i>Dasbor Saya"; tampilkanDasbor(user); } 
         });
 
         document.getElementById('btnSyncDash').addEventListener('click', () => {
@@ -797,139 +769,93 @@
             if(auth.currentUser) { tampilkanDasbor(auth.currentUser); setTimeout(() => { btn.innerHTML = '<i class="fas fa-sync-alt"></i>'; }, 1000); }
         });
 
-        // Edit Profil & Picker Foto
         document.getElementById('btnEditProfil').addEventListener('click', () => {
-            document.getElementById('profilModal').classList.remove('hidden');
-            document.getElementById('profilHP').value = currentProfileInfo.nohp || '';
-            document.getElementById('profilIG').value = currentProfileInfo.ig || '';
+            document.getElementById('profilModal').classList.remove('hidden'); document.getElementById('profilHP').value = currentProfileInfo.nohp || ''; document.getElementById('profilIG').value = currentProfileInfo.ig || '';
             renderPhotoPickerForProfile();
         });
+        document.getElementById('btnGantiFotoIcon').addEventListener('click', () => document.getElementById('btnEditProfil').click());
         document.getElementById('closeProfilModalBtn').addEventListener('click', () => document.getElementById('profilModal').classList.add('hidden'));
         
         function renderPhotoPickerForProfile() {
-            const picker = document.getElementById('profilPhotoPicker');
-            picker.innerHTML = ''; selectedProfilImgTemp = "";
-            if(userCloudinaryPhotos.length === 0) {
-                picker.innerHTML = '<p class="text-xs text-gray-400 w-full text-center py-4">Belum ada foto photobooth Anda.</p>'; return;
-            }
-            userCloudinaryPhotos.forEach(url => {
-                picker.innerHTML += `<img src="${url}" class="w-16 h-16 object-cover rounded-lg cursor-pointer border-4 border-transparent hover:border-blue-400 transition shadow-sm" onclick="selectProfilPhoto(this, '${url}')">`;
-            });
+            const picker = document.getElementById('profilPhotoPicker'); picker.innerHTML = ''; selectedProfilImgTemp = "";
+            if(userCloudinaryPhotos.length === 0) { picker.innerHTML = '<p class="text-xs text-gray-400 w-full text-center py-4">Belum ada foto photobooth Anda.</p>'; return; }
+            userCloudinaryPhotos.forEach(url => { picker.innerHTML += `<img src="${url}" class="w-16 h-16 object-cover rounded-lg cursor-pointer border-4 border-transparent hover:border-blue-400 transition shadow-sm" onclick="selectProfilPhoto(this, '${url}')">`; });
         }
 
         window.selectProfilPhoto = function(imgElement, url) {
             document.querySelectorAll('#profilPhotoPicker img').forEach(el => el.classList.remove('border-blue-600', 'shadow-md'));
-            imgElement.classList.add('border-blue-600', 'shadow-md');
-            selectedProfilImgTemp = url;
+            imgElement.classList.add('border-blue-600', 'shadow-md'); selectedProfilImgTemp = url;
         }
 
         document.getElementById('profilForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const safeEmail = formatSafeEmail(auth.currentUser.email);
-            const nohp = document.getElementById('profilHP').value; const ig = document.getElementById('profilIG').value;
-            
-            let updates = { nohp: nohp, ig: ig };
+            e.preventDefault(); const safeEmail = formatSafeEmail(auth.currentUser.email);
+            let updates = { nohp: document.getElementById('profilHP').value, ig: document.getElementById('profilIG').value };
             if (selectedProfilImgTemp !== "") { updates.profilePic = selectedProfilImgTemp; document.getElementById('dashProfilePic').src = selectedProfilImgTemp; }
-            
-            await update(ref(db, 'users/' + safeEmail), updates);
-            alert('Profil berhasil diperbarui!');
-            document.getElementById('profilModal').classList.add('hidden');
+            await update(ref(db, 'users/' + safeEmail), updates); alert('Profil berhasil diperbarui!'); document.getElementById('profilModal').classList.add('hidden');
         });
 
-        // Booking Mandiri & Kolom Voucher Baru
         document.getElementById('btnOpenBookingMandiri').addEventListener('click', () => {
-            if(!currentProfileInfo.nohp) {
-                alert("Harap lengkapi Profil (Nomor HP) Anda terlebih dahulu sebelum memesan.");
-                document.getElementById('btnEditProfil').click();
-                return;
-            }
+            if(!currentProfileInfo.nohp) { alert("Harap lengkapi Profil (Nomor HP) Anda terlebih dahulu sebelum memesan."); document.getElementById('btnEditProfil').click(); return; }
             document.getElementById('bookingMandiriModal').classList.remove('hidden');
         });
         document.getElementById('closeBookingMandiriBtn').addEventListener('click', () => document.getElementById('bookingMandiriModal').classList.add('hidden'));
         
         document.getElementById('bookingMandiriForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btnSubmitBookingMandiri');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...'; btn.disabled = true;
-
-            const digiSelect = document.getElementById('bmVoucherSelect').value;
-            const physInput = document.getElementById('bmVoucherCodeInput').value.trim().toUpperCase();
-            
+            e.preventDefault(); const btn = document.getElementById('btnSubmitBookingMandiri'); btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...'; btn.disabled = true;
+            const digiSelect = document.getElementById('bmVoucherSelect').value; const physInput = document.getElementById('bmVoucherCodeInput').value.trim().toUpperCase();
             let finalVoucher = "";
 
-            // Validasi: Hanya boleh pilih satu
-            if(digiSelect !== "" && physInput !== "") {
-                alert("❌ Anda tidak boleh memasukkan Voucher Fisik jika sudah memilih Voucher Digital. Silakan kosongkan salah satu.");
-                btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Buat Pesanan & Ambil Antrean'; btn.disabled = false; return;
-            }
+            if(digiSelect !== "" && physInput !== "") { alert("❌ Anda tidak boleh memasukkan Voucher Fisik jika sudah memilih Voucher Digital. Silakan kosongkan salah satu."); btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Buat Pesanan & Ambil Antrean'; btn.disabled = false; return; }
 
-            if (digiSelect !== "") {
-                finalVoucher = digiSelect;
-            } else if (physInput !== "") {
+            if (digiSelect !== "") { finalVoucher = digiSelect; } else if (physInput !== "") {
                 const snap = await get(ref(db, 'vouchers/' + physInput));
-                if(snap.exists()) {
-                    const v = snap.val(); const today = new Date().toISOString().split('T')[0];
+                if(snap.exists()) { const v = snap.val(); const today = new Date().toISOString().split('T')[0];
                     if (v.status === 'aktif' && v.expired >= today) finalVoucher = physInput;
                     else { alert("❌ Voucher fisik tidak valid atau sudah kedaluwarsa."); btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Buat Pesanan & Ambil Antrean'; btn.disabled = false; return; }
                 } else { alert("❌ Kode voucher fisik tidak ditemukan."); btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Buat Pesanan & Ambil Antrean'; btn.disabled = false; return; }
             }
 
             const sourceData = { paket: document.getElementById('bmPaket').value, waktu: document.getElementById('bmWaktu').value, voucher: finalVoucher };
-            document.getElementById('bookingMandiriModal').classList.add('hidden');
-            await simpanPendaftaran(auth.currentUser.email, sourceData);
+            document.getElementById('bookingMandiriModal').classList.add('hidden'); await simpanPendaftaran(auth.currentUser.email, sourceData);
             btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Buat Pesanan & Ambil Antrean'; btn.disabled = false;
         });
 
-        // TAMPILKAN DASBOR & TIER PELANGGAN
         async function tampilkanDasbor(user) {
             document.getElementById('mainWebsiteContent').classList.add('hidden'); document.getElementById('pelanggan-dashboard').classList.remove('hidden');
             document.getElementById('dashCustomerName').innerText = user.displayName; document.getElementById('dashCustomerEmail').innerText = user.email;
             const safeEmail = formatSafeEmail(user.email);
             
-            // Cek apakah user pernah ngasih testimoni
             onValue(ref(db, 'testimonials'), (snap) => {
                 hasGivenTestimonial = false;
                 if(snap.exists()) { snap.forEach(c => { if(c.val().email === user.email) hasGivenTestimonial = true; }); }
                 updateTestimoniUI();
             });
             
-            // A. Ambil Profil
             onValue(ref(db, 'users/' + safeEmail), (snap) => {
                 if(snap.exists()) {
                     const ud = snap.val();
                     if(ud.profilePic) document.getElementById('dashProfilePic').src = ud.profilePic;
                     if(ud.rating) globalUserRating = ud.rating;
-                    
                     currentProfileInfo.nohp = ud.nohp || ''; currentProfileInfo.ig = ud.ig || '';
-                    document.getElementById('dashCustomerPhone').innerText = ud.nohp || 'Belum diisi';
-                    document.getElementById('dashCustomerIG').innerText = ud.ig || 'Belum diisi';
+                    document.getElementById('dashCustomerPhone').innerText = ud.nohp || 'Belum diisi'; document.getElementById('dashCustomerIG').innerText = ud.ig || 'Belum diisi';
                 }
             });
 
-            // B. Cek Antrean Terbaru, Riwayat, & Tingkatan Pelanggan
             onValue(ref(db, 'pendaftaran'), (snap) => {
-                let latestBooking = null; userBookingCount = 0;
-                let totalSpend = 0;
-                const histList = document.getElementById('historyPemesananList'); histList.innerHTML = '';
-                let hasHistory = false;
+                let latestBooking = null; userBookingCount = 0; let totalSpend = 0;
+                const histList = document.getElementById('historyPemesananList'); histList.innerHTML = ''; let hasHistory = false; let allBookings = [];
 
-                let allBookings = [];
                 snap.forEach(child => {
                     const data = child.val();
                     if(data.email === user.email) {
                         if(data.status === 'Selesai') {
-                            userBookingCount++;
-                            hasHistory = true;
-                            // Tambah ke history
-                            allBookings.push(data);
-                            // Kalkulasi Spend
+                            userBookingCount++; hasHistory = true; allBookings.push(data);
                             if(paketPricesMap[data.paket]) totalSpend += paketPricesMap[data.paket];
                         }
-                        if(!latestBooking || data.timestamp > latestBooking.timestamp) latestBooking = data; // Antrean adalah yang paling akhir di klik booking
+                        if(!latestBooking || data.timestamp > latestBooking.timestamp) latestBooking = data; 
                     }
                 });
 
-                // Render History Selesai
                 allBookings.sort((a,b) => b.timestamp - a.timestamp).forEach(data => {
                     let vInfo = data.voucher ? `<span class="bg-gray-200 px-1 rounded text-[10px] ml-1">🎟️ ${data.voucher}</span>` : '';
                     histList.innerHTML += `
@@ -940,25 +866,13 @@
                 });
                 if(!hasHistory) histList.innerHTML = `<li class="text-center text-gray-400 py-4">Belum ada pesanan yang Selesai.</li>`;
 
-                // Render Reward Spend Progress
-                const spendBar = document.getElementById('spendProgressBar');
-                const spendText = document.getElementById('spendProgressText');
-                const btnKlaimSpend = document.getElementById('btnKlaimRewardSpend');
+                const spendBar = document.getElementById('spendProgressBar'); const spendText = document.getElementById('spendProgressText'); const btnKlaimSpend = document.getElementById('btnKlaimRewardSpend');
+                let spendPerc = (totalSpend / TARGET_SPEND_REWARD) * 100; if(spendPerc >= 100) spendPerc = 100;
+                spendBar.style.width = `${spendPerc}%`; spendText.innerText = `Rp ${totalSpend.toLocaleString('id-ID')} / Rp ${TARGET_SPEND_REWARD.toLocaleString('id-ID')}`;
                 
-                let spendPerc = (totalSpend / TARGET_SPEND_REWARD) * 100;
-                if(spendPerc >= 100) spendPerc = 100;
-                spendBar.style.width = `${spendPerc}%`;
-                spendText.innerText = `Rp ${totalSpend.toLocaleString('id-ID')} / Rp ${TARGET_SPEND_REWARD.toLocaleString('id-ID')}`;
+                if(totalSpend >= TARGET_SPEND_REWARD) { spendBar.classList.replace('bg-yellow-500', 'bg-green-500'); btnKlaimSpend.classList.remove('hidden'); } 
+                else { spendBar.classList.replace('bg-green-500', 'bg-yellow-500'); btnKlaimSpend.classList.add('hidden'); }
                 
-                if(totalSpend >= TARGET_SPEND_REWARD) {
-                    spendBar.classList.replace('bg-yellow-500', 'bg-green-500');
-                    btnKlaimSpend.classList.remove('hidden');
-                } else {
-                    spendBar.classList.replace('bg-green-500', 'bg-yellow-500');
-                    btnKlaimSpend.classList.add('hidden');
-                }
-                
-                // Set Customer Tier based on "Selesai" booking count
                 let tierText, nextTarget, tierClass;
                 if(userBookingCount <= 2) { tierText = "Pelanggan Baru"; nextTarget = 3; tierClass = "tier-baru text-gray-600 bg-gray-100"; }
                 else if(userBookingCount <= 8) { tierText = "Pelanggan Reguler"; nextTarget = 9; tierClass = "tier-reguler text-orange-800 bg-orange-50"; }
@@ -966,41 +880,28 @@
                 else { tierText = "Pelanggan VIP 👑"; nextTarget = userBookingCount; tierClass = "tier-vip text-yellow-900 bg-yellow-100"; }
                 
                 let tierPerc = (userBookingCount / nextTarget) * 100; if(userBookingCount >= 16) tierPerc = 100;
-                document.getElementById('tierProgressBar').style.width = `${tierPerc}%`;
-                document.getElementById('tierProgressText').innerText = `${userBookingCount}/${nextTarget}`;
+                document.getElementById('tierProgressBar').style.width = `${tierPerc}%`; document.getElementById('tierProgressText').innerText = `${userBookingCount}/${nextTarget}`;
 
-                const tierEl = document.getElementById('dashCustomerTier');
-                tierEl.innerText = tierText; tierEl.className = `text-xs font-bold inline-block px-4 py-1.5 rounded-full border mb-2 shadow-sm ${tierClass}`;
+                const tierEl = document.getElementById('dashCustomerTier'); tierEl.innerText = tierText; tierEl.className = `text-xs font-bold inline-block px-4 py-1.5 rounded-full border mb-2 shadow-sm ${tierClass}`;
+                const picEl = document.getElementById('dashProfilePic'); picEl.className = picEl.className.replace(/tier-\w+/g, '').trim(); picEl.classList.add(tierClass.split(' ')[0]);
                 
-                // Ganti class border foto sesuai tier (hapus kelas lama dulu via js regex)
-                const picEl = document.getElementById('dashProfilePic');
-                picEl.className = picEl.className.replace(/tier-\w+/g, '').trim();
-                picEl.classList.add(tierClass.split(' ')[0]);
-                
-                // Tampilkan Nomor Antrean Terbaru (Jika belum Selesai)
-                const qBox = document.getElementById('queueBoxContainer');
-                const pkgText = document.getElementById('dashAntreanPaket');
-
+                const qBox = document.getElementById('queueBoxContainer'); const pkgText = document.getElementById('dashAntreanPaket');
                 if(latestBooking && latestBooking.antrean && latestBooking.status !== 'Selesai') {
-                    document.getElementById('dashAntreanNumber').innerText = latestBooking.antrean;
-                    pkgText.classList.remove('hidden'); pkgText.innerText = `📦 ${latestBooking.paket}`;
+                    document.getElementById('dashAntreanNumber').innerText = latestBooking.antrean; pkgText.classList.remove('hidden'); pkgText.innerText = `📦 ${latestBooking.paket}`;
                     let statusText = `<i class="far fa-clock mr-1"></i> Jadwal: ${new Date(latestBooking.waktu).toLocaleString('id-ID')}`;
-                    
                     if (latestBooking.status && latestBooking.status.includes('Telat')) {
-                        statusText = `<span class="text-yellow-100 font-bold block bg-red-700/50 p-2 rounded-lg text-xs mt-2 border border-red-400 shadow-inner"><i class="fas fa-exclamation-triangle mr-1"></i> ${latestBooking.pesanAdmin || 'Jadwal Anda di-reschedule karena telat.'}</span>`;
+                        statusText = `<span class="text-yellow-100 font-bold block bg-red-700/50 p-2 rounded-lg text-xs mt-2 border border-red-400 shadow-inner"><i class="fas fa-exclamation-triangle mr-1"></i> ${latestBooking.pesanAdmin || 'Jadwal di-reschedule karena telat.'}</span>`;
                         qBox.className = "bg-red-600 rounded-2xl shadow p-6 md:col-span-1 text-white flex flex-col items-center justify-center text-center relative overflow-hidden transition-colors duration-500 border border-red-700";
                     } else {
                         qBox.className = "bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl shadow p-6 md:col-span-1 text-white flex flex-col items-center justify-center text-center relative overflow-hidden transition-colors duration-500 border border-blue-800";
                     }
                     document.getElementById('dashAntreanWaktu').innerHTML = statusText;
                 } else {
-                    document.getElementById('dashAntreanNumber').innerText = '-';
-                    pkgText.classList.add('hidden'); document.getElementById('dashAntreanWaktu').innerHTML = "<i class='fas fa-info-circle mr-1'></i> Belum ada pesanan aktif";
+                    document.getElementById('dashAntreanNumber').innerText = '-'; pkgText.classList.add('hidden'); document.getElementById('dashAntreanWaktu').innerHTML = "<i class='fas fa-info-circle mr-1'></i> Belum ada pesanan aktif";
                     qBox.className = "bg-gray-800 rounded-2xl shadow p-6 md:col-span-1 text-gray-300 flex flex-col items-center justify-center text-center relative overflow-hidden transition-colors duration-500 border border-gray-900";
                 }
             });
 
-            // C. Voucher Aktif & Select Dropdown Mandiri & Riwayat Terpakai Detail
             onValue(ref(db, 'vouchers'), (snap) => {
                 const vAktifList = document.getElementById('voucherAktifList'); vAktifList.innerHTML = ''; 
                 const vTerpakaiList = document.getElementById('voucherTerpakaiList'); vTerpakaiList.innerHTML = '';
@@ -1024,7 +925,7 @@
                             </li>`;
                         bmSelect.innerHTML += `<option value="${child.key}">${child.key} - ${v.jenis} ${b}</option>`;
                     }
-                    else if(v.digunakanOleh === user.email && v.status === 'terpakai') {
+                    else if(v.digunakanOleh === user.email && v.status === 'terpakai' || v.status.includes('Claimed') && v.digunakanOleh === user.email) {
                         hasTerpakai = true;
                         vTerpakaiList.innerHTML += `<li class="bg-gray-50 border border-gray-200 p-2 rounded text-xs text-gray-500 flex justify-between"><span class="font-voucher font-bold line-through">${child.key}</span> <span>${v.jenis} ${b}</span></li>`;
                     }
@@ -1036,31 +937,20 @@
             loadCloudinaryPhotos(user.email); window.scrollTo(0,0);
         }
 
-        // Klaim Reward Spend Button Logic
         document.getElementById('btnKlaimRewardSpend').addEventListener('click', async () => {
-            if(confirm(`Selamat! Total belanja Anda telah mencapai Rp ${TARGET_SPEND_REWARD.toLocaleString('id-ID')}. Klaim Voucher Rp 50.000 sekarang? (Proses ini akan mereset progress bar Anda kembali ke 0 untuk mengejar target berikutnya).`)) {
-                
+            if(confirm(`Selamat! Total belanja Anda telah mencapai Rp ${TARGET_SPEND_REWARD.toLocaleString('id-ID')}. Klaim Voucher Rp 50.000 sekarang?`)) {
                 const vCode = "V-LOYAL-" + Math.floor(1000 + Math.random() * 9000); 
-                const expDate = new Date(); expDate.setMonth(expDate.getMonth() + 2); // 2 bulan
+                const expDate = new Date(); expDate.setMonth(expDate.getMonth() + 2); 
                 
-                // Beri Voucher
                 await set(ref(db, 'vouchers/' + vCode), { status: 'aktif', pemilik: auth.currentUser.email, jenis: 'Diskon Nominal', besaran: '50000', expired: expDate.toISOString().split('T')[0] });
                 
-                // Reset/Tandai history sebagai 'Selesai & Diklaim' agar tidak kehitung lagi.
-                // Untuk simple way: kita ubah status di pendaftaran menjadi 'Selesai-Claimed'
                 const snapAll = await get(ref(db, 'pendaftaran'));
                 if(snapAll.exists()) {
                     let updates = {};
-                    snapAll.forEach(c => {
-                        if(c.val().email === auth.currentUser.email && c.val().status === 'Selesai') {
-                            updates[`pendaftaran/${c.key}/status`] = 'Selesai-Claimed';
-                        }
-                    });
+                    snapAll.forEach(c => { if(c.val().email === auth.currentUser.email && c.val().status === 'Selesai') updates[`pendaftaran/${c.key}/status`] = 'Selesai-Claimed'; });
                     await update(ref(db), updates);
                 }
-                
-                alert(`Reward Berhasil Diklaim! Cek Voucher Baru Anda: ${vCode}`);
-                tampilkanDasbor(auth.currentUser); // Refresh
+                alert(`Reward Berhasil Diklaim! Cek Voucher Baru Anda: ${vCode}`); tampilkanDasbor(auth.currentUser); 
             }
         });
 
@@ -1071,17 +961,10 @@
         starRadios.forEach(radio => radio.addEventListener('change', (e) => document.getElementById('ratingWarning').classList.toggle('hidden', parseInt(e.target.value) > 3)));
 
         function updateTestimoniUI() {
-            const form = document.getElementById('testimoniForm');
-            const successMsg = document.getElementById('testimoniSuccessMsg');
-            const errorMsg = document.getElementById('testimoniErrorMsg');
-
-            if(hasGivenTestimonial) {
-                form.classList.add('hidden'); successMsg.classList.remove('hidden'); errorMsg.classList.add('hidden');
-            } else if (userCloudinaryPhotos.length === 0) {
-                form.classList.add('hidden'); successMsg.classList.add('hidden'); errorMsg.classList.remove('hidden');
-            } else {
-                form.classList.remove('hidden'); successMsg.classList.add('hidden'); errorMsg.classList.add('hidden');
-            }
+            const form = document.getElementById('testimoniForm'); const successMsg = document.getElementById('testimoniSuccessMsg'); const errorMsg = document.getElementById('testimoniErrorMsg');
+            if(hasGivenTestimonial) { form.classList.add('hidden'); successMsg.classList.remove('hidden'); errorMsg.classList.add('hidden'); } 
+            else if (userCloudinaryPhotos.length === 0) { form.classList.add('hidden'); successMsg.classList.add('hidden'); errorMsg.classList.remove('hidden'); } 
+            else { form.classList.remove('hidden'); successMsg.classList.add('hidden'); errorMsg.classList.add('hidden'); }
         }
 
         document.getElementById('testimoniForm').addEventListener('submit', async (e) => {
@@ -1103,7 +986,7 @@
         });
 
         // ==========================================
-        // 6. CLOUDINARY & AKSI FOTO
+        // 6. CLOUDINARY & AKSI FOTO (Gabung Admin Foto)
         // ==========================================
         let hiddenPhotosList = [];
         async function loadCloudinaryPhotos(email) {
@@ -1116,30 +999,48 @@
 
         async function renderCloudinary(safeEmail) {
             const grid = document.getElementById('cloudinaryGalleryGrid');
+            grid.innerHTML = '<div class="col-span-full text-center py-10 text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat foto...</div>';
+            userCloudinaryPhotos = []; let found = false; let htmlContent = "";
+
+            try {
+                const snapAdmin = await get(ref(db, `admin_uploaded_photos/${safeEmail}`));
+                if(snapAdmin.exists()) {
+                    Object.values(snapAdmin.val()).forEach(url => {
+                        if(hiddenPhotosList.includes(url)) return;
+                        found = true; userCloudinaryPhotos.push(url);
+                        let dlUrl = url; if(url.includes('upload/')) dlUrl = url.replace('upload/', 'upload/fl_attachment/');
+                        htmlContent += generatePhotoHtml(url, dlUrl);
+                    });
+                }
+            } catch(e) {}
+
             try {
                 const res = await fetch(`https://res.cloudinary.com/${cloudName}/image/list/${safeEmail}.json`);
-                if(!res.ok) throw new Error("List Not Found"); const data = await res.json(); 
-                
-                grid.innerHTML = ''; userCloudinaryPhotos = []; let found = false;
-                
-                data.resources.forEach(img => {
-                    const imgUrl = `https://res.cloudinary.com/${cloudName}/image/upload/v${img.version}/${img.public_id}.${img.format}`;
-                    if(hiddenPhotosList.includes(imgUrl)) return;
-                    found = true; userCloudinaryPhotos.push(imgUrl);
-                    
-                    const dlUrl = `https://res.cloudinary.com/${cloudName}/image/upload/fl_attachment/v${img.version}/${img.public_id}.${img.format}`;
-                    grid.innerHTML += `
-                        <div class="relative group overflow-hidden rounded-xl shadow-md cursor-pointer aspect-square bg-gray-200" onclick="openPhotoModal('${imgUrl}', '${dlUrl}')">
-                            <img src="${imgUrl}" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-300" loading="lazy">
-                            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
-                                <span class="text-white font-bold text-xs bg-blue-600 px-4 py-2 rounded-full shadow-lg border border-blue-400"><i class="fas fa-search-plus mr-1"></i>Kelola</span>
-                            </div>
-                        </div>`;
-                });
-                if(!found) grid.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10"><i class="far fa-images text-4xl mb-3 block opacity-30"></i>Belum ada foto yang ditampilkan.</div>`;
-            } catch(e) { grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500"><i class="fas fa-exclamation-triangle text-2xl mb-2 text-yellow-500 block"></i>Foto belum tersedia / Error sinkronisasi Cloudinary.</div>`; }
-            
-            updateTestimoniUI(); // Update UI form testimoni setelah tau jumlah foto
+                if(res.ok) {
+                    const data = await res.json(); 
+                    data.resources.forEach(img => {
+                        const imgUrl = `https://res.cloudinary.com/${cloudName}/image/upload/v${img.version}/${img.public_id}.${img.format}`;
+                        if(hiddenPhotosList.includes(imgUrl) || userCloudinaryPhotos.includes(imgUrl)) return;
+                        found = true; userCloudinaryPhotos.push(imgUrl);
+                        const dlUrl = `https://res.cloudinary.com/${cloudName}/image/upload/fl_attachment/v${img.version}/${img.public_id}.${img.format}`;
+                        htmlContent += generatePhotoHtml(imgUrl, dlUrl);
+                    });
+                }
+            } catch(e) {}
+
+            if(found) { grid.innerHTML = htmlContent; } 
+            else { grid.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10"><i class="far fa-images text-4xl mb-3 block opacity-30"></i>Belum ada foto yang ditampilkan.</div>`; }
+            updateTestimoniUI();
+        }
+
+        function generatePhotoHtml(imgUrl, dlUrl) {
+            return `
+            <div class="relative group overflow-hidden rounded-xl shadow-md cursor-pointer aspect-square bg-gray-200 border border-gray-200" onclick="openPhotoModal('${imgUrl}', '${dlUrl}')">
+                <img src="${imgUrl}" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-300" loading="lazy">
+                <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+                    <span class="text-white font-bold text-xs bg-blue-600 px-4 py-2 rounded-full shadow-lg border border-blue-400"><i class="fas fa-search-plus mr-1"></i>Kelola</span>
+                </div>
+            </div>`;
         }
 
         let cViewUrl = "", cDlUrl = "";
@@ -1147,7 +1048,7 @@
             cViewUrl = view; cDlUrl = dl; document.getElementById('fullViewImg').src = view; document.getElementById('photoModal').classList.remove('hidden');
         }
         document.getElementById('closePhotoModalBtn').addEventListener('click', () => document.getElementById('photoModal').classList.add('hidden'));
-
+        document.getElementById('downloadPhotoBtn').addEventListener('click', () => window.open(cDlUrl, '_blank'));
         document.getElementById('setProfileBtn').addEventListener('click', async () => { await update(ref(db, 'users/' + formatSafeEmail(auth.currentUser.email)), { profilePic: cViewUrl }); document.getElementById('dashProfilePic').src = cViewUrl; alert("Foto profil diperbarui!"); });
         document.getElementById('hidePhotoBtn').addEventListener('click', async () => { if(confirm("Yakin sembunyikan foto?")) { await push(ref(db, 'hidden_photos/' + formatSafeEmail(auth.currentUser.email)), cViewUrl); document.getElementById('photoModal').classList.add('hidden'); loadCloudinaryPhotos(auth.currentUser.email); }});
         
@@ -1155,8 +1056,7 @@
             if(globalUserRating <= 3) return alert("Fitur ini dinonaktifkan karena rating testimoni Anda 3 Bintang ke bawah.");
             const pk = 'PUB-' + Date.now();
             await set(ref(db, 'homepage_photos/' + pk), { url: cViewUrl, ownerName: auth.currentUser.displayName, ownerEmail: auth.currentUser.email, likes: 0, dislikes: 0, timestamp: Date.now() });
-            alert("Berhasil dikirim ke Galeri Publik! Tunggu Like dari orang lain untuk masuk Photo of The Week.");
-            loadPublicGallery();
+            alert("Berhasil dikirim ke Galeri Publik! Tunggu Like dari orang lain untuk masuk Photo of The Week."); loadPublicGallery();
         });
 
         // ==========================================
@@ -1178,13 +1078,13 @@
                                     ${index === 0 ? '<div class="absolute top-2 left-2 bg-yellow-500 text-xs text-gray-900 font-bold px-3 py-1 rounded-full z-10 shadow border border-yellow-200"><i class="fas fa-crown mr-1"></i>#1 JUARA</div>' : ''}
                                     <img src="${p.url}" class="w-full h-full object-cover">
                                     <div class="absolute bottom-0 w-full bg-gradient-to-t from-black/90 to-transparent p-4 text-left">
-                                        <p class="font-bold text-sm truncate">${p.ownerName}</p>
+                                        <p class="font-bold text-sm truncate text-white">${p.ownerName}</p>
                                         <p class="text-xs text-yellow-400 font-bold mt-1"><i class="fas fa-heart mr-1"></i> ${p.likes} Suka</p>
                                     </div>
                                 </div>`;
                             if(auth.currentUser && auth.currentUser.email === p.ownerEmail) { cekDanBerikanRewardPOTW(p.key, p.ownerEmail); }
                         });
-                    } else { potwGrid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-10 border border-dashed border-gray-700 rounded-xl">Jadilah yang pertama mendapatkan Like minggu ini!</div>`; }
+                    } else { potwGrid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-5">Belum ada foto yang mendapat Like minggu ini.</div>`; }
 
                     photos.sort((a,b) => b.timestamp - a.timestamp).forEach(p => {
                         const curUserEmail = auth.currentUser ? formatSafeEmail(auth.currentUser.email) : null;
