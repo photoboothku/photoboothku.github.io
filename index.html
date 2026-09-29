@@ -58,15 +58,12 @@
                     <button id="navLoginPelangganBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full font-bold text-sm transition shadow-md">
                         Masuk / Dasbor Saya
                     </button>
-                    <!-- Tombol Admin Desktop -->
-                    <button id="openAdminModalBtn" class="text-gray-400 hover:text-gray-800 transition text-xl" title="Login Admin Khusus"><i class="fas fa-user-shield"></i></button>
+                    <!-- Tombol Admin Dikembalikan -->
+                    <button id="openAdminModalBtn" class="text-gray-400 hover:text-gray-800 transition text-sm" title="Admin Login"><i class="fas fa-cog text-lg"></i></button>
                 </div>
 
-                <!-- Mobile Menu Button -->
-                <div class="md:hidden flex items-center gap-4">
-                    <button id="mobileNavLoginBtn" class="bg-blue-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow">Dasbor</button>
-                    <!-- Tombol Admin Mobile -->
-                    <button id="openAdminModalBtnMob" class="text-gray-400 text-lg"><i class="fas fa-user-shield"></i></button>
+                <div class="md:hidden flex items-center gap-3">
+                    <button id="mobileNavLoginBtn" class="bg-blue-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow">Masuk / Dasbor</button>
                     <button id="mobileMenuToggleBtn" class="text-gray-700 focus:outline-none text-2xl"><i class="fas fa-bars"></i></button>
                 </div>
             </div>
@@ -101,7 +98,7 @@
             <div class="bg-white rounded-2xl shadow p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 border-t-4 border-blue-600 relative overflow-hidden">
                 <div class="absolute top-0 right-0 p-4 opacity-5 text-8xl"><i class="fas fa-crown"></i></div>
                 <div class="relative">
-                    <img id="dashProfilePic" src="https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff&size=150" alt="Profile" class="w-28 h-28 rounded-full object-cover border-4 transition-all duration-300 bg-gray-200">
+                    <img id="dashProfilePic" src="https://ui-avatars.com/api/?name=User&background=random" alt="Profile" class="w-28 h-28 rounded-full object-cover border-4 transition-all duration-300 bg-gray-200">
                     <button id="btnGantiFotoIcon" class="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition" title="Ganti Foto">
                         <i class="fas fa-camera text-sm"></i>
                     </button>
@@ -190,6 +187,7 @@
 
             <!-- Formulir Interaktif: Testimoni & Kotak Saran -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
                 <!-- Testimoni Box -->
                 <div class="bg-white rounded-2xl shadow p-6 bg-gradient-to-br from-blue-50 to-white relative overflow-hidden">
                     <div class="absolute -right-10 -bottom-10 opacity-5 text-9xl"><i class="fas fa-star"></i></div>
@@ -209,7 +207,7 @@
                                         <input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
                                     </div>
                                 </div>
-                                <p id="ratingWarning" class="text-[10px] text-red-500 font-bold hidden bg-red-50 p-1.5 rounded border border-red-100">⚠️ Bintang 3 ke bawah: Fitur "Tampil Beranda" dinonaktifkan.</p>
+                                <p id="ratingWarning" class="text-[10px] text-red-500 font-bold hidden bg-red-50 p-1.5 rounded border border-red-100">⚠️ Bintang 3 ke bawah: Fitur Tampil Beranda dinonaktifkan.</p>
                                 <textarea id="testimoniTeks" placeholder="Bagaimana hasil cetakan dan propertinya?" required class="w-full border border-gray-300 rounded-lg p-2 text-sm"></textarea>
                                 <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2 rounded-lg text-sm shadow transition"><i class="fas fa-paper-plane mr-2"></i>Kirim & Ambil Hadiah</button>
                             </form>
@@ -235,8 +233,9 @@
                         </form>
                     </div>
                 </div>
+
             </div>
-            
+
             <!-- Galeri Pelanggan -->
             <div class="bg-white rounded-2xl shadow p-6 md:p-8 border-t border-gray-100">
                 <h3 class="text-xl font-bold text-gray-800 mb-2"><i class="fas fa-images text-blue-500 mr-2"></i>Galeri Foto Photobooth Kamu</h3>
@@ -684,42 +683,14 @@
         
         loadPaketData(); loadTestimonials(); loadPublicGallery();
 
-        // ==========================================
-        // 2. ADMIN LOGIN (Email & Password - Berbeda dengan Member)
-        // ==========================================
-        const adminModal = document.getElementById('adminModal');
-        const openAdminBtnDesk = document.getElementById('openAdminModalBtn');
-        const openAdminBtnMob = document.getElementById('openAdminModalBtnMob');
-
-        if(openAdminBtnDesk) openAdminBtnDesk.addEventListener('click', () => adminModal.classList.remove('hidden'));
-        if(openAdminBtnMob) openAdminBtnMob.addEventListener('click', () => {
-            document.getElementById('mobileMenuDropdown').classList.add('hidden');
-            adminModal.classList.remove('hidden');
-        });
-        
-        document.getElementById('closeAdminModalBtn').addEventListener('click', () => adminModal.classList.add('hidden'));
-        
+        // 2. ADMIN LOGIN & MAIN VOUCHER SYSTEM
+        document.getElementById('openAdminModalBtn')?.addEventListener('click', () => document.getElementById('adminModal').classList.remove('hidden'));
+        document.getElementById('closeAdminModalBtn')?.addEventListener('click', () => document.getElementById('adminModal').classList.add('hidden'));
         document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            try { 
-                await signInWithEmailAndPassword(auth, document.getElementById('adminEmail').value, document.getElementById('adminPassword').value); 
-                window.location.href = 'setting.html'; 
-            } 
-            catch (error) { alert("Login Admin Gagal! Pastikan email dan password benar."); }
+            try { await signInWithEmailAndPassword(auth, document.getElementById('adminEmail').value, document.getElementById('adminPassword').value); window.location.href = 'setting.html'; } 
+            catch (error) { alert("Login Gagal!"); }
         });
-
-        // Pendaftaran Event Form Saran (Menggunakan pengamanan if agar tidak error jika elemen telat dimuat)
-        const formSaranEl = document.getElementById('saranForm');
-        if(formSaranEl) {
-            formSaranEl.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const btn = e.target.querySelector('button[type="submit"]'); btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Mengirim...';
-                const teks = document.getElementById('saranTeks').value;
-                await push(ref(db, 'suggestions'), { email: auth.currentUser.email, nama: auth.currentUser.displayName, teks: teks, timestamp: Date.now() });
-                alert("Terima kasih, saran Anda telah terkirim!");
-                e.target.reset(); btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Kirim Saran';
-            });
-        }
 
         document.getElementById('validateVoucherBtn').addEventListener('click', async () => {
             const code = document.getElementById('voucherCode').value.trim().toUpperCase(); 
