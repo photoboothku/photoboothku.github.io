@@ -192,16 +192,25 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- ROW 5: MODERASI GALERI & TESTIMONI         -->
+        <!-- ROW 5: GALERI, TESTIMONI, DAN SARAN        -->
         <!-- ========================================== -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Moderasi Galeri Publik -->
             <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-red-500">
                 <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-images text-red-500 mr-2"></i>Moderasi Galeri Publik</h2>
-                <div id="publicGalleryModeration" class="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-80 overflow-y-auto p-1 custom-scrollbar"></div>
+                <div id="publicGalleryModeration" class="grid grid-cols-2 md:grid-cols-2 gap-3 max-h-80 overflow-y-auto p-1 custom-scrollbar"></div>
             </div>
+
+            <!-- Testimoni Bintang 5 -->
             <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-green-500">
-                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-star text-yellow-400 mr-2"></i>Ulasan Pelanggan Bintang 5</h2>
+                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-star text-yellow-400 mr-2"></i>Ulasan Pelanggan</h2>
                 <ul id="testimoniListAdmin" class="space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar"></ul>
+            </div>
+
+            <!-- Kotak Saran (Baru Ditambahkan) -->
+            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-purple-500">
+                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-envelope-open-text text-purple-500 mr-2"></i>Kotak Saran & Kritik</h2>
+                <ul id="saranListAdmin" class="space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar"></ul>
             </div>
         </div>
 
@@ -282,7 +291,7 @@
         // Widget Upload Cloudinary untuk Banner
         document.getElementById('btnUploadBannerPromo').addEventListener('click', () => {
             cloudinary.createUploadWidget({
-                cloudName: 'y2k0oqrl', uploadPreset: 'photobooth', sources: ['local', 'url']
+                cloudName: 'y2k0oqrl', uploadPreset: 'photobooth', sources: ['local', 'url', 'camera']
             }, (error, result) => {
                 if (!error && result && result.event === "success") {
                     document.getElementById('setBannerUrl').value = result.info.secure_url;
@@ -316,7 +325,7 @@
             snapshot.forEach((child) => {
                 const data = child.val(); let statusBadge = "";
                 
-                if(data.status === 'terpakai' || data.status.includes('Claimed')) {
+                if(data.status === 'terpakai' || data.status?.includes('Claimed')) {
                     statusBadge = `<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-bold">Terpakai</span><div class="text-[10px] mt-1 text-gray-500">${data.digunakanOleh||data.pemilik||''}</div>`;
                 } else if (data.expired < today) {
                     statusBadge = `<span class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-[10px] font-bold">Kedaluwarsa</span>`;
@@ -429,21 +438,16 @@
             await update(ref(db, 'pendaftaran/' + key), { status: 'Reschedule (Telat)', antrean: newAntreanStr, pesanAdmin: `Jadwal terlewat. Anda dipindah ke antrean akhir (${newAntreanStr}).` });
         }
 
-        // Fungsi Menukar Posisi Antrean
         window.swapQueue = async function(currentIndex, direction) {
             const waitingList = window.currentWaitingQueue;
             const targetIndex = currentIndex + direction;
-            
             if(targetIndex < 0 || targetIndex >= waitingList.length) return; 
 
             const item1 = waitingList[currentIndex];
             const item2 = waitingList[targetIndex];
-
-            // Tukar value antrean di Firebase
             let updates = {};
             updates['pendaftaran/' + item1.key + '/antrean'] = item2.antrean;
             updates['pendaftaran/' + item2.key + '/antrean'] = item1.antrean;
-            
             await update(ref(db), updates);
         }
 
@@ -453,19 +457,13 @@
             snapshot.forEach(c => { let v = c.val(); v.key = c.key; listPendaftar.push(v); });
             
             const todayStr = new Date().toISOString().split('T')[0];
-            
-            // Pisahkan yang Menunggu Hari Ini (Untuk di-Sort berdasarkan Nomor Antrean)
             let waitingTodayList = listPendaftar.filter(p => !p.status?.includes('Selesai') && !p.status?.includes('Telat') && p.waktu.startsWith(todayStr));
             waitingTodayList.sort((a,b) => a.antrean.localeCompare(b.antrean));
-            
-            // Simpan ke window agar bisa diakses fungsi swap
             window.currentWaitingQueue = waitingTodayList;
 
-            // Yang Lainnya (Selesai, Telat, Beda Hari)
             let otherList = listPendaftar.filter(p => !(!p.status?.includes('Selesai') && !p.status?.includes('Telat') && p.waktu.startsWith(todayStr)));
-            otherList.sort((a,b) => b.timestamp - a.timestamp); // Urutkan yang lain berdasar waktu masuk
+            otherList.sort((a,b) => b.timestamp - a.timestamp); 
 
-            // Gabungkan kembali untuk render
             const renderList = [...waitingTodayList, ...otherList];
 
             renderList.forEach((data) => {
@@ -475,7 +473,6 @@
                 const jadwal = data.waktu ? new Date(data.waktu).toLocaleString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) : '-';
                 const status = data.status || 'Menunggu';
                 
-                // Tombol Naik Turun Antrean
                 let sortButtons = "";
                 if(isWaitingToday) {
                     const btnUpClass = currentIndex > 0 ? "hover:bg-gray-200 text-gray-700 cursor-pointer" : "text-gray-300 cursor-not-allowed opacity-50";
@@ -497,7 +494,6 @@
                 if(status.includes('Selesai')) statusUI = `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-[10px] font-bold border border-green-200 inline-block shadow-sm"><i class="fas fa-check-circle mr-1"></i>Selesai</span>`;
                 if(status.includes('Telat')) statusUI = `<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-[10px] font-bold border border-red-200 block shadow-sm"><i class="fas fa-exclamation-triangle"></i> Reschedule</span>`;
                 
-                // KALKULASI SISA ANTREAN
                 let sisaAntreanInfo = "";
                 let waText = `Halo ${data.nama}, ini admin Canon-Ipad Booth Wawancellcomp.\nMengingatkan jadwal photobooth Anda: ${jadwal}.\n`;
                 if (isWaitingToday) {
@@ -572,19 +568,17 @@
         // ==========================================
         // 4. MANAJEMEN MEMBER / PELANGGAN
         // ==========================================
-        // Cloudinary Upload for Member
-        window.bukaUploadModal = function(safeEmail) {
+        window.bukaUploadModalCloudinary = function(safeEmail) {
             cloudinary.createUploadWidget({
-                cloudName: 'y2k0oqrl', uploadPreset: 'photobooth', sources: ['local', 'url']
+                cloudName: 'y2k0oqrl', uploadPreset: 'photobooth', sources: ['local', 'url', 'camera']
             }, async (error, result) => {
                 if (!error && result && result.event === "success") {
                     await push(ref(db, `admin_uploaded_photos/${safeEmail}`), result.info.secure_url);
-                    alert("Foto berhasil diunggah ke Galeri Pelanggan!");
+                    alert("Foto berhasil diunggah ke Galeri Pelanggan bersangkutan!");
                 }
             }).open();
         }
 
-        // Search Filter
         document.getElementById('searchMember').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             document.querySelectorAll('#memberList tr').forEach(row => {
@@ -630,7 +624,7 @@
                         <td class="px-4 py-3 text-center">
                             <div class="flex justify-center gap-2">
                                 <a href="${promoLink}" target="_blank" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded text-[10px] font-bold shadow-sm transition"><i class="fab fa-whatsapp mr-1"></i>Promo</a>
-                                <button onclick="bukaUploadModal('${m.safeEmail}')" class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1.5 rounded text-[10px] font-bold shadow-sm transition"><i class="fas fa-cloud-upload-alt mr-1"></i>Upload Foto</button>
+                                <button onclick="bukaUploadModalCloudinary('${m.safeEmail}')" class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1.5 rounded text-[10px] font-bold shadow-sm transition"><i class="fas fa-cloud-upload-alt mr-1"></i>Upload Foto</button>
                             </div>
                         </td>
                     </tr>`;
@@ -638,7 +632,7 @@
         });
 
         // ==========================================
-        // 5. MODERASI GALERI & TESTIMONI
+        // 5. MODERASI GALERI, TESTIMONI & SARAN
         // ==========================================
         onValue(ref(db, 'testimonials'), (snap) => {
             const list = document.getElementById('testimoniListAdmin'); list.innerHTML = '';
@@ -659,6 +653,25 @@
             } else { list.innerHTML = '<li class="text-gray-400 text-sm">Belum ada ulasan.</li>'; }
         });
 
+        onValue(ref(db, 'suggestions'), (snap) => {
+            const list = document.getElementById('saranListAdmin'); list.innerHTML = '';
+            if(snap.exists()) {
+                let sarans = []; snap.forEach(c => sarans.push(c.val()));
+                sarans.sort((a,b) => b.timestamp - a.timestamp).forEach(s => {
+                    const time = new Date(s.timestamp).toLocaleString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+                    list.innerHTML += `
+                        <li class="bg-purple-50 p-3 rounded-xl border border-purple-100 shadow-sm text-sm">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="font-bold text-gray-800">${s.nama}</span>
+                                <span class="text-[10px] text-gray-500"><i class="far fa-clock"></i> ${time}</span>
+                            </div>
+                            <p class="text-gray-600 text-xs italic leading-relaxed">"${s.saran}"</p>
+                            <div class="text-[10px] text-purple-600 mt-2 flex items-center"><i class="fas fa-envelope mr-1"></i> ${s.email}</div>
+                        </li>`;
+                });
+            } else { list.innerHTML = '<li class="text-gray-400 text-sm">Belum ada saran masuk.</li>'; }
+        });
+
         window.deletePublicPhoto = async function(key) { if(confirm("Hapus foto ini dari Beranda Publik?")) await remove(ref(db, 'homepage_photos/' + key)); }
 
         onValue(ref(db, 'homepage_photos'), (snap) => {
@@ -673,7 +686,7 @@
                                 <span class="truncate pr-1">${p.ownerName}</span>
                                 <span class="text-yellow-400 font-bold">👍${p.likes||0}</span>
                             </div>
-                            <button onclick="deletePublicPhoto('${p.key}')" class="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full text-[10px] shadow opacity-0 group-hover:opacity-100 transition"><i class="fas fa-trash"></i></button>
+                            <button onclick="deletePublicPhoto('${p.key}')" class="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white w-7 h-7 rounded-full text-xs shadow-lg opacity-0 group-hover:opacity-100 transition transform hover:scale-110"><i class="fas fa-trash"></i></button>
                         </div>`;
                 });
             } else { grid.innerHTML = '<div class="col-span-full text-gray-400 text-sm">Beranda publik kosong.</div>'; }
