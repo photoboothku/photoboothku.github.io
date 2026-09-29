@@ -96,7 +96,7 @@
             <div class="bg-white rounded-2xl shadow p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 border-t-4 border-blue-600 relative overflow-hidden">
                 <div class="absolute top-0 right-0 p-4 opacity-5 text-8xl"><i class="fas fa-crown"></i></div>
                 <div class="relative">
-                    <img id="dashProfilePic" src="https://via.placeholder.com/150" alt="Profile" class="w-28 h-28 rounded-full object-cover border-4 transition-all duration-300 bg-gray-200">
+                    <img id="dashProfilePic" src="https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff&size=150" alt="Profile" class="w-28 h-28 rounded-full object-cover border-4 transition-all duration-300 bg-gray-200">
                     <button id="btnGantiFotoIcon" class="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition" title="Ganti Foto">
                         <i class="fas fa-camera text-sm"></i>
                     </button>
@@ -189,11 +189,11 @@
                 <!-- Testimoni Box -->
                 <div class="bg-white rounded-2xl shadow p-6 bg-gradient-to-br from-blue-50 to-white relative overflow-hidden">
                     <div class="absolute -right-10 -bottom-10 opacity-5 text-9xl"><i class="fas fa-star"></i></div>
-                    <div class="relative z-10">
+                    <div class="relative z-10 flex flex-col items-center text-center">
                         <h3 class="text-xl font-bold text-gray-800 mb-2">Berikan Testimoni</h3>
-                        <p class="text-xs text-gray-600 mb-4">Rating 5 Bintang akan mendapat <span class="font-bold text-blue-600">Voucher Diskon 20%</span> otomatis! (Hanya bisa 1x per akun).</p>
+                        <p class="text-xs text-gray-600 mb-4">Rating 5 Bintang akan mendapat <span class="font-bold text-blue-600">Voucher 20%</span> otomatis! (Hanya 1x per akun).</p>
                         
-                        <div id="testimoniContainerArea">
+                        <div id="testimoniContainerArea" class="w-full">
                             <form id="testimoniForm" class="space-y-3 bg-white p-4 rounded-xl shadow-sm border border-blue-100">
                                 <div class="flex justify-between items-center">
                                     <span class="font-bold text-gray-700 text-sm">Rating:</span>
@@ -206,8 +206,8 @@
                                     </div>
                                 </div>
                                 <p id="ratingWarning" class="text-[10px] text-red-500 font-bold hidden bg-red-50 p-1.5 rounded border border-red-100">⚠️ Bintang 3 ke bawah: Fitur Tampil Beranda dinonaktifkan.</p>
-                                <textarea id="testimoniTeks" placeholder="Bagaimana hasil cetakan dan propertinya?" required class="w-full border border-gray-300 rounded-lg p-2 text-sm"></textarea>
-                                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2 rounded-lg text-sm shadow transition"><i class="fas fa-paper-plane mr-2"></i>Kirim & Ambil Hadiah</button>
+                                <textarea id="testimoniTeks" placeholder="Bagaimana hasil cetakan dan propertinya?" required class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 transition"></textarea>
+                                <button type="submit" id="btnSubmitTestimoni" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2.5 rounded-lg text-sm shadow transition font-bold"><i class="fas fa-paper-plane mr-2"></i>Kirim & Ambil Hadiah</button>
                             </form>
                             <div id="testimoniSuccessMsg" class="hidden text-center bg-green-50 text-green-700 p-4 rounded-xl border border-green-200 font-bold text-sm">
                                 <i class="fas fa-check-circle text-xl mb-1"></i><br>Terima kasih atas testimoni Anda!
