@@ -11,138 +11,227 @@
     <style>
         body { font-family: 'Poppins', sans-serif; }
         .font-voucher { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-gray-100 p-6 min-h-screen">
+<body class="bg-gray-100 p-4 md:p-6 min-h-screen">
     
     <div class="max-w-7xl mx-auto space-y-6">
-        <div class="flex justify-between items-center mb-6 border-b pb-4">
-            <h1 class="text-3xl font-bold text-gray-800">Dasbor Admin</h1>
-            <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold text-sm shadow">Keluar</button>
+        <div class="flex justify-between items-center mb-6 border-b border-gray-300 pb-4">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800"><i class="fas fa-user-shield text-blue-600 mr-2"></i>Dasbor Admin</h1>
+            <div class="flex gap-2">
+                <a href="index.html" target="_blank" class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-4 py-2 rounded-lg font-bold text-sm shadow transition"><i class="fas fa-external-link-alt mr-1"></i>Lihat Web</a>
+                <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow transition">Keluar</button>
+            </div>
         </div>
 
+        <!-- ========================================== -->
+        <!-- ROW 1: PENGATURAN GLOBAL & PAKET           -->
+        <!-- ========================================== -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
+            <!-- Pengaturan Global Web & Dasbor -->
+            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-indigo-500 lg:col-span-2">
+                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-sliders-h text-indigo-500 mr-2"></i>Pengaturan Global Website</h2>
+                <form id="globalSettingsForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Target Reward Belanja (Loyalty)</label>
+                        <div class="flex items-center bg-gray-50 border border-gray-300 rounded-lg p-2">
+                            <span class="text-gray-500 font-bold mr-2">Rp</span>
+                            <input type="number" id="setTargetSpend" class="w-full bg-transparent focus:outline-none font-bold text-gray-800" placeholder="500000">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Batas Akhir Photo of the Week (Deadline)</label>
+                        <input type="datetime-local" id="setPotwDeadline" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-gray-600 mb-1">URL Banner Promo (Tampil di Dasbor Pelanggan & Index)</label>
+                        <input type="text" id="setBannerUrl" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50" placeholder="https://contoh.com/banner.jpg">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Teks Promo & Penawaran Dasbor Pelanggan</label>
+                        <textarea id="setPromoText" rows="2" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50" placeholder="Ketik info promo untuk pelanggan di sini..."></textarea>
+                    </div>
+                    <div class="md:col-span-2 text-right">
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg shadow transition">Simpan Pengaturan</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Manajemen Paket Photobooth -->
+            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-green-500">
+                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-box-open text-green-500 mr-2"></i>Paket Harga</h2>
+                <div class="mb-4 space-y-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <input type="hidden" id="paketId">
+                    <input type="text" id="namaPaket" placeholder="Nama Paket (cth: Paket Grup)" required class="border border-gray-300 p-2 w-full rounded-lg text-sm">
+                    <input type="number" id="hargaPaket" placeholder="Harga (Rp)" required class="border border-gray-300 p-2 w-full rounded-lg text-sm">
+                    <textarea id="deskripsiPaket" placeholder="Deskripsi/Detail paket..." rows="2" class="border border-gray-300 p-2 w-full rounded-lg text-sm"></textarea>
+                    <div class="flex gap-2">
+                        <button id="savePaketBtn" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-bold shadow text-sm transition">Simpan</button>
+                        <button id="cancelEditBtn" class="hidden bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-bold text-sm">Batal</button>
+                    </div>
+                </div>
+                <ul id="paketList" class="space-y-3 max-h-40 overflow-y-auto pr-2 custom-scrollbar"></ul>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- ROW 2: VOUCHER                             -->
+        <!-- ========================================== -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Panel Generator Voucher (Kiri) -->
-            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-blue-500 lg:col-span-1">
-                <h2 class="text-xl font-bold mb-4 text-gray-800">Buat Voucher Baru</h2>
+            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-yellow-500 lg:col-span-1">
+                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-ticket-alt text-yellow-500 mr-2"></i>Buat Voucher</h2>
                 <form id="voucherGeneratorForm" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700">Jenis Voucher</label>
-                        <select id="jenisVoucher" required class="mt-1 w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Jenis Voucher</label>
+                        <select id="jenisVoucher" required class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm">
                             <option value="Diskon %">Diskon Persentase (%)</option>
-                            <option value="Diskon Nominal">Diskon Nominal Harga (Rp)</option>
-                            <option value="Lainnya">Lainnya (Barang/Gratis)</option>
+                            <option value="Diskon Nominal">Diskon Nominal (Rp)</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700">Besaran (Contoh: 30 atau 15000)</label>
-                        <input type="text" id="besaranVoucher" required placeholder="Masukkan nilai" class="mt-1 w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Besaran (Contoh: 30 atau 15000)</label>
+                        <input type="text" id="besaranVoucher" required placeholder="Nilai" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700">Masa Berlaku</label>
-                        <input type="date" id="expiredVoucher" required class="mt-1 w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Masa Berlaku s/d</label>
+                        <input type="date" id="expiredVoucher" required class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700">Jumlah Dibuat</label>
-                        <input type="number" id="jumlahVoucher" required min="1" max="100" value="1" class="mt-1 w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Jumlah Dibuat</label>
+                        <input type="number" id="jumlahVoucher" required min="1" max="100" value="1" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm">
                     </div>
-                    
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg mt-4 transition shadow">
-                        Generate Otomatis
-                    </button>
+                    <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2.5 rounded-lg transition shadow-md">Generate Kode</button>
                 </form>
             </div>
 
             <!-- Panel Daftar Voucher (Tengah) -->
             <div class="bg-white p-6 rounded-2xl shadow lg:col-span-2">
-                <h2 class="text-xl font-bold mb-4 text-gray-800">Daftar Voucher</h2>
-                <div class="overflow-x-auto h-80 border rounded-lg">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Daftar Voucher Sistem</h2>
+                <div class="overflow-x-auto h-80 border border-gray-200 rounded-xl custom-scrollbar">
                     <table class="min-w-full table-auto text-sm">
-                        <thead class="bg-gray-100 sticky top-0">
+                        <thead class="bg-gray-100 sticky top-0 z-10 shadow-sm">
                             <tr>
-                                <th class="px-4 py-2 text-left text-gray-600">Kode</th>
-                                <th class="px-4 py-2 text-left text-gray-600">Jenis & Besaran</th>
-                                <th class="px-4 py-2 text-left text-gray-600">Berlaku s/d</th>
-                                <th class="px-4 py-2 text-left text-gray-600">Status</th>
-                                <th class="px-4 py-2 text-left text-gray-600">Aksi</th>
+                                <th class="px-4 py-3 text-left text-gray-600 font-bold">Kode Voucher</th>
+                                <th class="px-4 py-3 text-left text-gray-600 font-bold">Jenis & Besaran</th>
+                                <th class="px-4 py-3 text-left text-gray-600 font-bold">Berlaku s/d</th>
+                                <th class="px-4 py-3 text-left text-gray-600 font-bold">Status & Pemilik</th>
+                                <th class="px-4 py-3 text-center text-gray-600 font-bold">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="voucherList" class="divide-y"></tbody>
+                        <tbody id="voucherList" class="divide-y divide-gray-100"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-            <!-- Manajemen Paket Photobooth -->
-            <div class="bg-white p-6 rounded-2xl shadow lg:col-span-1 border-t-4 border-green-500">
-                <h2 class="text-xl font-bold mb-4 text-gray-800">Paket Harga</h2>
-                
-                <div class="mb-4 space-y-3 bg-gray-50 p-4 rounded-lg border">
-                    <input type="hidden" id="paketId">
-                    <input type="text" id="namaPaket" placeholder="Nama Paket (cth: Paket Grup)" required class="border p-2.5 w-full rounded-lg">
-                    <input type="number" id="hargaPaket" placeholder="Harga (Rp)" required class="border p-2.5 w-full rounded-lg">
-                    <textarea id="deskripsiPaket" placeholder="Deskripsi/Detail paket..." rows="2" class="border p-2.5 w-full rounded-lg"></textarea>
-                    
-                    <div class="flex gap-2">
-                        <button id="savePaketBtn" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-bold shadow">Simpan</button>
-                        <button id="cancelEditBtn" class="hidden bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-bold">Batal</button>
-                    </div>
+        <!-- ========================================== -->
+        <!-- ROW 3: MANAJEMEN ANTREAN                   -->
+        <!-- ========================================== -->
+        <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-blue-500">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800"><i class="fas fa-clipboard-list text-blue-500 mr-2"></i>Manajemen Antrean Pesanan</h2>
+                    <p class="text-xs text-gray-500">Klik ikon WhatsApp pada pelanggan Menunggu untuk mengirimkan sisa antrean otomatis.</p>
                 </div>
-
-                <ul id="paketList" class="space-y-3 max-h-60 overflow-y-auto pr-2"></ul>
-            </div>
-
-            <!-- Daftar Pendaftar & Antrean -->
-            <div class="bg-white p-6 rounded-2xl shadow lg:col-span-2 border-t-4 border-yellow-500">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-                    <h2 class="text-xl font-bold text-gray-800">Manajemen Antrean Pelanggan</h2>
-                    <div class="flex gap-2 w-full md:w-auto">
-                        <a href="pos.html" target="_blank" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg font-bold text-sm shadow flex-1 text-center">
-                            <i class="fas fa-cash-register mr-1"></i> Buka POS
-                        </a>
-                        <button id="btnOpenOfflineModal" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-lg font-bold text-sm shadow flex-1">
-                            <i class="fas fa-user-plus mr-1"></i> Booking Walk-in
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="overflow-x-auto">
-                    <table class="min-w-full table-auto text-sm border-collapse">
-                        <thead class="bg-gray-100">
-                            <tr>
-                                <th class="px-4 py-3 text-center text-gray-600 border-b">Antrean</th>
-                                <th class="px-4 py-3 text-left text-gray-600 border-b">Pelanggan & Kontak</th>
-                                <th class="px-4 py-3 text-left text-gray-600 border-b">Paket & Waktu</th>
-                                <th class="px-4 py-3 text-center text-gray-600 border-b">Aksi / Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pendaftarList" class="divide-y divide-gray-200"></tbody>
-                    </table>
+                <div class="flex gap-2 w-full md:w-auto">
+                    <button id="btnOpenOfflineModal" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-lg font-bold text-sm shadow flex-1 md:flex-none transition"><i class="fas fa-walking mr-1"></i> Walk-in (Offline)</button>
                 </div>
             </div>
+            
+            <div class="overflow-x-auto border border-gray-200 rounded-xl custom-scrollbar">
+                <table class="min-w-full table-auto text-sm">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-4 py-3 text-center text-gray-600 font-bold border-b">Antrean</th>
+                            <th class="px-4 py-3 text-left text-gray-600 font-bold border-b">Pelanggan & Kontak WA</th>
+                            <th class="px-4 py-3 text-left text-gray-600 font-bold border-b">Paket, Voucher & Waktu</th>
+                            <th class="px-4 py-3 text-center text-gray-600 font-bold border-b w-40">Status / Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendaftarList" class="divide-y divide-gray-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- ROW 4: DATA MEMBER PELANGGAN SETIA         -->
+        <!-- ========================================== -->
+        <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-orange-500">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800"><i class="fas fa-users text-orange-500 mr-2"></i>Data Member (Pelanggan)</h2>
+                <span class="text-xs font-bold text-white bg-orange-500 px-3 py-1 rounded-full shadow" id="totalMembers">Total: 0</span>
+            </div>
+            
+            <div class="overflow-x-auto border border-gray-200 rounded-xl custom-scrollbar max-h-[400px]">
+                <table class="min-w-full table-auto text-sm">
+                    <thead class="bg-gray-100 sticky top-0 z-10 shadow-sm">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-gray-600 font-bold">Email Member</th>
+                            <th class="px-4 py-3 text-left text-gray-600 font-bold">Nama Lengkap</th>
+                            <th class="px-4 py-3 text-left text-gray-600 font-bold">Total Selesai</th>
+                            <th class="px-4 py-3 text-left text-gray-600 font-bold">Tingkatan</th>
+                            <th class="px-4 py-3 text-center text-gray-600 font-bold">Aksi (WA Promo & Foto)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="memberList" class="divide-y divide-gray-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- ROW 5: MODERASI GALERI & TESTIMONI         -->
+        <!-- ========================================== -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Moderasi Galeri Publik -->
+            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-red-500">
+                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-images text-red-500 mr-2"></i>Moderasi Galeri Publik</h2>
+                <div id="publicGalleryModeration" class="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-80 overflow-y-auto p-1 custom-scrollbar"></div>
+            </div>
+
+            <!-- Testimoni Bintang 5 -->
+            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-green-500">
+                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-star text-yellow-400 mr-2"></i>Ulasan Pelanggan</h2>
+                <ul id="testimoniListAdmin" class="space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar"></ul>
+            </div>
+        </div>
+
+    </div> <!-- End Main Container -->
+
+    <!-- Modal Booking Offline -->
+    <div id="offlineModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl relative border-t-8 border-yellow-500">
+            <button id="closeOfflineModal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl"><i class="fas fa-times"></i></button>
+            <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-walking text-yellow-500 mr-2"></i> Input Walk-in Offline</h2>
+            <form id="offlineForm" class="space-y-4">
+                <input type="text" id="offNama" placeholder="Nama Pelanggan" required class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white transition">
+                <div class="relative">
+                    <span class="absolute left-3 top-3.5 text-gray-400"><i class="fab fa-whatsapp"></i></span>
+                    <input type="tel" id="offWA" placeholder="Nomor WA (contoh: 0812...)" required class="w-full border border-gray-300 rounded-lg p-3 pl-10 bg-gray-50 focus:bg-white transition">
+                </div>
+                <select id="offPaket" required class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white text-gray-700 transition">
+                    <option value="">Memuat Paket...</option>
+                </select>
+                <div class="bg-blue-50 p-3 rounded-lg text-xs text-blue-800 border border-blue-200 shadow-inner">
+                    <i class="fas fa-info-circle mr-1"></i> Jadwal otomatis dibuat hari ini, saat ini juga.
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg transition">Simpan & Beri Nomor Antrean</button>
+            </form>
         </div>
     </div>
 
-    <!-- Modal Booking Offline -->
-    <div id="offlineModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl relative border-t-8 border-yellow-500">
-            <button id="closeOfflineModal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl">&times;</button>
-            <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-store text-yellow-500 mr-2"></i> Input Walk-in Offline</h2>
-            <form id="offlineForm" class="space-y-4">
-                <input type="text" id="offNama" placeholder="Nama Pelanggan" required class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white">
-                <div class="relative">
-                    <span class="absolute left-3 top-3.5 text-gray-400"><i class="fab fa-whatsapp"></i></span>
-                    <input type="tel" id="offWA" placeholder="Nomor WA (contoh: 0812...)" required class="w-full border border-gray-300 rounded-lg p-3 pl-10 bg-gray-50 focus:bg-white">
-                </div>
-                <select id="offPaket" required class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white text-gray-700">
-                    <option value="">Memuat Paket...</option>
-                </select>
-                <div class="bg-blue-50 p-3 rounded text-xs text-blue-800">
-                    <i class="fas fa-info-circle mr-1"></i> Jadwal akan otomatis dibuat untuk hari ini, saat ini juga. Jangan lupa catat pembayaran di POS Kasir.
-                </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg">Simpan & Beri Nomor Antrean</button>
+    <!-- Modal Upload Foto Admin ke Member -->
+    <div id="uploadFotoModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl relative border-t-4 border-indigo-500">
+            <button id="closeUploadModal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl"><i class="fas fa-times"></i></button>
+            <h2 class="text-xl font-bold mb-2 text-gray-800"><i class="fas fa-cloud-upload-alt text-indigo-500 mr-2"></i>Upload Foto Pelanggan</h2>
+            <p class="text-xs text-gray-500 mb-4">Tambahkan URL gambar (Cloudinary/Drive) ke galeri <strong id="uploadTargetEmail" class="text-indigo-600"></strong></p>
+            <form id="uploadFotoForm" class="space-y-4">
+                <input type="hidden" id="uploadSafeEmail">
+                <input type="url" id="uploadImgUrl" placeholder="https://res.cloudinary.com/.../image.jpg" required class="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white text-sm">
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-lg transition">Simpan Foto ke Dasbor Pelanggan</button>
             </form>
         </div>
     </div>
@@ -160,8 +249,7 @@
             projectId: "dasborusaha",
             storageBucket: "dasborusaha.firebasestorage.app",
             messagingSenderId: "427165972600",
-            appId: "1:427165972600:web:a0731cbf737717d567558d",
-            measurementId: "G-TL37HXZ834"
+            appId: "1:427165972600:web:a0731cbf737717d567558d"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -171,94 +259,108 @@
         onAuthStateChanged(auth, (user) => { if (!user) window.location.href = 'index.html'; });
         document.getElementById('logoutBtn').addEventListener('click', () => { signOut(auth).then(() => window.location.href = 'index.html'); });
 
-        // --- 1. FITUR VOUCHER ---
+        function formatSafeEmail(email) { return email.replace(/[@.]/g, '_'); }
+
+        // ==========================================
+        // 0. PENGATURAN GLOBAL DASBOR & WEB
+        // ==========================================
+        onValue(ref(db, 'settings/global'), (snap) => {
+            if(snap.exists()) {
+                const data = snap.val();
+                document.getElementById('setTargetSpend').value = data.targetSpend || 500000;
+                document.getElementById('setPotwDeadline').value = data.potwDeadline || '';
+                document.getElementById('setBannerUrl').value = data.bannerUrl || '';
+                document.getElementById('setPromoText').value = data.promoText || '';
+            }
+        });
+
+        document.getElementById('globalSettingsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                targetSpend: parseInt(document.getElementById('setTargetSpend').value),
+                potwDeadline: document.getElementById('setPotwDeadline').value,
+                bannerUrl: document.getElementById('setBannerUrl').value,
+                promoText: document.getElementById('setPromoText').value
+            };
+            await set(ref(db, 'settings/global'), data);
+            alert("Pengaturan Global Berhasil Disimpan!");
+        });
+
+        // ==========================================
+        // 1. FITUR VOUCHER GENERATOR & LIST
+        // ==========================================
         function generateRandomCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let code = '';
-            for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-            return code;
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let code = '';
+            for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length)); return code;
         }
 
         document.getElementById('voucherGeneratorForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const jenis = document.getElementById('jenisVoucher').value;
-            const besaran = document.getElementById('besaranVoucher').value;
-            const expired = document.getElementById('expiredVoucher').value;
-            const jumlah = parseInt(document.getElementById('jumlahVoucher').value);
+            const jenis = document.getElementById('jenisVoucher').value; const besaran = document.getElementById('besaranVoucher').value;
+            const expired = document.getElementById('expiredVoucher').value; const jumlah = parseInt(document.getElementById('jumlahVoucher').value);
 
             for (let i = 0; i < jumlah; i++) {
-                await set(ref(db, 'vouchers/' + generateRandomCode()), {
-                    status: 'aktif', jenis: jenis, besaran: besaran, expired: expired, dibuatPada: Date.now()
-                });
+                await set(ref(db, 'vouchers/' + generateRandomCode()), { status: 'aktif', jenis: jenis, besaran: besaran, expired: expired, dibuatPada: Date.now() });
             }
-            alert(`${jumlah} Voucher berhasil dibuat!`);
-            e.target.reset();
+            alert(`${jumlah} Voucher berhasil dibuat!`); e.target.reset();
         });
 
         onValue(ref(db, 'vouchers'), (snapshot) => {
-            const list = document.getElementById('voucherList');
-            list.innerHTML = '';
+            const list = document.getElementById('voucherList'); list.innerHTML = '';
             const today = new Date().toISOString().split('T')[0];
 
             snapshot.forEach((child) => {
-                const data = child.val();
-                let statusBadge = "";
+                const data = child.val(); let statusBadge = "";
                 
-                if(data.status === 'terpakai') {
-                    statusBadge = `<span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-bold">Terpakai</span>`;
+                // Mengenali status Claimed atau Terpakai
+                if(data.status === 'terpakai' || data.status.includes('Claimed')) {
+                    statusBadge = `<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-bold">Terpakai</span><div class="text-[10px] mt-1 text-gray-500">${data.digunakanOleh||data.pemilik||''}</div>`;
                 } else if (data.expired < today) {
-                    statusBadge = `<span class="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs font-bold">Kedaluwarsa</span>`;
+                    statusBadge = `<span class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-[10px] font-bold">Kedaluwarsa</span>`;
                 } else {
-                    statusBadge = `<span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-bold">Aktif</span>`;
+                    statusBadge = `<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-[10px] font-bold">Aktif</span><div class="text-[10px] mt-1 text-blue-500">${data.pemilik || 'Bebas'}</div>`;
                 }
                 
-                let tampilanBesaran = data.besaran;
-                if(data.jenis === "Diskon %") tampilanBesaran = data.besaran + "%";
-                if(data.jenis === "Diskon Nominal") tampilanBesaran = "Rp " + parseInt(data.besaran).toLocaleString('id-ID');
+                let tampilanBesaran = data.jenis === "Diskon %" ? data.besaran + "%" : "Rp " + parseInt(data.besaran).toLocaleString('id-ID');
 
                 list.innerHTML += `
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 font-voucher font-bold text-gray-800 text-lg">${child.key}</td>
-                        <td class="px-4 py-3">${data.jenis}<br><span class="font-semibold text-blue-600">${tampilanBesaran}</span></td>
-                        <td class="px-4 py-3 text-gray-600 text-xs">${data.expired}</td>
+                    <tr class="hover:bg-blue-50 transition border-b border-gray-100">
+                        <td class="px-4 py-3 font-voucher font-bold text-gray-900 text-base bg-white">${child.key}</td>
+                        <td class="px-4 py-3"><span class="text-xs text-gray-500">${data.jenis}</span><br><span class="font-black text-blue-600">${tampilanBesaran}</span></td>
+                        <td class="px-4 py-3 text-gray-500 text-xs">${data.expired}</td>
                         <td class="px-4 py-3">${statusBadge}</td>
-                        <td class="px-4 py-3">
-                            <button class="text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-xs font-bold delete-voucher shadow" data-id="${child.key}">X</button>
+                        <td class="px-4 py-3 text-center">
+                            <button class="bg-red-100 text-red-600 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded text-xs font-bold transition shadow-sm delete-voucher" data-id="${child.key}"><i class="fas fa-trash-alt"></i></button>
                         </td>
                     </tr>`;
             });
             
             document.querySelectorAll('.delete-voucher').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
-                    if(confirm('Yakin ingin menghapus voucher ini?')) {
-                        await remove(ref(db, 'vouchers/' + e.target.getAttribute('data-id')));
-                    }
+                    const id = e.currentTarget.getAttribute('data-id');
+                    if(confirm(`Yakin ingin menghapus voucher ${id}?`)) await remove(ref(db, 'vouchers/' + id));
                 });
             });
         });
 
-        // --- 2. FITUR PAKET LENGKAP (CRUD) ---
-        const savePaketBtn = document.getElementById('savePaketBtn');
-        const cancelEditBtn = document.getElementById('cancelEditBtn');
-        const paketIdInput = document.getElementById('paketId');
-        const namaPaketInput = document.getElementById('namaPaket');
-        const hargaPaketInput = document.getElementById('hargaPaket');
-        const deskripsiPaketInput = document.getElementById('deskripsiPaket');
+        // ==========================================
+        // 2. FITUR PAKET
+        // ==========================================
+        const savePaketBtn = document.getElementById('savePaketBtn'); const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const paketIdInput = document.getElementById('paketId'); const namaPaketInput = document.getElementById('namaPaket');
+        const hargaPaketInput = document.getElementById('hargaPaket'); const deskripsiPaketInput = document.getElementById('deskripsiPaket');
 
         function resetPaketForm() {
             paketIdInput.value = ''; namaPaketInput.value = ''; hargaPaketInput.value = ''; deskripsiPaketInput.value = '';
-            savePaketBtn.innerText = 'Simpan'; savePaketBtn.className = 'flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-bold shadow';
-            cancelEditBtn.classList.add('hidden');
+            savePaketBtn.innerText = 'Simpan'; savePaketBtn.className = 'flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-bold shadow text-sm'; cancelEditBtn.classList.add('hidden');
         }
-
         cancelEditBtn.addEventListener('click', resetPaketForm);
 
         savePaketBtn.addEventListener('click', async () => {
             const id = paketIdInput.value; const nama = namaPaketInput.value.trim(); const harga = hargaPaketInput.value; const deskripsi = deskripsiPaketInput.value.trim();
             if(!nama || !harga) return alert("Nama dan Harga wajib diisi!");
             const dataPaket = { nama, harga, deskripsi };
-            if(id) await update(ref(db, 'settings/paket/' + id), dataPaket);
-            else await push(ref(db, 'settings/paket'), dataPaket);
+            if(id) await update(ref(db, 'settings/paket/' + id), dataPaket); else await push(ref(db, 'settings/paket'), dataPaket);
             resetPaketForm();
         });
 
@@ -272,56 +374,47 @@
                 const harga = typeof data === 'object' && data.harga ? data.harga : 0;
                 const deskripsi = typeof data === 'object' && data.deskripsi ? data.deskripsi : "-";
                 
-                // Tambah ke form Offline
                 offPaket.innerHTML += `<option value="${nama}">${nama} (Rp ${parseInt(harga).toLocaleString('id-ID')})</option>`;
-
                 list.innerHTML += `
-                    <li class="bg-white p-3 rounded-lg border shadow-sm flex flex-col gap-2">
+                    <li class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex flex-col gap-2 transition hover:shadow-md">
                         <div>
                             <div class="flex justify-between items-start">
-                                <span class="font-bold text-gray-800">${nama}</span>
-                                <span class="text-blue-600 font-bold text-sm">Rp ${parseInt(harga).toLocaleString('id-ID')}</span>
+                                <span class="font-bold text-gray-800 text-sm">${nama}</span>
+                                <span class="text-blue-600 font-black text-sm">Rp ${parseInt(harga).toLocaleString('id-ID')}</span>
                             </div>
-                            <p class="text-xs text-gray-500 mt-1">${deskripsi}</p>
                         </div>
-                        <div class="flex justify-end gap-2 border-t pt-2 mt-1">
-                            <button class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-xs font-bold edit-paket" 
-                                data-id="${child.key}" data-nama="${nama}" data-harga="${harga}" data-deskripsi="${deskripsi}">Edit</button>
-                            <button class="bg-red-100 text-red-700 hover:bg-red-200 px-3 py-1 rounded text-xs font-bold delete-paket" 
-                                data-id="${child.key}">Hapus</button>
+                        <div class="flex justify-end gap-2 border-t border-gray-100 pt-2 mt-1">
+                            <button class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1 rounded text-xs font-bold edit-paket transition" data-id="${child.key}" data-nama="${nama}" data-harga="${harga}" data-deskripsi="${deskripsi}">Edit</button>
+                            <button class="bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1 rounded text-xs font-bold delete-paket transition" data-id="${child.key}">Hapus</button>
                         </div>
                     </li>`;
             });
 
             document.querySelectorAll('.delete-paket').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    if(confirm("Hapus paket ini?")) await remove(ref(db, 'settings/paket/' + e.target.getAttribute('data-id')));
-                });
+                btn.addEventListener('click', async (e) => { if(confirm("Hapus paket ini?")) await remove(ref(db, 'settings/paket/' + e.target.getAttribute('data-id'))); });
             });
-
             document.querySelectorAll('.edit-paket').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     paketIdInput.value = e.target.getAttribute('data-id'); namaPaketInput.value = e.target.getAttribute('data-nama');
                     hargaPaketInput.value = e.target.getAttribute('data-harga'); deskripsiPaketInput.value = e.target.getAttribute('data-deskripsi');
-                    savePaketBtn.innerText = 'Update Paket'; savePaketBtn.className = 'flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold shadow';
+                    savePaketBtn.innerText = 'Update Paket'; savePaketBtn.className = 'flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold shadow text-sm transition';
                     cancelEditBtn.classList.remove('hidden');
                 });
             });
         });
 
-        // --- 3. MANAJEMEN ANTREAN & PELANGGAN ---
-        // Expose function to window for inline onclick inside dynamic HTML
+        // ==========================================
+        // 3. MANAJEMEN ANTREAN (DENGAN WA LINK PINTAR)
+        // ==========================================
         window.tandaiSelesai = async function(key) {
             if(confirm("Tandai sesi ini telah Selesai?")) await update(ref(db, 'pendaftaran/' + key), { status: 'Selesai' });
         }
 
         window.tandaiTelat = async function(key, tglWaktuAsli) {
-            if(!confirm("Pelanggan ini telat? Memindahkan jadwal mereka ke antrean terakhir hari ini...")) return;
-            
+            if(!confirm("Pindahkan pelanggan ke antrean terakhir hari ini?")) return;
             const tglPilih = tglWaktuAsli.split('T')[0];
             const snapAll = await get(ref(db, 'pendaftaran'));
             let maxQueue = 0;
-            
             if(snapAll.exists()) {
                 snapAll.forEach(c => {
                     const d = c.val();
@@ -332,117 +425,222 @@
                 });
             }
             const newAntreanStr = "A-" + (maxQueue + 1).toString().padStart(3, '0');
-            
-            await update(ref(db, 'pendaftaran/' + key), { 
-                status: 'Reschedule (Telat)', 
-                antrean: newAntreanStr,
-                pesanAdmin: `Pemberitahuan: Jadwal sebelumnya terlewat. Anda telah otomatis dipindahkan ke ujung antrean (${newAntreanStr}).`
-            });
-            alert(`Berhasil dipindah ke antrean baru: ${newAntreanStr}`);
+            await update(ref(db, 'pendaftaran/' + key), { status: 'Reschedule (Telat)', antrean: newAntreanStr, pesanAdmin: `Jadwal terlewat. Anda dipindah ke antrean akhir (${newAntreanStr}).` });
+            alert(`Dipindah ke antrean: ${newAntreanStr}`);
         }
 
         onValue(ref(db, 'pendaftaran'), (snapshot) => {
-            const tbody = document.getElementById('pendaftarList');
-            tbody.innerHTML = '';
-            
-            // Urutkan data berdasarkan waktu terbaru di atas
+            const tbody = document.getElementById('pendaftarList'); tbody.innerHTML = '';
             let listPendaftar = [];
             snapshot.forEach(c => { let v = c.val(); v.key = c.key; listPendaftar.push(v); });
-            listPendaftar.sort((a,b) => b.timestamp - a.timestamp);
+            
+            // Sort by Waktu Pemesanan / Kedatangan
+            listPendaftar.sort((a,b) => new Date(a.waktu).getTime() - new Date(b.waktu).getTime());
 
-            listPendaftar.forEach((data) => {
-                const jadwal = data.waktu ? new Date(data.waktu).toLocaleString('id-ID') : '-';
+            const todayStr = new Date().toISOString().split('T')[0];
+            let waitingTodayList = listPendaftar.filter(p => p.status !== 'Selesai' && !p.status?.includes('Claimed') && p.waktu.startsWith(todayStr));
+
+            listPendaftar.reverse().forEach((data) => {
+                const jadwal = data.waktu ? new Date(data.waktu).toLocaleString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) : '-';
                 const status = data.status || 'Menunggu';
                 const antreanBadge = data.antrean ? `<span class="font-voucher text-xl font-black text-blue-700 tracking-wider">${data.antrean}</span>` : `<span class="text-gray-400">-</span>`;
                 
-                let statusUI = `<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-bold border border-yellow-200">${status}</span>`;
-                if(status === 'Selesai') statusUI = `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold border border-green-200"><i class="fas fa-check-circle mr-1"></i>Selesai</span>`;
-                if(status.includes('Telat')) statusUI = `<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-[10px] font-bold border border-red-200 leading-tight block mt-1">${status}</span>`;
+                let statusUI = `<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-bold border border-yellow-200 inline-block shadow-sm">Menunggu</span>`;
+                if(status.includes('Selesai')) statusUI = `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-[10px] font-bold border border-green-200 inline-block shadow-sm"><i class="fas fa-check-circle mr-1"></i>Selesai</span>`;
+                if(status.includes('Telat')) statusUI = `<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-[10px] font-bold border border-red-200 block shadow-sm"><i class="fas fa-exclamation-triangle"></i> Reschedule</span>`;
                 
-                const aksiUI = status === 'Selesai' ? `<span class="text-gray-400 italic text-xs">Telah Selesai</span>` : `
-                    <div class="flex flex-col gap-1">
-                        <button onclick="tandaiSelesai('${data.key}')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition"><i class="fas fa-check mr-1"></i> Selesai</button>
-                        <button onclick="tandaiTelat('${data.key}', '${data.waktu}')" class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 rounded text-[10px] font-bold shadow-sm transition mt-1 uppercase"><i class="fas fa-clock mr-1"></i> Telat (Reschedule)</button>
+                // KALKULASI SISA ANTREAN UNTUK PESAN WA
+                let sisaAntreanInfo = "";
+                let waText = `Halo ${data.nama}, ini admin Canon-Ipad Booth Wawancellcomp.\nMengingatkan jadwal photobooth Anda: ${jadwal}.\n`;
+                if (status === 'Menunggu' && data.waktu.startsWith(todayStr)) {
+                    let indexOrangIni = waitingTodayList.findIndex(p => p.key === data.key);
+                    if (indexOrangIni > 0) {
+                        waText += `Saat ini ada *${indexOrangIni} antrean* lagi sebelum giliran Anda (Nomor ${data.antrean}). Segera bersiap ya!`;
+                        sisaAntreanInfo = `<span class="text-[10px] font-bold text-orange-500 block mt-1"><i class="fas fa-users"></i> Sisa antrean: ${indexOrangIni}</span>`;
+                    } else if (indexOrangIni === 0) {
+                        waText += `Giliran Anda (Nomor ${data.antrean}) adalah yang *SELANJUTNYA*. Silakan menuju booth sekarang!`;
+                        sisaAntreanInfo = `<span class="text-[10px] font-bold text-green-600 block mt-1 animate-pulse"><i class="fas fa-play-circle"></i> Giliran Berikutnya!</span>`;
+                    }
+                }
+                const waLink = `https://wa.me/${data.nohp}?text=${encodeURIComponent(waText)}`;
+
+                let tipeBadge = "";
+                if(data.tipe === 'Offline') tipeBadge = `<span class="ml-2 bg-slate-200 text-slate-700 px-2 py-0.5 rounded text-[9px] font-bold uppercase">Walk-in</span>`;
+                if(data.tipe === 'Mandiri') tipeBadge = `<span class="ml-2 bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[9px] font-bold uppercase">Mandiri</span>`;
+
+                const aksiUI = status.includes('Selesai') ? `<span class="text-gray-400 italic text-[10px]"><i class="fas fa-lock mr-1"></i>Terkunci</span>` : `
+                    <div class="flex flex-col gap-1.5 w-full">
+                        <button onclick="tandaiSelesai('${data.key}')" class="w-full bg-green-500 hover:bg-green-600 text-white py-1.5 rounded text-xs font-bold shadow-sm transition"><i class="fas fa-check mr-1"></i>Selesai</button>
+                        <button onclick="tandaiTelat('${data.key}', '${data.waktu}')" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-1.5 rounded text-[10px] font-bold shadow-sm transition"><i class="fas fa-clock mr-1"></i>Reschedule</button>
                     </div>`;
 
                 tbody.innerHTML += `
-                    <tr class="hover:bg-blue-50 transition border-b">
-                        <td class="px-4 py-4 text-center align-middle bg-gray-50 border-r border-gray-100">
-                            ${antreanBadge}<br>
+                    <tr class="hover:bg-blue-50 transition border-b border-gray-100 bg-white">
+                        <td class="px-4 py-4 text-center align-middle bg-gray-50 border-r border-gray-100 w-24">
+                            ${antreanBadge}
                             <div class="mt-2">${statusUI}</div>
+                            ${sisaAntreanInfo}
                         </td>
                         <td class="px-4 py-4">
-                            <div class="font-bold text-gray-900 text-base">${data.nama} 
-                                ${data.tipe === 'Offline' ? '<span class="ml-2 bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">Offline (Walk-in)</span>' : ''}
-                            </div>
-                            <div class="text-sm text-gray-600 font-voucher mt-1">
-                                <a href="https://wa.me/${data.nohp}" target="_blank" class="text-green-600 hover:text-green-700 transition">
-                                    <i class="fab fa-whatsapp text-lg align-middle mr-1"></i>${data.nohp}
+                            <div class="font-bold text-gray-900">${data.nama} ${tipeBadge}</div>
+                            <div class="mt-1">
+                                <a href="${waLink}" target="_blank" class="inline-flex items-center bg-green-100 text-green-700 hover:bg-green-200 px-2 py-1 rounded text-xs font-bold font-voucher transition shadow-sm border border-green-200">
+                                    <i class="fab fa-whatsapp text-sm mr-1"></i>${data.nohp}
                                 </a>
                             </div>
                         </td>
                         <td class="px-4 py-4">
                             <span class="font-bold text-blue-700 block">${data.paket}</span>
-                            <span class="text-xs text-gray-500 flex items-center mt-1"><i class="far fa-calendar-alt mr-1"></i> ${jadwal}</span>
-                            ${data.voucher ? `<span class="inline-block mt-2 bg-yellow-100 text-yellow-800 text-[10px] px-2 py-0.5 rounded font-bold border border-yellow-300">Voucher: ${data.voucher}</span>` : ''}
+                            <span class="text-xs text-gray-500 flex items-center mt-1"><i class="far fa-calendar-alt text-blue-400 mr-1"></i> ${jadwal}</span>
+                            ${data.voucher ? `<span class="inline-block mt-2 font-voucher bg-yellow-100 text-yellow-800 text-[10px] px-2 py-0.5 rounded font-bold border border-yellow-300"><i class="fas fa-ticket-alt mr-1"></i>${data.voucher}</span>` : ''}
                         </td>
-                        <td class="px-4 py-4 text-center align-middle w-32">
+                        <td class="px-4 py-4 align-middle">
                             ${aksiUI}
                         </td>
                     </tr>`;
             });
         });
 
-        // --- 4. BOOKING OFFLINE (WALK-IN) ---
+        // Offline Walk-in Form
         document.getElementById('btnOpenOfflineModal').addEventListener('click', () => document.getElementById('offlineModal').classList.remove('hidden'));
         document.getElementById('closeOfflineModal').addEventListener('click', () => document.getElementById('offlineModal').classList.add('hidden'));
-        
         document.getElementById('offlineForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btnSubmit = e.target.querySelector('button[type="submit"]');
-            btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...'; btnSubmit.disabled = true;
+            const btnSubmit = e.target.querySelector('button[type="submit"]'); btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...'; btnSubmit.disabled = true;
 
-            const now = new Date();
-            const wibOffset = now.getTimezoneOffset() * 60000; 
-            const localISOTime = (new Date(now - wibOffset)).toISOString().slice(0, 16);
+            const localISOTime = (new Date(new Date() - (new Date().getTimezoneOffset() * 60000))).toISOString().slice(0, 16);
             const tglPilih = localISOTime.split('T')[0];
-
-            // Hitung Nomor Antrean Hari Ini
             const snapAll = await get(ref(db, 'pendaftaran'));
             let antreanKe = 1;
             if(snapAll.exists()) {
-                snapAll.forEach(c => {
-                    const d = c.val();
-                    if(d.waktu && d.waktu.startsWith(tglPilih) && d.antrean) {
-                        const maxNum = parseInt(d.antrean.replace('A-', ''));
-                        if (maxNum >= antreanKe) antreanKe = maxNum + 1;
-                    }
-                });
+                snapAll.forEach(c => { const d = c.val(); if(d.waktu && d.waktu.startsWith(tglPilih) && d.antrean) { const maxNum = parseInt(d.antrean.replace('A-', '')); if (maxNum >= antreanKe) antreanKe = maxNum + 1; } });
             }
             const antreanStr = "A-" + antreanKe.toString().padStart(3, '0');
+            const data = { antrean: antreanStr, nama: document.getElementById('offNama').value, nohp: document.getElementById('offWA').value, paket: document.getElementById('offPaket').value, waktu: localISOTime, tipe: 'Offline', status: 'Menunggu', timestamp: Date.now() };
 
-            const data = {
-                antrean: antreanStr,
-                nama: document.getElementById('offNama').value,
-                nohp: document.getElementById('offWA').value,
-                paket: document.getElementById('offPaket').value,
-                waktu: localISOTime,
-                tipe: 'Offline',
-                status: 'Menunggu',
-                timestamp: Date.now()
-            };
-
-            try {
-                await push(ref(db, 'pendaftaran'), data);
-                alert(`Booking Offline Berhasil!\nNomor Antrean: ${antreanStr}`);
-                document.getElementById('offlineModal').classList.add('hidden');
-                e.target.reset();
-            } catch (error) {
-                alert("Terjadi kesalahan sistem.");
-            } finally {
-                btnSubmit.innerHTML = 'Simpan & Beri Nomor Antrean'; btnSubmit.disabled = false;
-            }
+            try { await push(ref(db, 'pendaftaran'), data); alert(`Booking Offline Berhasil!\nNomor Antrean: ${antreanStr}`); document.getElementById('offlineModal').classList.add('hidden'); e.target.reset(); } 
+            catch (error) { alert("Error sistem."); } finally { btnSubmit.innerHTML = 'Simpan & Beri Nomor Antrean'; btnSubmit.disabled = false; }
         });
+
+        // ==========================================
+        // 4. MANAJEMEN MEMBER / PELANGGAN
+        // ==========================================
+        // Modal Upload Foto Admin
+        window.bukaUploadModal = function(safeEmail) {
+            document.getElementById('uploadSafeEmail').value = safeEmail;
+            document.getElementById('uploadTargetEmail').innerText = safeEmail.replace(/_/g, '.');
+            document.getElementById('uploadFotoModal').classList.remove('hidden');
+        }
+        document.getElementById('closeUploadModal').addEventListener('click', () => document.getElementById('uploadFotoModal').classList.add('hidden'));
+        
+        document.getElementById('uploadFotoForm').addEventListener('submit', async(e) => {
+            e.preventDefault();
+            const sEmail = document.getElementById('uploadSafeEmail').value;
+            const url = document.getElementById('uploadImgUrl').value;
+            // Admin menambahkan foto langsung ke nodes rahasia yang dirender di pelanggan dashboard (index.html bisa disesuaikan nanti jika butuh, tp yg diminta push ke DB)
+            await push(ref(db, `admin_uploaded_photos/${sEmail}`), url);
+            alert("URL Gambar Berhasil ditambahkan ke Database untuk Pelanggan ini!");
+            document.getElementById('uploadFotoModal').classList.add('hidden');
+            e.target.reset();
+        });
+
+        // Render Member Table
+        onValue(ref(db, 'pendaftaran'), async (snapPend) => {
+            if(!snapPend.exists()) return;
+            const pData = snapPend.val();
+            
+            const snapUsers = await get(ref(db, 'users'));
+            const uData = snapUsers.exists() ? snapUsers.val() : {};
+
+            let membersMap = {};
+            // Aggregation based on Email
+            Object.values(pData).forEach(p => {
+                if(!p.email) return; // Skip walk-in without email for member tracking
+                if(!membersMap[p.email]) {
+                    membersMap[p.email] = { email: p.email, safeEmail: formatSafeEmail(p.email), nama: p.nama, nohp: p.nohp, totalSelesai: 0, lastActivity: p.timestamp };
+                }
+                if(p.status && p.status.includes('Selesai')) membersMap[p.email].totalSelesai++;
+                if(p.timestamp > membersMap[p.email].lastActivity) membersMap[p.email].lastActivity = p.timestamp;
+            });
+
+            const mList = document.getElementById('memberList'); mList.innerHTML = '';
+            const mArr = Object.values(membersMap).sort((a,b) => b.totalSelesai - a.totalSelesai);
+            document.getElementById('totalMembers').innerText = `Total: ${mArr.length} Member`;
+
+            mArr.forEach(m => {
+                // Get updated NO HP from users node if exists
+                if(uData[m.safeEmail] && uData[m.safeEmail].nohp) m.nohp = uData[m.safeEmail].nohp;
+
+                let tierBadge = "";
+                if(m.totalSelesai <= 2) tierBadge = `<span class="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-[10px] font-bold border border-gray-300">Baru</span>`;
+                else if(m.totalSelesai <= 8) tierBadge = `<span class="bg-orange-50 text-orange-800 px-2 py-1 rounded-full text-[10px] font-bold border border-orange-300">Reguler</span>`;
+                else if(m.totalSelesai <= 15) tierBadge = `<span class="bg-slate-100 text-slate-800 px-2 py-1 rounded-full text-[10px] font-bold border border-slate-400">Setia</span>`;
+                else tierBadge = `<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-[10px] font-bold border border-yellow-500 shadow-sm"><i class="fas fa-crown"></i> VIP</span>`;
+
+                const promoLink = `https://wa.me/${m.nohp}?text=${encodeURIComponent(`Halo ${m.nama}, ada promo spesial dari Canon-Ipad Booth khusus untuk Anda pelanggan setia kami!`)}`;
+
+                mList.innerHTML += `
+                    <tr class="hover:bg-orange-50 transition border-b border-gray-100 bg-white">
+                        <td class="px-4 py-3 text-xs text-gray-500">${m.email}</td>
+                        <td class="px-4 py-3 font-bold text-gray-800">${m.nama}</td>
+                        <td class="px-4 py-3 text-center"><span class="font-black text-blue-600 text-lg">${m.totalSelesai}</span><br><span class="text-[9px] text-gray-400">Order</span></td>
+                        <td class="px-4 py-3">${tierBadge}</td>
+                        <td class="px-4 py-3 text-center">
+                            <div class="flex justify-center gap-2">
+                                <a href="${promoLink}" target="_blank" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded text-[10px] font-bold shadow-sm transition"><i class="fab fa-whatsapp mr-1"></i>Promo</a>
+                                <button onclick="bukaUploadModal('${m.safeEmail}')" class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1.5 rounded text-[10px] font-bold shadow-sm transition"><i class="fas fa-upload mr-1"></i>Foto</button>
+                            </div>
+                        </td>
+                    </tr>`;
+            });
+        });
+
+        // ==========================================
+        // 5. MODERASI GALERI & TESTIMONI
+        // ==========================================
+        // Testimoni Reader
+        onValue(ref(db, 'testimonials'), (snap) => {
+            const list = document.getElementById('testimoniListAdmin'); list.innerHTML = '';
+            if(snap.exists()) {
+                let tests = []; snap.forEach(c => tests.push(c.val()));
+                tests.sort((a,b) => b.waktu - a.waktu).forEach(t => {
+                    const stars = '★'.repeat(t.rating) + '☆'.repeat(5-t.rating);
+                    const color = t.rating === 5 ? 'text-yellow-500' : 'text-gray-400';
+                    list.innerHTML += `
+                        <li class="bg-gray-50 p-3 rounded-xl border border-gray-100 shadow-sm text-sm">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="font-bold text-gray-800">${t.nama}</span>
+                                <span class="${color} font-bold tracking-widest">${stars}</span>
+                            </div>
+                            <p class="text-gray-600 text-xs italic">"${t.teks}"</p>
+                        </li>`;
+                });
+            } else { list.innerHTML = '<li class="text-gray-400 text-sm">Belum ada ulasan.</li>'; }
+        });
+
+        // Public Gallery Moderation
+        window.deletePublicPhoto = async function(key) {
+            if(confirm("Hapus foto ini dari Beranda Publik?")) await remove(ref(db, 'homepage_photos/' + key));
+        }
+
+        onValue(ref(db, 'homepage_photos'), (snap) => {
+            const grid = document.getElementById('publicGalleryModeration'); grid.innerHTML = '';
+            if(snap.exists()) {
+                let photos = []; snap.forEach(c => { let p=c.val(); p.key=c.key; photos.push(p); });
+                photos.sort((a,b) => b.timestamp - a.timestamp).forEach(p => {
+                    grid.innerHTML += `
+                        <div class="relative group rounded-xl overflow-hidden aspect-square border border-gray-200">
+                            <img src="${p.url}" class="w-full h-full object-cover">
+                            <div class="absolute bottom-0 w-full bg-black/70 p-2 text-white text-[10px] flex justify-between">
+                                <span class="truncate pr-1">${p.ownerName}</span>
+                                <span class="text-yellow-400 font-bold">👍${p.likes||0}</span>
+                            </div>
+                            <button onclick="deletePublicPhoto('${p.key}')" class="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full text-[10px] shadow opacity-0 group-hover:opacity-100 transition"><i class="fas fa-trash"></i></button>
+                        </div>`;
+                });
+            } else { grid.innerHTML = '<div class="col-span-full text-gray-400 text-sm">Beranda publik kosong.</div>'; }
+        });
+
     </script>
 </body>
 </html>
