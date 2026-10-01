@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasir Harian - BizDash</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-database-compat.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { primary: '#0f172a', secondary: '#334155', accent: '#3b82f6' } } }
+        }
+    </script>
+    <style>
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px;}
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+        .font-voucher { font-family: monospace; letter-spacing: 0.1em; }
+    </style>
+</head>
+<body class="bg-gray-100 flex h-screen overflow-hidden text-gray-800 font-sans selection:bg-blue-200">
+
+    <!-- Sidebar Minimalis -->
+    <aside class="w-20 lg:w-64 bg-primary text-white flex flex-col h-full shadow-2xl z-20 transition-all">
+        <div class="p-4 lg:p-6 flex items-center justify-center lg:justify-start border-b border-gray-700">
+            <i class="fas fa-cash-register text-2xl text-accent"></i>
+            <span class="hidden lg:block text-xl font-bold tracking-wider ml-3">Kasir POS</span>
+        </div>
+        <nav class="flex-1 mt-6">
+            <a href="master.html" class="flex items-center px-4 lg:px-6 py-4 text-gray-300 hover:bg-secondary hover:text-white transition-colors" title="Kembali ke Dasbor Master">
+                <i class="fas fa-boxes text-xl w-8 text-center"></i>
+                <span class="hidden lg:block font-medium">Dasbor Master</span>
+            </a>
+            <a href="setting.html" class="flex items-center px-4 lg:px-6 py-4 text-gray-300 hover:bg-secondary hover:text-white transition-colors" title="Kembali ke Dasbor Admin">
+                <i class="fas fa-user-shield text-xl w-8 text-center"></i>
+                <span class="hidden lg:block font-medium">Dasbor Admin</span>
+            </a>
+            <a href="#" class="flex items-center px-4 lg:px-6 py-4 text-white bg-blue-600 border-l-4 border-blue-400 transition-colors" title="Kasir">
+                <i class="fas fa-th-large text-xl w-8 text-center"></i>
+                <span class="hidden lg:block font-medium">Kasir Harian</span>
+            </a>
+            <a href="laporan.html" class="flex items-center px-4 lg:px-6 py-4 text-gray-300 hover:bg-secondary hover:text-white transition-colors" title="Laporan Keuangan">
+                <i class="fas fa-chart-line text-xl w-8 text-center"></i>
+                <span class="hidden lg:block font-medium">Laporan Keuangan</span>
+            </a>
+        </nav>
+        <div class="p-4 border-t border-gray-700 text-center lg:text-left">
+            <div class="text-xs text-gray-400 font-semibold mb-1 hidden lg:block">Status Server:</div>
+            <div class="flex items-center justify-center lg:justify-start text-green-400 text-sm font-bold">
+                <i class="fas fa-wifi mr-2"></i> <span class="hidden lg:inline">Firebase Aktif</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main POS Area -->
+    <main class="flex-1 flex flex-col h-full bg-gray-100 overflow-hidden relative">
+        
+        <!-- Header & BEP Progress Bar -->
+        <header class="bg-white shadow-sm px-6 py-4 z-10 flex flex-col justify-center">
+            <div class="flex justify-between items-center mb-2">
+                <h1 class="text-xl font-bold text-gray-800">Transaksi Hari Ini: <span id="current-date" class="text-blue-600"></span></h1>
+                <div class="flex items-center gap-3">
+                    <button onclick="bukaModalTutupBuku()" id="btnHeaderTutupBuku" class="hidden bg-red-100 text-red-600 hover:bg-red-600 hover:text-white border border-red-200 px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-sm">
+                        <i class="fas fa-lock mr-1"></i> Tutup Buku
+                    </button>
+                    <div class="text-lg font-bold text-gray-700 bg-gray-100 px-4 py-1 rounded-lg border border-gray-200 shadow-inner flex items-center">
+                        <i class="far fa-clock text-blue-500 mr-2"></i><span id="current-time">00:00</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-2">
+                <div class="flex justify-between text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">
+                    <span>Progress Target Omzet Harian (BEP)</span>
+                    <span id="progress-text">Rp 0 / Rp 0 (0%)</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3.5 shadow-inner">
+                    <div id="bep-progress-bar" class="bg-gradient-to-r from-blue-500 to-green-500 h-3.5 rounded-full transition-all duration-1000 shadow-md" style="width: 0%"></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
+            <!-- Kiri: Grid Antrean & Produk -->
+            <div class="flex-1 overflow-y-auto p-6 bg-gray-50 flex flex-col gap-6 hide-scrollbar">
+                
+                <!-- PANEL ANTREAN BOOKING -->
+                <div class="bg-white border border-blue-100 rounded-2xl shadow-sm p-4">
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
+                        <h2 class="text-base font-bold text-gray-800 uppercase tracking-wider"><i class="fas fa-clipboard-list text-blue-500 mr-2"></i>Antrean Booking (Hari Ini)</h2>
+                        <button onclick="bukaMappingModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-sm border border-gray-300">
+                            <i class="fas fa-link mr-1"></i> Mapping Paket & Addons
+                        </button>
+                    </div>
+                    
+                    <div id="booking-list" class="flex gap-4 overflow-x-auto custom-scrollbar pb-2">
+                        <div class="text-gray-400 italic text-sm py-4"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat antrean...</div>
+                    </div>
+                </div>
+
+                <!-- Kategori Produk Reguler -->
+                <div>
+                    <h2 class="text-base font-bold text-gray-700 mb-4 uppercase tracking-wider border-b-2 border-green-500 pb-1 inline-block"><i class="fas fa-box-open text-green-500 mr-2"></i>Produk & Jasa Reguler</h2>
+                    <div id="product-grid" class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <div class="col-span-full text-sm text-gray-500 italic"><i class="fas fa-spinner fa-spin mr-1"></i> Memuat produk...</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Kanan: Keranjang & Laci Kasir -->
+            <div class="w-full md:w-[400px] bg-white shadow-[-10px_0_15px_-3px_rgba(0,0,0,0.05)] flex flex-col z-10 border-l border-gray-200">
+                
+                <!-- Multi-Tab System (Simpan/Tahan Bill) -->
+                <div class="bg-gray-900 pt-2 px-2 flex gap-1 overflow-x-auto custom-scrollbar" id="session-tabs">
+                    <!-- Tabs diinjeksi via JS -->
+                </div>
+
+                <div class="p-3 bg-gray-800 text-white shadow-md flex justify-between items-center">
+                    <h2 class="text-sm font-bold flex items-center"><i class="fas fa-shopping-cart text-blue-400 mr-2"></i> Keranjang Aktif</h2>
+                    <button onclick="kosongkanKeranjang()" class="text-red-400 hover:text-red-300 text-xs font-bold transition"><i class="fas fa-trash"></i> Kosongkan</button>
+                </div>
+
+                <div class="bg-blue-50 text-blue-800 text-[10px] font-bold px-4 py-2 flex justify-between items-center hidden border-b border-blue-200" id="banner-booking-aktif">
+                    <span class="truncate pr-2"><i class="fas fa-ticket-alt mr-1"></i> Mode Tarik: <span id="lbl-booking-name" class="text-blue-900 uppercase"></span></span>
+                    <button onclick="batalkanBooking()" class="text-red-500 hover:text-red-700 px-2 py-1 rounded bg-white shadow-sm border border-red-200 transition">Lepas</button>
+                </div>
+
+                <!-- List Pesanan -->
+                <div class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50 custom-scrollbar" id="cart-items">
+                    <div class="text-center text-gray-400 italic text-sm mt-10">Belum ada pesanan masuk.</div>
+                </div>
+
+                <!-- Kalkulasi Laci Kasir -->
+                <div class="bg-white border-t-2 border-gray-200 p-5 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)]">
+                    <div class="space-y-2 mb-4 border-b border-gray-100 pb-4">
+                        <div class="flex justify-between text-gray-600">
+                            <span class="font-semibold text-sm">Total Omzet (Kotor)</span>
+                            <span class="font-bold text-gray-800" id="cart-omzet">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between text-orange-600">
+                            <span class="font-semibold text-sm">Alokasi HPP (Modal)</span>
+                            <span class="font-bold" id="cart-hpp">- Rp 0</span>
+                        </div>
+                        <div class="flex justify-between text-green-600 pt-2 border-t border-gray-100">
+                            <span class="font-bold text-sm uppercase">Laba Kotor</span>
+                            <span class="font-black text-lg" id="cart-laba">Rp 0</span>
+                        </div>
+                    </div>
+
+                    <button onclick="prosesCheckout()" id="btn-checkout" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition-transform transform hover:scale-[1.02] flex justify-between px-6 items-center disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span class="uppercase tracking-wider text-sm"><i class="fas fa-check-circle mr-1"></i> Bayar Selesai</span>
+                        <span class="text-xl font-bold" id="btn-total-bayar">Rp 0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prediksi Pemakaian Stok Hari Ini -->
+        <div class="bg-slate-800 text-white px-6 py-2 flex items-center justify-between text-xs z-20 shadow-[0_-5px_15px_rgba(0,0,0,0.2)]">
+            <div class="flex items-center font-bold text-yellow-400 whitespace-nowrap">
+                <i class="fas fa-boxes mr-2"></i> Prediksi Bahan Habis:
+            </div>
+            <div class="flex-1 overflow-x-auto whitespace-nowrap ml-4 hide-scrollbar" id="stock-prediction">
+                <span class="text-gray-400 italic">Belum ada transaksi.</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL BUKA BUKU / KASIR -->
+    <div id="bukaBukuModal" class="fixed inset-0 bg-gray-900 bg-opacity-95 hidden flex items-center justify-center z-[100] backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border-t-8 border-blue-500 p-8 text-center relative">
+            <i class="fas fa-store-alt text-6xl text-blue-500 mb-4 drop-shadow-md"></i>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Buka Kasir Hari Ini</h2>
+            <p class="text-gray-500 text-sm mb-6">Masukkan saldo awal (uang modal kembalian) yang ada di laci kasir Anda untuk memulai shift hari ini.</p>
+            <form id="formBukaBuku" class="space-y-4 text-left">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2 text-center">Saldo Awal Kasir (Rp)</label>
+                    <input type="text" id="saldoAwal" required class="w-full border-2 border-blue-200 rounded-xl p-4 text-2xl font-black text-center text-blue-700 focus:outline-none focus:border-blue-500 transition shadow-inner bg-blue-50" value="0" oninput="this.value = formatRupiahLive(this.value)">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition transform hover:-translate-y-1"><i class="fas fa-unlock mr-2"></i>Buka Kasir Sekarang</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL TUTUP BUKU / KASIR -->
+    <div id="tutupBukuModal" class="fixed inset-0 bg-gray-900 bg-opacity-90 hidden flex items-center justify-center z-[110] backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border-t-8 border-red-500">
+            <div class="bg-gray-50 px-6 py-4 border-b flex justify-between items-center">
+                <h3 class="font-bold text-xl text-gray-800"><i class="fas fa-lock text-red-500 mr-2"></i>Tutup Buku Kasir</h3>
+                <button onclick="closeTutupBukuModal()" class="text-gray-400 hover:text-red-500 transition text-2xl"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-gray-100 p-3 rounded-lg text-center border border-gray-200">
+                        <p class="text-xs font-bold text-gray-500 uppercase mb-1">Saldo Awal</p>
+                        <p class="text-lg font-bold text-gray-800" id="tb-saldo-awal">Rp 0</p>
+                    </div>
+                    <div class="bg-green-50 p-3 rounded-lg text-center border border-green-200">
+                        <p class="text-xs font-bold text-green-700 uppercase mb-1">Total Omzet (Penjualan)</p>
+                        <p class="text-lg font-bold text-green-800" id="tb-omzet">Rp 0</p>
+                    </div>
+                    <div class="bg-orange-50 p-3 rounded-lg text-center border border-orange-200">
+                        <p class="text-xs font-bold text-orange-700 uppercase mb-1">HPP (Modal Bahan)</p>
+                        <p class="text-lg font-bold text-orange-800" id="tb-hpp">Rp 0</p>
+                    </div>
+                    <div class="bg-blue-50 p-3 rounded-lg text-center border border-blue-200">
+                        <p class="text-xs font-bold text-blue-700 uppercase mb-1">Laba Kotor</p>
+                        <p class="text-lg font-bold text-blue-800" id="tb-laba">Rp 0</p>
+                    </div>
+                </div>
+
+                <form id="formTutupBuku" class="bg-white border-2 border-red-100 p-4 rounded-xl shadow-inner">
+                    <div class="mb-4 text-center">
+                        <p class="text-sm font-bold text-gray-600 mb-1">Ekspektasi Uang di Laci Kasir (Saldo Awal + Omzet):</p>
+                        <p class="text-2xl font-black text-gray-900" id="tb-expected-cash">Rp 0</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2 text-center text-red-600">Hitung & Masukkan Uang Fisik Aktual (Rp)</label>
+                        <input type="text" id="tb-actual-cash" required class="w-full border-2 border-red-200 rounded-xl p-3 text-xl font-bold text-center text-red-700 focus:outline-none focus:border-red-500 transition shadow-sm bg-red-50 mb-4" oninput="this.value = formatRupiahLive(this.value)">
+                    </div>
+                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg transition transform hover:-translate-y-1"><i class="fas fa-lock mr-2"></i>Tutup Kasir & Lihat Laporan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL KASIR SUDAH DITUTUP -->
+    <div id="kasirDitutupModal" class="fixed inset-0 bg-gray-900 bg-opacity-95 hidden flex items-center justify-center z-[120] backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border-t-8 border-red-500 p-8 text-center relative">
+            <i class="fas fa-lock text-6xl text-red-500 mb-4 drop-shadow-md"></i>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Kasir Telah Ditutup</h2>
+            <p class="text-gray-500 text-sm mb-6">Sesi kasir untuk hari ini telah diakhiri. Transaksi baru tidak dapat dilakukan hingga besok atau Anda harus mereset status buku kas.</p>
+            <a href="laporan.html" class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition"><i class="fas fa-chart-bar mr-2"></i>Lihat Laporan Keuangan</a>
+        </div>
+    </div>
+
+    <!-- MODAL MAPPING PAKET & ADDONS -->
+    <div id="mappingModal" class="fixed inset-0 bg-gray-900 bg-opacity-80 hidden flex items-center justify-center z-[90] backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border border-gray-200 flex flex-col max-h-[90vh]">
+            <div class="bg-blue-600 px-6 py-4 flex justify-between items-center text-white shrink-0">
+                <h3 class="font-bold text-lg"><i class="fas fa-link mr-2"></i>Pemetaan (Mapping) HPP Paket</h3>
+                <button onclick="tutupMappingModal()" class="hover:text-red-200 transition text-xl"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6 flex-1 overflow-y-auto custom-scrollbar">
+                <p class="text-sm text-gray-600 mb-4 border-b border-gray-200 pb-3">Pilih <strong>Produk Master POS</strong> yang sesuai dengan nama Paket/Addons. Ini berfungsi agar sistem bisa menarik resep modal bahan baku (HPP) dengan akurat.</p>
+                <h4 class="font-bold text-gray-800 mb-2">Mapping Paket Utama</h4>
+                <div class="space-y-3 mb-6" id="mappingListContainer"></div>
+                <h4 class="font-bold text-pink-800 mb-2">Mapping Add-ons (Tambahan)</h4>
+                <div class="space-y-3 mb-4" id="mappingAddonsContainer"></div>
+                <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-200 text-xs text-yellow-800 mb-4 shadow-sm">
+                    <i class="fas fa-info-circle mr-1"></i> Harga jual di kasir akan tetap mengikuti harga yang di-booking.
+                </div>
+            </div>
+            <div class="p-6 border-t border-gray-200 shrink-0">
+                <button onclick="simpanMapping()" id="btnSimpanMapping" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg transition"><i class="fas fa-save mr-2"></i>Simpan Pemetaan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL AI ASSISTANT -->
+    <div id="marketing-modal" class="fixed inset-0 bg-gray-900 bg-opacity-80 hidden flex items-center justify-center z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-11/12 max-w-lg overflow-hidden border border-gray-200">
+            <div class="bg-gradient-to-r from-red-500 to-orange-500 px-6 py-4 flex justify-between items-center text-white">
+                <h3 class="font-bold text-lg"><i class="fas fa-exclamation-triangle text-yellow-300 mr-2 text-2xl"></i>Target Belum Tercapai</h3>
+                <button onclick="closeMarketingModal()" class="hover:text-red-200 transition text-xl"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6">
+                <p class="text-gray-600 text-sm mb-4 border-b pb-4">Saat ini sudah jam <strong class="text-red-600">15:00</strong> lewat, namun Laba Kotor Anda masih di bawah <strong class="text-red-600">80%</strong> dari target. Berikut trik yang bisa Anda lakukan sekarang:</p>
+                <div class="bg-yellow-50 border border-yellow-200 p-5 rounded-xl mb-6 shadow-inner relative">
+                    <i class="fas fa-lightbulb absolute -top-3 -right-3 text-4xl text-yellow-400 bg-white rounded-full p-1 shadow"></i>
+                    <p id="marketing-trick-text" class="text-gray-800 font-medium text-lg leading-snug"></p>
+                </div>
+                <div class="space-y-3">
+                    <label class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-blue-50 cursor-pointer transition">
+                        <input type="checkbox" onchange="nextTrick(this)" class="w-5 h-5 text-blue-600 rounded">
+                        <span class="ml-3 font-semibold text-gray-700 text-sm">Ganti Saran Lain</span>
+                    </label>
+                    <label class="flex items-center p-3 border border-green-200 bg-green-50 rounded-lg hover:bg-green-100 cursor-pointer transition shadow-sm">
+                        <input type="checkbox" onchange="acceptTrick(this)" class="w-5 h-5 text-green-600 rounded">
+                        <span class="ml-3 font-bold text-green-800 text-sm">Saya akan coba saran ini!</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Konfigurasi Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdM-1ziZLq2r8P1qpgHM763ke8GUPitvw",
+            authDomain: "dasborusaha.firebaseapp.com",
+            databaseURL: "https://dasborusaha-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "dasborusaha",
+            storageBucket: "dasborusaha.firebasestorage.app",
+            messagingSenderId: "427165972600",
+            appId: "1:427165972600:web:a0731cbf737717d567558d"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // State Aplikasi
+        let dataMaster = { aset: [], bahan: [], tetap: [], produk: [] };
+        let dataPaket = [];
+        let paketMapping = {};
+        let addonsMapping = {};
+        let dataAddons = {};
+        let antreanHariIni = [];
+        
+        // Multi-Shift & Buku Kas
+        let activeShiftKey = null; 
+        let statusBukuKas = null; 
+        let dataBukuKas = null;
+
+        // Multi-Cart Session State (Antrian Kasir Bergilir)
+        let cartSessions = [ { id: 0, title: "Bill 1", items: [], bookingId: null } ];
+        let activeSessionId = 0;
+        let sessionCounter = 0;
+
+        let transaksiHariIni = [];
+        let targetHarianOmzet = 0;
+        let todayStr = new Date().toISOString().split('T')[0];
+        let hasShownModalToday = localStorage.getItem('hideTrickDate') === todayStr;
+
+        function initClock() {
+            const dateEl = document.getElementById('current-date'); const timeEl = document.getElementById('current-time');
+            setInterval(() => {
+                const now = new Date();
+                dateEl.innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                timeEl.innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second:'2-digit' });
+                checkBEPWarning(now); 
+            }, 1000);
+        }
+
+        function formatRp(num) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num); }
+
+        window.formatRupiahLive = function(angka) {
+            let number_string = angka.replace(/[^,\d]/g, '').toString(),
+                split = number_string.split(','),
+                sisa = split[0].length % 3,
+                rupiah = split[0].substr(0, sisa),
+                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+            if(ribuan) { let separator = sisa ? '.' : ''; rupiah += separator + ribuan.join('.'); }
+            return split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+        }
+
+        function parseRupiahAsli(angkaStr) {
+            if(!angkaStr) return 0;
+            return parseInt(angkaStr.toString().replace(/\./g, '')) || 0;
+        }
+
+        // Tambahkan variabel ini di barisan atas (di bawah let hasShownModalToday...)
+        let labaShiftLainHariIni = 0; 
+
+        function fetchDataFirebase() {
+            // Memantau Shift Aktif saat ini
+            database.ref('bizDash/activeShift').on('value', (snapshot) => {
+                activeShiftKey = snapshot.val();
+                
+                if(activeShiftKey) {
+                    document.getElementById('bukaBukuModal').classList.add('hidden');
+                    document.getElementById('kasirDitutupModal').classList.add('hidden');
+                    document.getElementById('btnHeaderTutupBuku').classList.remove('hidden');
+
+                    database.ref(`bizDash/bukuKas/${activeShiftKey}`).on('value', bkSnap => {
+                        dataBukuKas = bkSnap.val();
+                        statusBukuKas = dataBukuKas ? dataBukuKas.status : null;
+                    });
+
+                    database.ref(`bizDash/transaksi/${activeShiftKey}`).on('value', txSnap => {
+                        transaksiHariIni = txSnap.exists() ? Object.values(txSnap.val()) : [];
+                        updateBEPProgressBar(); kalkulasiPrediksiStok(); updateLaciKasir();
+                    });
+                } else {
+                    statusBukuKas = null; dataBukuKas = null; transaksiHariIni = [];
+                    document.getElementById('bukaBukuModal').classList.remove('hidden');
+                    document.getElementById('kasirDitutupModal').classList.add('hidden');
+                    document.getElementById('btnHeaderTutupBuku').classList.add('hidden');
+                    updateBEPProgressBar(); kalkulasiPrediksiStok(); updateLaciKasir();
+                }
+            });
+
+            // PERBAIKAN: Akumulasi Laba dari Shift Lain pada Hari yang Sama
+            database.ref('bizDash/bukuKas').on('value', snap => {
+                labaShiftLainHariIni = 0;
+                if(snap.exists()) {
+                    snap.forEach(child => {
+                        const shiftId = child.key;
+                        const dataShift = child.val();
+                        // Jika shift terjadi hari ini, dan BUKAN shift yang sedang aktif
+                        if(shiftId.startsWith(todayStr) && shiftId !== activeShiftKey) {
+                            labaShiftLainHariIni += (dataShift.labaKotor || 0);
+                        }
+                    });
+                }
+                updateBEPProgressBar();
+            });
+
+            database.ref('bizDash/master').on('value', (snapshot) => {
+                const val = snapshot.val();
+                if(val) {
+                    dataMaster.aset = val.aset ? Object.values(val.aset) : [];
+                    dataMaster.bahan = val.bahan ? Object.values(val.bahan) : [];
+                    dataMaster.tetap = val.tetap ? Object.values(val.tetap) : [];
+                    dataMaster.produk = val.produk ? Object.values(val.produk) : [];
+                    dataMaster.targetBulan = val.targetBulan || 12; 
+                    hitungTargetHarian(); renderProductGrid();
+                }
+            });
+
+            database.ref('settings/paket').on('value', (snapshot) => {
+                dataPaket = [];
+                if(snapshot.exists()) {
+                    snapshot.forEach(child => {
+                        let v = child.val();
+                        dataPaket.push({ id: child.key, nama: typeof v === 'object' ? v.nama : v, hargaJual: typeof v === 'object' && v.harga ? parseInt(v.harga) : 0 });
+                    });
+                }
+            });
+
+            database.ref('settings/paketMapping').on('value', (snapshot) => { paketMapping = snapshot.exists() ? snapshot.val() : {}; });
+            database.ref('settings/addonsMapping').on('value', (snapshot) => { addonsMapping = snapshot.exists() ? snapshot.val() : {}; });
+            database.ref('settings/addons').on('value', (snapshot) => { dataAddons = snapshot.exists() ? snapshot.val() : { hargaOrang: 0, hargaLembar: 0, harga2R: 0, harga4R: 0, harga10Inci: 0 }; });
+
+            database.ref('pendaftaran').on('value', (snapshot) => {
+                antreanHariIni = [];
+                if(snapshot.exists()) {
+                    snapshot.forEach(c => {
+                        let b = c.val(); b.key = c.key;
+                        if(b.waktu && b.waktu.startsWith(todayStr) && !b.status?.includes('Selesai') && !b.status?.includes('Telat')) antreanHariIni.push(b);
+                    });
+                }
+                renderAntreanList(); renderTabs(); 
+            });
+        }
+
+        // --- SISTEM BUKA & TUTUP BUKU MULTI-SHIFT ---
+        document.getElementById('formBukaBuku').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newShiftKey = todayStr + '_' + Date.now(); // Buat ID unik untuk shift ini
+            const saldo = parseRupiahAsli(document.getElementById('saldoAwal').value) || 0;
+            const data = { status: 'buka', waktuBuka: new Date().toISOString(), saldoAwal: saldo, totalOmzet: 0, totalHpp: 0, labaKotor: 0, uangFisik: 0, selisih: 0 };
+            
+            await database.ref(`bizDash/bukuKas/${newShiftKey}`).set(data);
+            await database.ref('bizDash/activeShift').set(newShiftKey); // Set shift aktif
+            alert("Kasir berhasil dibuka! Selamat bekerja.");
+        });
+
+        window.bukaModalTutupBuku = function() {
+            let totalOmzet = 0; let totalHpp = 0;
+            transaksiHariIni.forEach(tx => { totalOmzet += tx.totalOmzet; totalHpp += tx.totalHpp; });
+            const saldoAwal = dataBukuKas ? (dataBukuKas.saldoAwal || 0) : 0;
+            const expectedCash = saldoAwal + totalOmzet;
+            
+            document.getElementById('tb-saldo-awal').innerText = formatRp(saldoAwal);
+            document.getElementById('tb-omzet').innerText = formatRp(totalOmzet);
+            document.getElementById('tb-hpp').innerText = formatRp(totalHpp);
+            document.getElementById('tb-laba').innerText = formatRp(totalOmzet - totalHpp);
+            document.getElementById('tb-expected-cash').innerText = formatRp(expectedCash);
+            document.getElementById('tb-actual-cash').value = formatRupiahLive(expectedCash.toString()); 
+            
+            document.getElementById('tutupBukuModal').classList.remove('hidden');
+        }
+
+        window.closeTutupBukuModal = function() { document.getElementById('tutupBukuModal').classList.add('hidden'); }
+
+        document.getElementById('formTutupBuku').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(!confirm("Yakin ingin mengakhiri shift dan menutup kasir saat ini?")) return;
+            
+            const btnSubmit = e.target.querySelector('button[type="submit"]');
+            btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyimpan...'; btnSubmit.disabled = true;
+
+            let totalOmzet = 0; let totalHpp = 0;
+            transaksiHariIni.forEach(tx => { totalOmzet += tx.totalOmzet; totalHpp += tx.totalHpp; });
+            const saldoAwal = dataBukuKas ? (dataBukuKas.saldoAwal || 0) : 0;
+            const actualCash = parseRupiahAsli(document.getElementById('tb-actual-cash').value) || 0;
+            const expectedCash = saldoAwal + totalOmzet;
+            const selisih = actualCash - expectedCash;
+
+            const updates = { status: 'tutup', waktuTutup: new Date().toISOString(), totalOmzet: totalOmzet, totalHpp: totalHpp, labaKotor: totalOmzet - totalHpp, uangFisik: actualCash, selisih: selisih };
+            await database.ref(`bizDash/bukuKas/${activeShiftKey}`).update(updates);
+            
+            // Hapus shift aktif agar layar pos meminta saldo buka buku untuk shift selanjutnya
+            await database.ref('bizDash/activeShift').remove(); 
+            
+            alert("Buku Kas shift ini telah ditutup! Mengarahkan ke Laporan...");
+            window.location.href = "laporan.html";
+        });
+
+        // --- SISTEM TABS UI ---
+        function renderTabs() {
+            const container = document.getElementById('session-tabs');
+            container.innerHTML = '';
+            
+            cartSessions.forEach(sess => {
+                const isActive = (sess.id === activeSessionId);
+                const bgClass = isActive ? 'bg-white text-blue-700' : 'bg-gray-700 text-gray-300 hover:bg-gray-600';
+                
+                let displayTitle = sess.title;
+                if(sess.bookingId) {
+                    const b = antreanHariIni.find(a => a.key === sess.bookingId);
+                    if(b) displayTitle = b.antrean + ' (' + b.nama.split(' ')[0] + ')';
+                }
+
+                container.innerHTML += `
+                    <div class="flex items-center ${bgClass} px-3 py-2 rounded-t-lg cursor-pointer text-xs font-bold transition whitespace-nowrap shadow-sm" onclick="switchTab(${sess.id})">
+                        <span>${displayTitle}</span>
+                        ${cartSessions.length > 1 ? `<button onclick="closeTab(event, ${sess.id})" class="ml-2 ${isActive ? 'text-red-500 hover:text-red-700' : 'text-gray-400 hover:text-red-300'}"><i class="fas fa-times"></i></button>` : ''}
+                    </div>`;
+            });
+            container.innerHTML += `<button onclick="addTab()" class="bg-gray-800 hover:bg-gray-600 text-white px-3 py-2 rounded-t-lg text-xs font-bold transition ml-1"><i class="fas fa-plus mr-1"></i> Baru</button>`;
+            
+            const activeSession = cartSessions.find(s => s.id === activeSessionId);
+            if(activeSession && activeSession.bookingId) {
+                const b = antreanHariIni.find(a => a.key === activeSession.bookingId);
+                document.getElementById('lbl-booking-name').innerText = b ? b.nama : activeSession.bookingId;
+                document.getElementById('banner-booking-aktif').classList.remove('hidden');
+            } else {
+                document.getElementById('banner-booking-aktif').classList.add('hidden');
+            }
+        }
+
+        window.switchTab = function(id) { activeSessionId = id; renderTabs(); renderAntreanList(); renderPosCart(); }
+
+        window.addTab = function() {
+            sessionCounter++; cartSessions.push({ id: sessionCounter, title: "Bill " + (sessionCounter + 1), items: [], bookingId: null });
+            switchTab(sessionCounter);
+        }
+
+        window.closeTab = function(event, id) {
+            event.stopPropagation(); if(cartSessions.length <= 1) return;
+            const session = cartSessions.find(s => s.id === id);
+            if(session.items.length > 0 && !confirm("Keranjang di Bill ini belum kosong. Yakin ingin menutupnya?")) return;
+            cartSessions = cartSessions.filter(s => s.id !== id);
+            if(activeSessionId === id) activeSessionId = cartSessions[cartSessions.length - 1].id;
+            renderTabs(); renderAntreanList(); renderPosCart();
+        }
+
+        // --- RENDER ANTREAN & PRODUK REGULER ---
+        function renderAntreanList() {
+            const list = document.getElementById('booking-list'); list.innerHTML = '';
+            if(antreanHariIni.length === 0) { list.innerHTML = '<div class="text-gray-400 italic text-sm py-4 ml-2">Tidak ada antrean hari ini.</div>'; return; }
+
+            antreanHariIni.sort((a,b) => a.antrean.localeCompare(b.antrean));
+
+            antreanHariIni.forEach(b => {
+                let isPulled = false; let pulledInSessionTitle = "";
+                for(let i=0; i<cartSessions.length; i++) {
+                    if(cartSessions[i].bookingId === b.key) { isPulled = true; pulledInSessionTitle = cartSessions[i].title; break; }
+                }
+
+                let btnState = "";
+                if(isPulled) {
+                    const actSess = cartSessions.find(s => s.id === activeSessionId);
+                    const isMySession = actSess && (actSess.bookingId === b.key);
+                    if(isMySession) {
+                        btnState = `<button disabled class="w-full bg-blue-500 text-white font-bold py-2 rounded-lg text-xs mt-3"><i class="fas fa-check mr-1"></i> Sedang Diproses di Tab Ini</button>`;
+                    } else {
+                        btnState = `<button disabled class="w-full bg-gray-200 text-gray-500 font-bold py-2 rounded-lg text-xs mt-3">Diproses di ${pulledInSessionTitle}</button>`;
+                    }
+                } else {
+                    btnState = `<button onclick="tarikKeKasir('${b.key}')" class="w-full bg-blue-100 hover:bg-blue-600 text-blue-700 hover:text-white font-bold py-2 rounded-lg text-xs mt-3 transition border border-blue-200 shadow-sm"><i class="fas fa-hand-holding-usd mr-1"></i> Tarik ke Kasir</button>`;
+                }
+                
+                let addonsInfo = [];
+                if(b.ukuranCetak && b.ukuranCetak !== "2R") addonsInfo.push(`Uk: ${b.ukuranCetak}`);
+                if(b.tambahOrang > 0) addonsInfo.push(`+${b.tambahOrang} Org`);
+                if(b.tambahCetak > 0) addonsInfo.push(`+${b.tambahCetak} Cetak`);
+                const strAddons = addonsInfo.length > 0 ? `<div class="text-[9px] text-pink-600 font-bold mt-1 bg-pink-50 px-2 py-0.5 rounded border border-pink-100">${addonsInfo.join(', ')}</div>` : '';
+
+                list.innerHTML += `
+                    <div class="min-w-[220px] bg-white border ${isPulled ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-200'} rounded-xl p-3 shadow-sm flex flex-col justify-between transition-all relative">
+                        ${b.voucher ? `<div class="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 text-[9px] font-bold px-2 py-0.5 rounded-full shadow"><i class="fas fa-ticket-alt"></i> VOUCHER</div>` : ''}
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="font-voucher font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">${b.antrean}</span>
+                                <span class="text-[10px] text-gray-400"><i class="far fa-clock"></i> ${b.waktu.split('T')[1]}</span>
+                            </div>
+                            <h3 class="font-bold text-gray-800 text-sm truncate">${b.nama}</h3>
+                            <p class="text-[10px] text-gray-500 truncate">${b.paket}</p>
+                            ${strAddons}
+                        </div>
+                        ${btnState}
+                    </div>`;
+            });
+        }
+
+        function getHPPProduk(produk) {
+            let hpp = 0; if(!produk.komposisi) return 0;
+            produk.komposisi.forEach(k => {
+                const b = dataMaster.bahan.find(x => x.id == k.id_bahan);
+                if (b) { const tB = (b.hargaBeli || 0) + (b.bebanProporsional || 0); const tP = (b.qty || 1) * (b.isiPerPack || 1); hpp += (tP > 0 ? tB / tP : 0) * k.qty; }
+            }); return hpp;
+        }
+
+        function renderProductGrid() {
+            const grid = document.getElementById('product-grid'); grid.innerHTML = '';
+            if(dataMaster.produk.length === 0) { grid.innerHTML = '<div class="col-span-full text-gray-400 text-sm">Belum ada produk reguler. Silakan tambahkan di Dasbor Master.</div>'; return; }
+            
+            dataMaster.produk.forEach(p => {
+                const hpp = getHPPProduk(p);
+                grid.innerHTML += `
+                    <button onclick="addPosItem('${p.id}', '${p.nama.replace(/'/g, "\\'")}', ${p.hargaJual}, ${hpp})" class="bg-white p-4 rounded-2xl shadow-sm border border-green-100 hover:border-green-500 hover:shadow-md transition-all text-left flex flex-col justify-between group h-28 relative overflow-hidden">
+                        <div class="font-bold text-gray-800 text-sm leading-tight group-hover:text-green-600 transition-colors z-10 pr-4">${p.nama}</div>
+                        <div class="mt-1 z-10"><div class="font-black text-base text-green-700">${formatRp(p.hargaJual)}</div></div>
+                        <i class="fas fa-box absolute -bottom-2 -right-2 text-4xl text-green-50 group-hover:text-green-100 transition-colors"></i>
+                    </button>`;
+            });
+        }
+
+        // --- MAPPING MODAL LOGIC ---
+        window.bukaMappingModal = function() {
+            const container = document.getElementById('mappingListContainer'); container.innerHTML = '';
+            const addonCont = document.getElementById('mappingAddonsContainer'); addonCont.innerHTML = '';
+            
+            let optionsHTML = '<option value="">-- Tidak dihubungkan --</option>';
+            dataMaster.produk.forEach(p => { optionsHTML += `<option value="${p.id}">${p.nama}</option>`; });
+
+            if(dataPaket.length === 0) { container.innerHTML = '<div class="text-center text-gray-500 text-sm">Tidak ada paket photobooth.</div>'; }
+            else {
+                dataPaket.forEach(paket => {
+                    container.innerHTML += `
+                        <div class="flex flex-col md:flex-row md:items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-200 gap-2">
+                            <div class="font-bold text-sm text-blue-800 w-full md:w-1/2">${paket.nama}</div>
+                            <div class="w-full md:w-1/2">
+                                <select class="map-select w-full border border-gray-300 rounded p-1.5 text-xs focus:ring-2 focus:ring-blue-500" data-paketname="${paket.nama}">${optionsHTML}</select>
+                            </div>
+                        </div>`;
+                });
+            }
+
+            const addonsList = [
+                { id: 'ADD_ORG', nama: 'Tambah Orang' }, { id: 'ADD_LBR', nama: 'Tambah Cetak (Lembar)' },
+                { id: 'ADD_4R', nama: 'Upgrade Ukuran 4R' }, { id: 'ADD_10IN', nama: 'Upgrade Ukuran 10 Inci' }
+            ];
+            addonsList.forEach(addon => {
+                addonCont.innerHTML += `
+                    <div class="flex flex-col md:flex-row md:items-center justify-between bg-pink-50 p-3 rounded-lg border border-pink-200 gap-2">
+                        <div class="font-bold text-sm text-pink-800 w-full md:w-1/2">${addon.nama}</div>
+                        <div class="w-full md:w-1/2">
+                            <select class="map-addon-select w-full border border-pink-300 rounded p-1.5 text-xs focus:ring-2 focus:ring-pink-500" data-addonid="${addon.id}">${optionsHTML}</select>
+                        </div>
+                    </div>`;
+            });
+
+            setTimeout(() => {
+                document.querySelectorAll('.map-select').forEach(sel => { const pName = sel.getAttribute('data-paketname'); if(paketMapping[pName]) sel.value = paketMapping[pName]; });
+                document.querySelectorAll('.map-addon-select').forEach(sel => { const aId = sel.getAttribute('data-addonid'); if(addonsMapping[aId]) sel.value = addonsMapping[aId]; });
+            }, 100);
+
+            document.getElementById('mappingModal').classList.remove('hidden');
+        }
+
+        window.tutupMappingModal = function() { document.getElementById('mappingModal').classList.add('hidden'); }
+        window.simpanMapping = async function() {
+            const btn = document.getElementById('btnSimpanMapping'); btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyimpan...'; btn.disabled = true;
+            let newMap = {}; document.querySelectorAll('.map-select').forEach(sel => { const pName = sel.getAttribute('data-paketname'); if(sel.value !== "") newMap[pName] = sel.value; });
+            let newAddonMap = {}; document.querySelectorAll('.map-addon-select').forEach(sel => { const aId = sel.getAttribute('data-addonid'); if(sel.value !== "") newAddonMap[aId] = sel.value; });
+
+            await database.ref('settings/paketMapping').set(newMap); await database.ref('settings/addonsMapping').set(newAddonMap);
+            alert("Mapping berhasil disimpan!"); tutupMappingModal(); btn.innerHTML = '<i class="fas fa-save mr-2"></i>Simpan Pemetaan'; btn.disabled = false;
+        }
+
+        // --- TARIK KE KASIR LOGIC (INTI PEMECAHAN HPP) ---
+        window.tarikKeKasir = async function(bookingKey) {
+            if(statusBukuKas !== 'buka') return alert("Maaf, Kasir harus 'Buka Buku' terlebih dahulu.");
+
+            const booking = antreanHariIni.find(a => a.key === bookingKey);
+            if(!booking) return;
+
+            const session = cartSessions.find(s => s.id === activeSessionId);
+            if(session.items.length > 0 && !confirm("Keranjang di tab ini tidak kosong. Hapus dan ganti dengan data Booking ini?")) return;
+
+            session.items = []; session.bookingId = bookingKey;
+
+            const pushToCart = (mappingDict, identifier, fallbackName, price, qty) => {
+                const masterId = mappingDict[identifier];
+                let idPush = identifier + '_' + bookingKey; let namePush = fallbackName; let hppPush = 0;
+                
+                if(masterId) {
+                    const mProd = dataMaster.produk.find(p => p.id == masterId);
+                    if(mProd) { idPush = mProd.id; namePush = mProd.nama; hppPush = getHPPProduk(mProd); } 
+                    else { alert(`⚠️ Produk POS yang di-map ke "${fallbackName}" tidak ditemukan. Mungkin dihapus di Master?`); }
+                } else { alert(`⚠️ Info: "${fallbackName}" belum di-mapping. HPP akan bernilai Rp 0.`); }
+                
+                const exist = session.items.find(i => i.idProduk == idPush);
+                if(exist) { exist.qty += qty; } 
+                else { session.items.push({ idProduk: idPush, nama: namePush, hargaJual: price, hpp: hppPush, qty: qty, isLocked: false }); }
+            };
+
+            const pData = dataPaket.find(p => p.nama === booking.paket);
+            const hargaPaket = pData ? pData.hargaJual : 0;
+            pushToCart(paketMapping, booking.paket, booking.paket, hargaPaket, 1);
+
+            if(booking.tambahOrang > 0 && dataAddons.hargaOrang > 0) pushToCart(addonsMapping, 'ADD_ORG', '+Orang', dataAddons.hargaOrang, booking.tambahOrang);
+            if(booking.tambahCetak > 0 && dataAddons.hargaLembar > 0) pushToCart(addonsMapping, 'ADD_LBR', '+Cetak', dataAddons.hargaLembar, booking.tambahCetak);
+            if(booking.ukuranCetak === '4R' && dataAddons.harga4R > 0) pushToCart(addonsMapping, 'ADD_4R', 'Upgrade 4R', dataAddons.harga4R, 1);
+            if(booking.ukuranCetak === '10 Inci' && dataAddons.harga10Inci > 0) pushToCart(addonsMapping, 'ADD_10IN', 'Upgrade 10 Inci', dataAddons.harga10Inci, 1);
+
+            if(booking.voucher) {
+                const snapV = await database.ref('vouchers/' + booking.voucher).get();
+                if(snapV.exists()) {
+                    const v = snapV.val();
+                    let subtotal = session.items.reduce((sum, item) => sum + (item.hargaJual * item.qty), 0);
+                    let dAmnt = 0;
+                    if(v.jenis === 'Diskon %') { dAmnt = subtotal * (parseInt(v.besaran) / 100); if(v.max_diskon && dAmnt > v.max_diskon) dAmnt = v.max_diskon; } 
+                    else if (v.jenis === 'Diskon Nominal') { dAmnt = parseInt(v.besaran); }
+                    if(dAmnt > 0) { session.items.push({ idProduk: 'VOU_' + bookingKey, nama: `Voucher Diskon [${booking.voucher}]`, hargaJual: -dAmnt, hpp: 0, qty: 1, isLocked: false }); }
+                }
+            }
+            renderTabs(); renderAntreanList(); renderPosCart();
+        }
+
+        window.batalkanBooking = function() {
+            const session = cartSessions.find(s => s.id === activeSessionId);
+            session.items = []; session.bookingId = null;
+            renderTabs(); renderAntreanList(); renderPosCart();
+        }
+
+        window.kosongkanKeranjang = function() {
+            if(confirm("Hapus seluruh pesanan di Keranjang ini?")) batalkanBooking();
+        }
+
+        // --- KASIR LOGIC UMUM ---
+        window.addPosItem = function(id, nama, harga, hpp) {
+            if(statusBukuKas !== 'buka') return alert("Maaf, Buku Kas hari ini sudah ditutup atau belum dibuka.");
+            const session = cartSessions.find(s => s.id === activeSessionId);
+            const existing = session.items.find(c => c.idProduk == id);
+            if(existing) { existing.qty += 1; } 
+            else { session.items.push({ idProduk: id, nama: nama, hargaJual: parseInt(harga), hpp: parseFloat(hpp), qty: 1, isLocked: false }); }
+            renderPosCart();
+        }
+
+        window.ubahQtyPos = function(idProduk, delta) {
+            const sessionItems = cartSessions.find(s => s.id === activeSessionId).items;
+            const item = sessionItems.find(c => c.idProduk == idProduk);
+            if(item) {
+                item.qty += delta;
+                if(item.qty <= 0) cartSessions.find(s => s.id === activeSessionId).items = sessionItems.filter(c => c.idProduk != idProduk);
+                renderPosCart();
+            }
+        }
+
+        function renderPosCart() {
+            const session = cartSessions.find(s => s.id === activeSessionId);
+            if(!session) return;
+            const items = session.items;
+            const container = document.getElementById('cart-items');
+
+            if(items.length === 0) { container.innerHTML = '<div class="text-center text-gray-400 italic text-sm mt-10">Belum ada pesanan masuk.</div>'; updateLaciKasir(); return; }
+
+            container.innerHTML = '';
+            items.forEach(item => {
+                let textCol = "text-gray-800"; let bgControl = "bg-white"; let bgItem = "bg-white";
+                if(item.hargaJual < 0) { textCol = "text-yellow-800"; bgControl="bg-yellow-50"; bgItem = "bg-yellow-50 border-yellow-300"; }
+                else if(dataMaster.produk.find(p => p.id == item.idProduk)) { textCol = "text-green-800"; bgControl="bg-green-50"; bgItem = "bg-green-50 border-green-200 shadow-sm"; }
+
+                const ctrHtml = `
+                    <div class="flex items-center ${bgControl} rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+                        <button onclick="ubahQtyPos('${item.idProduk}', -1)" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-red-100 hover:text-red-600 font-bold transition"><i class="fas fa-minus text-xs"></i></button>
+                        <span class="w-8 text-center font-bold text-sm bg-gray-50 h-8 flex items-center justify-center border-x border-gray-200">${item.qty}</span>
+                        <button onclick="ubahQtyPos('${item.idProduk}', 1)" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-blue-100 hover:text-blue-600 font-bold transition"><i class="fas fa-plus text-xs"></i></button>
+                    </div>`;
+
+                container.innerHTML += `
+                    <div class="p-3 rounded-lg border border-gray-200 flex flex-col ${bgItem}">
+                        <div class="font-bold ${textCol} text-sm w-full mb-2 leading-tight">${item.nama}</div>
+                        <div class="flex justify-between items-center gap-4">
+                            <div class="font-bold whitespace-nowrap ${item.hargaJual < 0 ? 'text-red-500' : 'text-gray-900'}">${formatRp(item.hargaJual * item.qty)}</div>
+                            <div class="w-24 shrink-0">${ctrHtml}</div>
+                        </div>
+                        ${item.hpp > 0 ? `<div class="text-[10px] text-gray-400 mt-1 text-right w-full font-bold">HPP: ${formatRp(item.hpp * item.qty)}</div>` : ''}
+                    </div>`;
+            });
+            updateLaciKasir();
+        }
+
+        function updateLaciKasir() {
+            const session = cartSessions.find(s => s.id === activeSessionId);
+            if(!session) return;
+            const items = session.items;
+            let totalOmzet = 0; let totalHpp = 0;
+            
+            items.forEach(item => { totalOmzet += (item.hargaJual * item.qty); totalHpp += (item.hpp * item.qty); });
+            const labaKotor = totalOmzet - totalHpp;
+
+            document.getElementById('cart-omzet').innerText = formatRp(totalOmzet);
+            document.getElementById('cart-hpp').innerText = `- ${formatRp(totalHpp)}`;
+            document.getElementById('cart-laba').innerText = formatRp(labaKotor);
+            
+            const btnTotalBayar = document.getElementById('btn-total-bayar');
+            if(btnTotalBayar) btnTotalBayar.innerText = formatRp(totalOmzet);
+            
+            document.getElementById('btn-checkout').disabled = items.length === 0 || statusBukuKas !== 'buka';
+        }
+
+        window.prosesCheckout = function() {
+            if(statusBukuKas !== 'buka') return alert("Kasir belum dibuka!");
+            
+            const session = cartSessions.find(s => s.id === activeSessionId);
+            if(session.items.length === 0) return;
+            
+            const btn = document.getElementById('btn-checkout'); 
+            btn.innerHTML = '<span class="uppercase tracking-wider text-sm"><i class="fas fa-spinner fa-spin mr-2"></i> Memproses...</span><span class="text-xl font-bold" id="btn-total-bayar">...</span>'; 
+            btn.disabled = true;
+
+            let totalOmzet = 0; let totalHpp = 0;
+            session.items.forEach(item => { totalOmzet += (item.hargaJual * item.qty); totalHpp += (item.hpp * item.qty); });
+
+            const transaksiId = Date.now().toString();
+            const dataTransaksi = { id: transaksiId, waktu: new Date().toISOString(), items: session.items, totalOmzet: totalOmzet, totalHpp: totalHpp, labaKotor: totalOmzet - totalHpp };
+
+            database.ref(`bizDash/transaksi/${activeShiftKey}/${transaksiId}`).set(dataTransaksi).then(async () => {
+                if(session.bookingId) await database.ref(`pendaftaran/${session.bookingId}`).update({ status: 'Selesai' });
+                
+                const currentDataKas = dataBukuKas || {};
+                await database.ref(`bizDash/bukuKas/${activeShiftKey}`).update({
+                    totalOmzet: (currentDataKas.totalOmzet || 0) + totalOmzet,
+                    totalHpp: (currentDataKas.totalHpp || 0) + totalHpp,
+                    labaKotor: (currentDataKas.labaKotor || 0) + (totalOmzet - totalHpp)
+                });
+
+                batalkanBooking(); 
+                alert("Transaksi Berhasil & Laci Terupdate!");
+                btn.innerHTML = '<span class="uppercase tracking-wider text-sm"><i class="fas fa-check-circle mr-1"></i> Bayar Selesai</span><span class="text-xl font-bold" id="btn-total-bayar">Rp 0</span>';
+                btn.disabled = false;
+            }).catch(err => {
+                alert("Gagal menyimpan: " + err.message);
+                btn.innerHTML = '<span class="uppercase tracking-wider text-sm">Bayar Ulang</span><span class="text-xl font-bold" id="btn-total-bayar">Rp 0</span>'; 
+                btn.disabled = false;
+            });
+        }
+
+        function hitungTargetHarian() {
+            const totalTetap = dataMaster.tetap.reduce((sum, item) => sum + item.harga, 0);
+            let totalModalAwal = 0;
+            dataMaster.aset.forEach(a => { if(a.isModalAwal) totalModalAwal += (a.harga + (a.bebanProporsional||0)); });
+            dataMaster.bahan.forEach(b => { if(b.isModalAwal) totalModalAwal += (b.hargaBeli + (b.bebanProporsional||0)); });
+            const cicilanBulan = totalModalAwal / (dataMaster.targetBulan || 12);
+            targetHarianOmzet = Math.ceil((totalTetap + cicilanBulan) / 30); 
+        }
+
+        function updateBEPProgressBar() {
+            let terkumpulShiftIni = 0; 
+            transaksiHariIni.forEach(tx => { terkumpulShiftIni += tx.labaKotor; });
+            
+            // PERBAIKAN: Laba shift saat ini ditambah dengan total laba dari shift sebelumnya di hari yang sama
+            let totalLabaHariIni = terkumpulShiftIni + labaShiftLainHariIni;
+
+            let persentase = targetHarianOmzet > 0 ? Math.min((totalLabaHariIni / targetHarianOmzet) * 100, 100) : 0;
+            const bar = document.getElementById('bep-progress-bar'); bar.style.width = `${persentase}%`;
+            
+            if(persentase >= 100) bar.className = "bg-gradient-to-r from-green-400 to-green-600 h-3.5 rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(74,222,128,0.8)]";
+            else bar.className = "bg-gradient-to-r from-blue-500 to-indigo-500 h-3.5 rounded-full transition-all duration-1000 shadow-md";
+            
+            document.getElementById('progress-text').innerText = `Laba Rp ${totalLabaHariIni.toLocaleString('id-ID')} / Target Rp ${targetHarianOmzet.toLocaleString('id-ID')} (${persentase.toFixed(1)}%)`;
+        }
+
+        function kalkulasiPrediksiStok() {
+            const container = document.getElementById('stock-prediction'); let pemakaian = {};
+            transaksiHariIni.forEach(tx => {
+                tx.items.forEach(item => {
+                    const produk = dataMaster.produk.find(p => p.id == item.idProduk);
+                    if(produk && produk.komposisi) {
+                        produk.komposisi.forEach(k => {
+                            if(!pemakaian[k.id_bahan]) pemakaian[k.id_bahan] = 0;
+                            pemakaian[k.id_bahan] += (k.qty * item.qty);
+                        });
+                    }
+                });
+            });
+
+            if(Object.keys(pemakaian).length === 0) { container.innerHTML = '<span class="text-gray-400 italic">Belum ada bahan baku terpakai.</span>'; return; }
+            container.innerHTML = '';
+            for(let idBahan in pemakaian) {
+                const b = dataMaster.bahan.find(x => x.id == idBahan);
+                if(b) container.innerHTML += `<span class="bg-gray-700 border border-gray-600 px-3 py-1 rounded-full mr-2"><strong class="text-white">${b.nama}</strong>: <span class="text-orange-300 font-bold">${(pemakaian[idBahan] / (b.isiPerPack||1)).toFixed(1)} Pack</span> <span class="text-gray-400 text-[10px]">(${pemakaian[idBahan]} Pcs)</span></span>`;
+            }
+        }
+
+        const trikMarketing = ["Tawarkan 'Photobooth Unlimited' untuk acara ulang tahun di sekitar.", "Berikan promo dadakan 'Cetak Lembar Tambahan Diskon 50%'.", "Ajak pelanggan tag IG Anda untuk cetak gratis.", "Hubungi klien lama, tawarkan promo setia hari ini."];
+        let currentTrickIndex = Math.floor(Math.random() * trikMarketing.length);
+
+        function checkBEPWarning(now) {
+            if(hasShownModalToday) return;
+            if(now.getHours() >= 15 && targetHarianOmzet > 0) {
+                let terkumpul = 0; transaksiHariIni.forEach(tx => terkumpul += tx.labaKotor);
+                if(terkumpul < (targetHarianOmzet * 0.8)) {
+                    document.getElementById('marketing-trick-text').innerText = trikMarketing[currentTrickIndex]; document.getElementById('marketing-modal').classList.remove('hidden'); hasShownModalToday = true; 
+                }
+            }
+        }
+
+        window.closeMarketingModal = function() { document.getElementById('marketing-modal').classList.add('hidden'); }
+        window.nextTrick = function(cb) { cb.checked = false; currentTrickIndex = (currentTrickIndex + 1) % trikMarketing.length; const tEl = document.getElementById('marketing-trick-text'); tEl.style.opacity = 0; setTimeout(() => { tEl.innerText = trikMarketing[currentTrickIndex]; tEl.style.opacity = 1; }, 300); }
+        window.acceptTrick = function(cb) { setTimeout(() => { closeMarketingModal(); localStorage.setItem('hideTrickDate', todayStr); }, 500); }
+
+        window.onload = () => { initClock(); fetchDataFirebase(); renderTabs(); };
+    </script>
+</body>
+</html>

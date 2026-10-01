@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dasbor Pengusaha Pemula - BizDash V13</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Chart.js (DIKEMBALIKAN) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- SheetJS (XLSX) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-database-compat.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: { 
+                extend: { 
+                    colors: { primary: '#0f172a', secondary: '#334155', accent: '#3b82f6' } 
+                } 
+            }
+        }
+    </script>
+    <style>
+        .nav-active { background-color: #1e293b; border-left: 4px solid #3b82f6; }
+        .section-hidden { display: none; }
+    </style>
+</head>
+<body class="bg-gray-50 flex h-screen overflow-hidden text-gray-800 font-sans">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-primary text-white flex flex-col h-full shadow-xl z-20">
+        <div class="p-6 flex items-center space-x-3 border-b border-gray-700">
+            <i class="fas fa-rocket text-2xl text-accent"></i>
+            <span class="text-xl font-bold tracking-wider">BizDash V13</span>
+        </div>
+        
+        <div class="px-6 py-3 text-xs text-gray-400 uppercase tracking-wider">Menu Navigasi</div>
+        
+        <nav class="flex-1 overflow-y-auto">
+            <a href="#" onclick="showSection('dashboard', this)" class="nav-item nav-active flex items-center px-6 py-3 text-gray-300 hover:bg-secondary hover:text-white transition-colors">
+                <i class="fas fa-chart-pie w-6"></i> Dasbor Utama
+            </a>
+            <a href="#" onclick="showSection('belanja', this)" class="nav-item flex items-center px-6 py-3 text-gray-300 hover:bg-secondary text-green-400 hover:text-green-300 font-bold transition-colors">
+                <i class="fas fa-shopping-cart w-6"></i> 1. Catat Belanja
+            </a>
+            <a href="#" onclick="showSection('aset', this)" class="nav-item flex items-center px-6 py-3 text-gray-300 hover:bg-secondary hover:text-white transition-colors">
+                <i class="fas fa-tools w-6"></i> 2. Daftar Alat
+            </a>
+            <a href="#" onclick="showSection('bahan', this)" class="nav-item flex items-center px-6 py-3 text-gray-300 hover:bg-secondary hover:text-white transition-colors">
+                <i class="fas fa-box-open w-6"></i> 3. Daftar Bahan
+            </a>
+            <a href="#" onclick="showSection('biaya-tetap', this)" class="nav-item flex items-center px-6 py-3 text-gray-300 hover:bg-secondary hover:text-white transition-colors">
+                <i class="fas fa-building w-6"></i> 4. Biaya Bulanan
+            </a>
+            <a href="#" onclick="showSection('produk', this)" class="nav-item flex items-center px-6 py-3 text-gray-300 hover:bg-secondary hover:text-white transition-colors">
+                <i class="fas fa-tags w-6"></i> 5. Resep & Produk
+            </a>
+            <a href="#" onclick="showSection('bep-multi', this)" class="nav-item flex items-center px-6 py-3 text-gray-300 hover:bg-secondary hover:text-white transition-colors">
+                <i class="fas fa-balance-scale w-6"></i> 6. Simulasi BEP Multi
+            </a>
+        </nav>
+        
+        <div class="p-4 border-t border-gray-700 space-y-3">
+            <a href="pos.html" class="w-full mb-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition-colors flex items-center justify-center space-x-2 border border-blue-400 text-sm">
+                <i class="fas fa-cash-register text-xl"></i><span>BUKA KASIR (POS)</span>
+            </a>
+            <button onclick="exportExcel()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition-colors flex items-center justify-center space-x-2 border border-green-400 text-sm">
+                <i class="fas fa-download"></i><span>Ekspor ke EXCEL</span>
+            </button>
+            
+            <button onclick="document.getElementById('import-excel-file').click()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded shadow transition-colors flex items-center justify-center space-x-2 text-xs border border-emerald-500">
+                <i class="fas fa-file-excel"></i><span>Impor dari EXCEL</span>
+            </button>
+            <input type="file" id="import-excel-file" accept=".xlsx, .xls" class="hidden" onchange="importExcel(event)">
+            <button onclick="syncToServer(this)" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition-colors flex items-center justify-center space-x-2 mt-3 border border-indigo-400 text-sm">
+                <i class="fas fa-cloud-upload-alt text-xl"></i><span>Sync ke Server</span>
+            </button>
+
+            <div class="flex gap-2 mt-2 pt-2 border-t border-gray-600">
+                <button onclick="exportJSON()" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white py-2 px-2 rounded transition-colors flex flex-col items-center justify-center text-[10px] uppercase font-bold" title="Simpan file cadangan sistem (JSON)">
+                    <i class="fas fa-download mb-1"></i><span>Backup Sys</span>
+                </button>
+                <button onclick="document.getElementById('import-file').click()" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white py-2 px-2 rounded transition-colors flex flex-col items-center justify-center text-[10px] uppercase font-bold" title="Pulihkan data dari file backup JSON">
+                    <i class="fas fa-upload mb-1"></i><span>Impor Sys</span>
+                </button>
+                <input type="file" id="import-file" accept=".json" class="hidden" onchange="importJSON(event)">
+            </div>
+            
+            <button onclick="resetData()" class="w-full bg-red-900/50 hover:bg-red-600 text-red-200 hover:text-white py-2 px-4 rounded transition-colors flex items-center justify-center space-x-2 text-xs mt-2 border border-red-800">
+                <i class="fas fa-trash-alt"></i><span>Hapus Semua Data</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 relative">
+        
+        <div id="toast" class="fixed top-5 right-5 bg-green-500 text-white px-6 py-3 rounded shadow-lg transform transition-transform duration-300 translate-x-full z-50 flex items-center">
+            <i class="fas fa-check-circle mr-2"></i> <span id="toast-msg">Data disimpan!</span>
+        </div>
+
+        <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center z-10 sticky top-0">
+            <div>
+                <h1 id="page-title" class="text-2xl font-bold text-gray-800">Dasbor Utama</h1>
+                <p id="page-desc" class="text-sm text-gray-500 mt-1">Ringkasan bisnis Anda.</p>
+            </div>
+            <div class="flex items-center space-x-4 bg-green-50 px-3 py-1 rounded-full border border-green-200">
+                <span class="text-sm text-green-700"><i class="fas fa-save"></i> Tersimpan Otomatis</span>
+            </div>
+        </header>
+
+        <div class="p-8">
+            <!-- SECTION: DASHBOARD -->
+            <div id="dashboard" class="content-section space-y-6">
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-lg shadow p-6 border-t-4 border-blue-500 relative overflow-hidden">
+                        <i class="fas fa-wallet absolute -right-4 -bottom-4 text-7xl text-blue-50 opacity-50"></i>
+                        <div class="text-sm font-bold text-gray-500 uppercase relative z-10">Total Modal Awal (Capex)</div>
+                        <div class="text-xs text-gray-400 mb-2 relative z-10">Alat & Bahan awal merintis</div>
+                        <div class="mt-2 text-3xl font-bold text-gray-800 relative z-10" id="dash-modal-awal">Rp 0</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6 border-t-4 border-purple-500 relative overflow-hidden">
+                        <i class="fas fa-building absolute -right-4 -bottom-4 text-7xl text-purple-50 opacity-50"></i>
+                        <div class="text-sm font-bold text-gray-500 uppercase relative z-10">Biaya Bulanan Tetap</div>
+                        <div class="text-xs text-gray-400 mb-2 relative z-10">Sewa, Gaji Pokok, Listrik, dll</div>
+                        <div class="mt-2 text-3xl font-bold text-gray-800 relative z-10" id="dash-biaya-tetap">Rp 0</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6 border-t-4 border-green-500 relative overflow-hidden">
+                        <i class="fas fa-box absolute -right-4 -bottom-4 text-7xl text-green-50 opacity-50"></i>
+                        <div class="text-sm font-bold text-gray-500 uppercase relative z-10">Jumlah Produk / Menu</div>
+                        <div class="text-xs text-gray-400 mb-2 relative z-10">Siap dijual ke pelanggan</div>
+                        <div class="mt-2 text-3xl font-bold text-gray-800 relative z-10" id="dash-jml-produk">0</div>
+                    </div>
+                </div>
+
+                <!-- BEP Highlight (Kalkulator ROI) -->
+                <div class="bg-white rounded-lg shadow p-6 border border-gray-200">
+                    <div class="flex flex-col md:flex-row justify-between md:items-start mb-6 border-b pb-4">
+                        <div class="flex-1">
+                            <h2 class="text-xl font-bold text-gray-800 text-indigo-700"><i class="fas fa-bullseye mr-2"></i>Kalkulator Balik Modal (Return on Investment)</h2>
+                            <p class="text-gray-600 text-sm mt-1">Perhitungan target penjualan per bulan agar Anda bisa <strong>Balik Modal Awal</strong> sesuai target waktu, menutupi <strong>Biaya Operasional Bulanan</strong>, dan <strong>Membeli Ulang Bahan Baku (HPP)</strong>.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+                        <div class="bg-blue-50 p-5 rounded-lg border border-blue-200">
+                            <label class="block text-sm font-bold text-blue-800 mb-2">Target Waktu Balik Modal Awal (Bulan):</label>
+                            <div class="flex items-center">
+                                <input type="number" id="target-bulan" value="12" min="1" class="w-24 text-xl font-bold p-2 border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-center" oninput="updateBEPView()">
+                                <span class="ml-3 font-semibold text-blue-800">Bulan</span>
+                            </div>
+                            <div class="mt-3 text-xs text-blue-700 bg-blue-100 p-2 rounded">
+                                *Total Modal Awal dibagi dengan target waktu ini sebagai Beban Cicilan Bulanan.
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Pilih Produk Patokan Simulasi:</label>
+                            <select id="bep-product-select" onchange="updateBEPView()" class="w-full border-gray-300 rounded shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 p-3 font-semibold"></select>
+                            <div class="mt-3 text-xs text-gray-500">
+                                *Asumsi fokus menjual 1 produk. Untuk multi-produk, buka Menu 6.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 text-white rounded-xl p-8 text-center shadow-xl relative">
+                        <h3 class="text-gray-300 font-bold mb-6 text-lg tracking-wider border-b border-gray-600 pb-2 inline-block">TARGET RATA-RATA PENJUALAN PER BULAN</h3>
+                        <div class="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-16">
+                            <div>
+                                <div class="text-6xl font-black text-green-400" id="bep-unit">0</div>
+                                <div class="text-sm mt-3 text-gray-400 uppercase tracking-widest font-bold">Produk Terjual</div>
+                            </div>
+                            <div class="hidden md:block w-px h-20 bg-gray-600"></div>
+                            <div>
+                                <div class="text-6xl font-black text-accent" id="bep-rupiah">Rp 0</div>
+                                <div class="text-sm mt-3 text-gray-400 uppercase tracking-widest font-bold">Omzet Target</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 bg-slate-800/80 p-4 rounded-lg text-left text-sm text-gray-300 max-w-3xl mx-auto border border-slate-600">
+                            <div class="font-bold text-white mb-2"><i class="fas fa-calculator mr-2"></i>Rincian Alokasi Omzet di atas:</div>
+                            
+                            <!-- GRID UNTUK RINCIAN -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                                
+                                <!-- BIAYA OPERASIONAL & CICILAN -->
+                                <div class="space-y-3">
+                                    <div class="bg-slate-700/50 p-3 rounded border border-slate-600">
+                                        <div class="font-bold text-white flex justify-between">
+                                            <span>Bayar Biaya Bulanan:</span>
+                                            <span id="rincian-operasional" class="text-purple-300">Rp 0</span>
+                                        </div>
+                                        <div class="text-gray-400 text-xs mt-1">Sewa ruko, gaji, listrik, dll.</div>
+                                    </div>
+                                    <div class="bg-slate-700/50 p-3 rounded border border-slate-600">
+                                        <div class="font-bold text-white flex justify-between">
+                                            <span>Tabungan Balik Modal:</span>
+                                            <span id="rincian-cicilan" class="text-blue-300">Rp 0</span>
+                                        </div>
+                                        <div class="text-gray-400 text-xs mt-1">Disimpan agar dlm <span id="rincian-bulan">12</span> bln modal utuh.</div>
+                                    </div>
+                                </div>
+
+                                <!-- RINCIAN BELI ULANG BAHAN BAKU -->
+                                <div class="bg-orange-900/30 p-3 rounded border border-orange-800/50">
+                                    <div class="font-bold text-white flex justify-between border-b border-orange-800 pb-2 mb-2">
+                                        <span>Beli Ulang Bahan (HPP):</span>
+                                        <span id="rincian-hpp" class="text-orange-300">Rp 0</span>
+                                    </div>
+                                    <div class="text-gray-400 text-xs mb-2">Dana muter utk beli bahan <span id="label-nama-produk-hpp"></span>:</div>
+                                    <ul id="rincian-list-bahan" class="list-disc pl-4 text-xs space-y-1 text-gray-300">
+                                        <!-- Diisi via JS -->
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GRAFIK BEP (FITUR YANG HILANG DAN DIKEMBALIKAN DI V13) -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4"><i class="fas fa-chart-line text-blue-500 mr-2"></i>Grafik Proyeksi Break Even Point (BEP)</h3>
+                    <p class="text-sm text-gray-500 mb-4">Grafik ini menunjukkan titik potong antara Garis Pendapatan (Hijau) dan Garis Total Biaya (Merah) berdasarkan produk patokan di atas.</p>
+                    <div class="relative h-80 w-full border border-gray-100 rounded bg-gray-50 p-2">
+                        <canvas id="bepChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- SECTION: SIMULASI BEP MULTI PRODUK -->
+            <div id="bep-multi" class="content-section section-hidden space-y-6">
+                <div class="bg-white rounded-lg shadow p-6 border-t-4 border-indigo-500">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">Simulasi Penjualan & BEP Multi-Produk</h2>
+                    <p class="text-gray-600 mb-6 text-sm">Masukkan estimasi unit terjual per produk. Hitung apakah penjualan ini menutupi Biaya Bulanan + Cicilan Balik Modal Awal.</p>
+                    
+                    <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 mb-6">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 border-b pb-2">
+                            <h3 class="font-bold text-gray-700">Estimasi Penjualan Bulanan</h3>
+                            <div class="text-sm mt-2 md:mt-0">
+                                Target Balik Modal Awal: <strong class="text-indigo-600" id="sim-multi-target-bulan">12 Bulan</strong> 
+                                <span class="text-xs text-gray-500">(Beban Rp <span id="sim-multi-beban-modal">0</span>/bln)</span>
+                            </div>
+                        </div>
+                        <div id="simulasi-inputs" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- Input estimasi -->
+                        </div>
+                        <button onclick="hitungSimulasi()" class="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded shadow transition w-full md:w-auto">
+                            <i class="fas fa-calculator mr-2"></i> Hitung Simulasi Keuntungan
+                        </button>
+                    </div>
+
+                    <div id="hasil-simulasi-container" class="hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-blue-50 p-4 rounded border border-blue-200 text-center">
+                                <div class="text-sm text-blue-800 font-bold uppercase">Total Omzet (Kotor)</div>
+                                <div class="text-2xl font-black text-blue-900 mt-1" id="simulasi-omzet">Rp 0</div>
+                            </div>
+                            <div class="bg-orange-50 p-4 rounded border border-orange-200 text-center relative group">
+                                <div class="text-sm text-orange-800 font-bold uppercase">Total Beli Ulang Bahan</div>
+                                <div class="text-2xl font-black text-orange-900 mt-1" id="simulasi-hpp">Rp 0</div>
+                                <div class="text-xs text-gray-500 mt-1 cursor-help underline decoration-dotted decoration-gray-400">Lihat Rincian Belanja</div>
+                                
+                                <div class="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-left text-xs rounded shadow-2xl p-4 top-full left-1/2 transform -translate-x-1/2 mt-2 w-64 border border-gray-700 max-h-64 overflow-y-auto">
+                                    <div class="font-bold mb-2 border-b border-gray-600 pb-1">Harus Beli Lagi:</div>
+                                    <ul id="simulasi-tooltip-bahan" class="space-y-1">
+                                        <!-- Diisi JS -->
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded border border-green-200 text-center">
+                                <div class="text-sm text-green-800 font-bold uppercase">Laba Kotor Total</div>
+                                <div class="text-2xl font-black text-green-900 mt-1" id="simulasi-laba-kotor">Rp 0</div>
+                                <div class="text-xs text-gray-500 mt-1">Sisa uang sblm potong sewa & modal</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800 rounded-lg p-6 text-white text-center shadow-lg">
+                            <h3 class="text-lg font-semibold text-gray-300 mb-2">Keuntungan Bersih Akhir</h3>
+                            <p class="text-sm text-gray-400 mb-4">(Setelah potong Biaya Bulanan Rp <span id="simulasi-biaya-tetap-label">0</span> & Tabungan Balik Modal Rp <span id="simulasi-cicilan-label">0</span>)</p>
+                            
+                            <div id="simulasi-status" class="text-5xl font-black mb-2">Rp 0</div>
+                            <p id="simulasi-kesimpulan" class="text-lg font-medium mt-4">Silakan hitung simulasi.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: CATAT BELANJA -->
+            <div id="belanja" class="content-section section-hidden space-y-6">
+                <div class="bg-white rounded-lg shadow p-6 border-t-4 border-green-500">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">Bon Belanja / Keranjang</h2>
+                    <p class="text-gray-600 mb-6 text-sm">Catat belanjaan dalam 1 nota di sini. Ongkir/diskon akan dibagi adil. Tentukan juga apakah barang tsb masuk Modal Awal usaha Anda.</p>
+                    
+                    <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                        <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 flex items-center">
+                                <div class="flex-1">
+                                    <label class="block text-sm font-bold text-blue-800 mb-1"><i class="fas fa-truck mr-1"></i> Total Ongkir (Rp)</label>
+                                    <input type="number" id="bon-ongkir" value="0" class="w-full border rounded px-3 py-2 focus:outline-none focus:border-blue-500 font-bold" min="0" oninput="updateCartLiveTotal()">
+                                </div>
+                            </div>
+                            <div class="bg-orange-50 p-4 rounded-lg border border-orange-100 flex items-center">
+                                <div class="flex-1">
+                                    <label class="block text-sm font-bold text-orange-800 mb-1"><i class="fas fa-ticket-alt mr-1"></i> Voucher Diskon (Rp)</label>
+                                    <input type="number" id="bon-diskon" value="0" class="w-full border rounded px-3 py-2 focus:outline-none focus:border-orange-500 font-bold" min="0" oninput="updateCartLiveTotal()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto mb-4 shadow-sm border border-gray-200 rounded-lg">
+                            <table class="min-w-full bg-white text-sm">
+                                <thead class="bg-gray-800 text-white">
+                                    <tr>
+                                        <th class="py-3 px-2 text-left">Nama Barang</th>
+                                        <th class="py-3 px-2 text-left w-24">Jenis</th>
+                                        <th class="py-3 px-2 text-center w-24" title="Tandai jika ini dibeli sebagai Modal Awal merintis usaha">Modal Awal?</th>
+                                        <th class="py-3 px-2 text-right">Hrg Total (Rp)</th>
+                                        <th class="py-3 px-2 text-center" title="Berapa bungkus/dus yang dibeli?">Jml Beli</th>
+                                        <th class="py-3 px-2 text-center" title="Isi per 1 bungkus (Pcs/Gr/Ml)">Isi/Bungkus</th>
+                                        <th class="py-3 px-2 text-center w-12"><i class="fas fa-trash"></i></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cart-body"></tbody>
+                            </table>
+                        </div>
+
+                        <div class="flex justify-between items-center mb-6">
+                            <button onclick="addToCart()" type="button" class="text-blue-700 hover:text-blue-900 font-bold bg-blue-100 px-4 py-2 rounded-lg border border-blue-200 transition text-sm">
+                                <i class="fas fa-plus mr-1"></i> Tambah Baris
+                            </button>
+                        </div>
+
+                        <div class="bg-white border-2 border-gray-800 rounded-lg p-5 flex flex-col md:flex-row justify-between items-center shadow-lg">
+                            <div>
+                                <span class="text-gray-500 font-bold uppercase text-xs tracking-wider">Total Harus Dibayar (Belanja + Ongkir - Diskon)</span>
+                                <div id="live-total-nota" class="text-3xl font-black text-gray-900 mt-1">Rp 0</div>
+                            </div>
+                            <button onclick="simpanBelanja(this)" type="button" class="mt-4 md:mt-0 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg px-8 py-4 shadow-lg transition text-lg w-full md:w-auto">
+                                <i class="fas fa-save mr-2"></i> Simpan Nota Belanja
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: ASET -->
+            <div id="aset" class="content-section section-hidden space-y-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">Daftar Peralatan (Awet)</h2>
+                    <p class="text-gray-600 text-sm mb-4">Peralatan jangka panjang. Beban proporsional otomatis dihitung dari nota.</p>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border">
+                            <thead class="bg-blue-50 text-blue-900">
+                                <tr>
+                                    <th class="py-3 px-4 text-left font-semibold text-sm border-b">Nama Alat</th>
+                                    <th class="py-3 px-4 text-center font-semibold text-sm border-b">Modal Awal?</th>
+                                    <th class="py-3 px-4 text-center font-semibold text-sm border-b">Jml Beli</th>
+                                    <th class="py-3 px-4 text-right font-semibold text-sm border-b">Hrg Awal</th>
+                                    <th class="py-3 px-4 text-right font-semibold text-sm border-b">Ongkir/Diskon</th>
+                                    <th class="py-3 px-4 text-right font-semibold text-sm border-b bg-blue-100">Total Modal Bersih</th>
+                                    <th class="py-3 px-4 text-center font-semibold text-sm border-b w-32">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-aset" class="text-gray-700"></tbody>
+                            <tfoot class="bg-gray-100 font-bold">
+                                <tr>
+                                    <td colspan="5" class="py-3 px-4 text-right border-t text-gray-700">TOTAL MODAL ALAT</td>
+                                    <td class="py-3 px-4 text-right border-t text-blue-600 text-lg" id="total-aset-table">Rp 0</td>
+                                    <td class="border-t"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: BAHAN -->
+            <div id="bahan" class="content-section section-hidden space-y-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">Daftar Bahan Baku (Habis Terpakai)</h2>
+                    <p class="text-gray-600 text-sm mb-4">Rincian otomatis pencarian "Harga Modal per Pcs".</p>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border">
+                            <thead class="bg-orange-100 text-orange-900 text-sm">
+                                <tr>
+                                    <th class="py-3 px-3 text-left font-semibold border-b">Nama Bahan</th>
+                                    <th class="py-3 px-3 text-center font-semibold border-b">Modal Awal?</th>
+                                    <th class="py-3 px-3 text-right font-semibold border-b">Total Belanja Bersih</th>
+                                    <th class="py-3 px-3 text-center font-semibold border-b">Kuantitas<br><span class="text-xs font-normal">(Bungkus x Isi)</span></th>
+                                    <th class="py-3 px-3 text-center font-semibold border-b">Total Pcs</th>
+                                    <th class="py-3 px-3 text-right font-bold border-b bg-orange-200">Harga Modal / Pcs</th>
+                                    <th class="py-3 px-3 text-center font-semibold border-b w-32">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-bahan" class="text-gray-700 text-sm"></tbody>
+                            <tfoot class="bg-gray-100 font-bold text-sm">
+                                <tr>
+                                    <td colspan="2" class="py-3 px-3 text-right border-t text-gray-700">TOTAL BELANJA BAHAN</td>
+                                    <td class="py-3 px-3 text-right border-t text-orange-600 text-lg" id="total-bahan-table">Rp 0</td>
+                                    <td colspan="4" class="border-t"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: BIAYA TETAP -->
+            <div id="biaya-tetap" class="content-section section-hidden space-y-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">Biaya Tetap Bulanan (Pasti Keluar)</h2>
+                    <p class="text-gray-600 mb-4 text-sm">Sewa, Internet, Gaji Pokok, dll.</p>
+                    
+                    <form id="form-tetap" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-purple-50 p-4 rounded-lg border border-purple-200" onsubmit="addTetap(event)">
+                        <div class="md:col-span-2">
+                            <input type="text" id="tetap-nama" placeholder="Contoh: Sewa Tempat" class="w-full border rounded px-3 py-2 focus:outline-none focus:border-purple-500" required>
+                        </div>
+                        <div>
+                            <input type="number" id="tetap-harga" placeholder="Total per Bulan (Rp)" class="w-full border rounded px-3 py-2 focus:outline-none focus:border-purple-500" min="0" required>
+                        </div>
+                        <div class="md:col-span-3 flex justify-end">
+                            <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded px-6 py-2 transition"><i class="fas fa-plus mr-2"></i> Tambah Pengeluaran</button>
+                        </div>
+                    </form>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border">
+                            <thead class="bg-purple-100 text-purple-900">
+                                <tr>
+                                    <th class="py-3 px-4 text-left font-semibold text-sm border-b">Deskripsi Pengeluaran</th>
+                                    <th class="py-3 px-4 text-right font-semibold text-sm border-b">Total per Bulan (Rp)</th>
+                                    <th class="py-3 px-4 text-center font-semibold text-sm border-b w-32">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-tetap" class="text-gray-700"></tbody>
+                            <tfoot class="bg-gray-100 font-bold">
+                                <tr>
+                                    <td class="py-3 px-4 text-right border-t text-gray-700">TOTAL BIAYA TETAP PER BULAN</td>
+                                    <td class="py-3 px-4 text-right border-t text-purple-600 text-lg" id="total-tetap-table">Rp 0</td>
+                                    <td class="border-t"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: PRODUK & RESEP -->
+            <div id="produk" class="content-section section-hidden space-y-6">
+                <div class="bg-white rounded-lg shadow p-6 border-t-4 border-green-500" id="form-produk-container">
+                    <div class="flex justify-between items-center mb-2 border-b pb-3">
+                        <h2 class="text-xl font-semibold text-gray-800" id="produk-form-title">Buat Produk & Komposisi Resep Baru</h2>
+                        <button type="button" id="btn-batal-edit-produk" onclick="batalkanEditProduk()" class="hidden text-sm bg-red-100 hover:bg-red-200 text-red-800 px-4 py-2 rounded transition font-bold border border-red-300">
+                            <i class="fas fa-times mr-1"></i> Batal Edit
+                        </button>
+                    </div>
+                    
+                    <form id="form-produk" onsubmit="simpanProduk(event)" class="mt-4">
+                        <input type="hidden" id="edit-produk-id" value="">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Nama Produk / Jasa</label>
+                                <input type="text" id="produk-nama" placeholder="Contoh: Es Kopi Susu Aren" class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:border-green-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Harga Jual per Unit (Rp)</label>
+                                <input type="number" id="produk-jual" placeholder="Contoh: 15000" class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:border-green-500" min="0" required>
+                            </div>
+                        </div>
+
+                        <div class="bg-green-50 p-5 rounded-lg border border-green-200 mb-6">
+                            <h3 class="font-bold text-green-800 mb-3"><i class="fas fa-list-ul mr-2"></i>Komposisi Bahan (Untuk 1 Porsi)</h3>
+                            <div id="komposisi-container" class="space-y-3 mb-4"></div>
+                            <div class="flex justify-between items-center">
+                                <button type="button" onclick="addKomposisiRow()" class="text-sm font-bold text-green-700 bg-green-100 hover:bg-green-200 px-4 py-2 rounded border border-green-300 shadow-sm">
+                                    <i class="fas fa-plus mr-1"></i> Tambah Bahan
+                                </button>
+                                <div class="text-right">
+                                    <span class="text-xs text-gray-500 uppercase font-bold tracking-wider">Total Modal Bahan (HPP)</span>
+                                    <div id="live-hpp" class="text-2xl font-black text-gray-800 mt-1">Rp 0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit" id="btn-simpan-produk" class="bg-gray-800 hover:bg-black text-white font-bold rounded-lg px-8 py-3 shadow transition">
+                                <i class="fas fa-save mr-2"></i> Simpan Produk
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Daftar Produk Jualan</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border text-sm">
+                            <thead class="bg-gray-100 text-gray-700">
+                                <tr>
+                                    <th class="py-3 px-4 text-left font-semibold border-b">Nama Produk</th>
+                                    <th class="py-3 px-4 text-left font-semibold border-b w-1/3">Komposisi Resep</th>
+                                    <th class="py-3 px-4 text-right font-semibold border-b">Total HPP</th>
+                                    <th class="py-3 px-4 text-right font-semibold border-b">Harga Jual</th>
+                                    <th class="py-3 px-4 text-right font-semibold border-b bg-green-100">Untung Bersih</th>
+                                    <th class="py-3 px-4 text-center font-semibold border-b w-32">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-produk" class="text-gray-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL EDIT GLOBAL (Aset, Bahan, Tetap) -->
+    <div id="edit-modal" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl w-11/12 max-w-md overflow-hidden">
+            <div class="bg-gray-100 px-6 py-4 border-b">
+                <h3 id="edit-title" class="font-bold text-lg text-gray-800"><i class="fas fa-edit text-blue-500 mr-2"></i>Edit Data</h3>
+            </div>
+            <div class="p-6">
+                <form id="edit-form" onsubmit="saveEdit(event)" class="space-y-4">
+                    <input type="hidden" id="edit-id">
+                    <input type="hidden" id="edit-type">
+                    <div id="edit-fields-container" class="space-y-1"></div>
+                    <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-100">
+                        <button type="button" onclick="closeEditModal()" class="px-5 py-2 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition">Batal</button>
+                        <button type="submit" class="px-5 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition">Simpan Perubahan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Global V13
+        let data = { aset: [], bahan: [], tetap: [], produk: [], targetBulan: 12 };
+        let cart = [];
+        let currentKomposisi = [];
+        let bepChartInstance = null; // Variabel penampung grafik Chart.js
+
+        // Konfigurasi Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdM-1ziZLq2r8P1qpgHM763ke8GUPitvw",
+            authDomain: "dasborusaha.firebaseapp.com",
+            // Menggunakan server asia-southeast1 (Singapura) karena Realtime Database untuk Asia berpusat di sini
+            databaseURL: "https://dasborusaha-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "dasborusaha",
+            storageBucket: "dasborusaha.firebasestorage.app",
+            messagingSenderId: "427165972600",
+            appId: "1:427165972600:web:a0731cbf737717d567558d",
+            measurementId: "G-TL37HXZ834"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const database = firebase.database();
+
+        function generateId() { return Date.now() + Math.floor(Math.random() * 1000000); }
+        function formatRp(num) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num); }
+
+        function initData() {
+            const localStored = localStorage.getItem('bizDashV13Data');
+            let localData = null;
+            if (localStored) {
+                try { localData = JSON.parse(localStored); } catch(e) {}
+            }
+
+            database.ref('bizDash/master').on('value', (snapshot) => {
+                const val = snapshot.val();
+                
+                if (val) {
+                    data.aset = val.aset ? Object.values(val.aset) : [];
+                    data.bahan = val.bahan ? Object.values(val.bahan) : [];
+                    data.tetap = val.tetap ? Object.values(val.tetap) : [];
+                    data.produk = val.produk ? Object.values(val.produk) : [];
+                    data.targetBulan = val.targetBulan || 12; // Menerima dari server
+                    
+                    localStorage.setItem('bizDashV13Data', JSON.stringify(data));
+                } 
+                else if (localData && (localData.aset.length > 0 || localData.bahan.length > 0)) {
+                    data = localData;
+                    if(!data.targetBulan) data.targetBulan = 12;
+                    saveData(); 
+                } 
+                else {
+                    data = { aset: [], bahan: [], tetap: [], produk: [], targetBulan: 12 };
+                }
+
+                // Perbarui nilai kotak input agar sesuai dengan data pusat
+                const targetInput = document.getElementById('target-bulan');
+                if(targetInput) targetInput.value = data.targetBulan;
+
+                initCart();
+                initFormProduk();
+                renderAll(); 
+            }, (error) => {
+                console.error("Koneksi Firebase Terputus: ", error);
+                if (localData) {
+                    data = localData;
+                    if(!data.targetBulan) data.targetBulan = 12;
+                    
+                    const targetInput = document.getElementById('target-bulan');
+                    if(targetInput) targetInput.value = data.targetBulan;
+                    
+                    initCart();
+                    initFormProduk();
+                    renderAll();
+                }
+            });
+        }
+
+        function saveData() {
+            // Mengirim data ke Server Firebase (akan memicu on('value') di atas secara otomatis)
+            database.ref('bizDash/master').set(data).catch(err => {
+                alert("Gagal menyimpan ke Server: " + err.message);
+            });
+        }
+
+        function syncToServer(btnElemen) {
+            // Animasi loading pada tombol
+            const originalHtml = btnElemen.innerHTML;
+            btnElemen.innerHTML = '<i class="fas fa-spinner fa-spin text-xl"></i><span>Menyinkronkan...</span>';
+            btnElemen.disabled = true;
+
+            // Pastikan data tersimpan di lokal memori laptop
+            localStorage.setItem('bizDashV13Data', JSON.stringify(data));
+
+            // Paksa tembak data terbaru ke Firebase
+            database.ref('bizDash/master').set(data)
+                .then(() => {
+                    showToast('Data berhasil di-Sync ke Server Firebase!');
+                    setTimeout(() => {
+                        btnElemen.innerHTML = originalHtml;
+                        btnElemen.disabled = false;
+                    }, 1000);
+                })
+                .catch(err => {
+                    alert("Gagal Sync ke Server: " + err.message);
+                    btnElemen.innerHTML = originalHtml;
+                    btnElemen.disabled = false;
+                });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-x-full');
+            setTimeout(() => { toast.classList.add('translate-x-full'); }, 3000);
+        }
+
+        // --- CALCULATION HELPERS ---
+        function getModalPerPcsBahan(bahan) {
+            const totalBersih = (bahan.hargaBeli || 0) + (bahan.bebanProporsional || 0);
+            const totalPcs = (bahan.qty || 1) * (bahan.isiPerPack || 1);
+            if (totalPcs === 0) return 0;
+            return totalBersih / totalPcs;
+        }
+
+        function getHPPProduk(produk) {
+            let hpp = 0;
+            if(!produk || !produk.komposisi) return 0;
+            produk.komposisi.forEach(k => {
+                const b = data.bahan.find(x => x.id == k.id_bahan);
+                if (b) { hpp += getModalPerPcsBahan(b) * k.qty; }
+            });
+            return hpp;
+        }
+
+        function hitungTotalModalAwal() {
+            let total = 0;
+            data.aset.forEach(a => { if(a.isModalAwal) total += (a.harga + (a.bebanProporsional||0)); });
+            data.bahan.forEach(b => { if(b.isModalAwal) total += (b.hargaBeli + (b.bebanProporsional||0)); });
+            return total;
+        }
+
+        // --- CART LOGIC ---
+        function initCart() {
+            cart = [{ id: generateId(), nama: '', type: 'bahan', isModalAwal: true, harga: '', qty: 1, isiPerPack: 1 }];
+            document.getElementById('bon-ongkir').value = 0;
+            document.getElementById('bon-diskon').value = 0;
+            renderCart();
+        }
+
+        function addToCart() {
+            cart.push({ id: generateId(), nama: '', type: 'bahan', isModalAwal: true, harga: '', qty: 1, isiPerPack: 1 });
+            renderCart();
+        }
+
+        function removeCart(id) {
+            cart = cart.filter(c => c.id !== id);
+            if(cart.length === 0) addToCart(); 
+            renderCart();
+        }
+
+        function updateCart(id, field, value) {
+            const item = cart.find(c => c.id === id);
+            if(item) {
+                if(field === 'isModalAwal') {
+                    item[field] = value;
+                } else {
+                    item[field] = value;
+                }
+                
+                if(field === 'type') {
+                    if(value === 'aset') item.isiPerPack = 1;
+                    renderCart();
+                } else if(field === 'harga') {
+                    updateCartLiveTotal();
+                }
+            }
+        }
+
+        function updateCartLiveTotal() {
+            const totalOngkir = parseFloat(document.getElementById('bon-ongkir').value) || 0;
+            const totalDiskon = parseFloat(document.getElementById('bon-diskon').value) || 0;
+            const totalBrg = cart.reduce((sum, item) => sum + (parseFloat(item.harga) || 0), 0);
+            const total = totalBrg + totalOngkir - totalDiskon;
+            document.getElementById('live-total-nota').innerText = formatRp(total);
+        }
+
+        function renderCart() {
+            const tbody = document.getElementById('cart-body');
+            tbody.innerHTML = '';
+            
+            // HTML dikembalikan dalam bentuk string template multilines yang rapi
+            cart.forEach(item => {
+                const isAlat = item.type === 'aset';
+                
+                let html = `<tr class="border-b hover:bg-gray-100 transition">`;
+                
+                // Kolom Nama
+                html += `
+                    <td class="p-2">
+                        <input type="text" value="${item.nama}" oninput="updateCart(${item.id}, 'nama', this.value)" class="w-full border border-gray-300 p-1.5 rounded focus:border-blue-500 focus:outline-none bg-white" placeholder="Cth: Gelas">
+                    </td>`;
+                
+                // Kolom Jenis
+                html += `
+                    <td class="p-2">
+                        <select onchange="updateCart(${item.id}, 'type', this.value)" class="w-full border border-gray-300 p-1.5 rounded focus:border-blue-500 focus:outline-none bg-white text-xs">
+                            <option value="bahan" ${!isAlat ? 'selected' : ''}>Bahan (Habis)</option>
+                            <option value="aset" ${isAlat ? 'selected' : ''}>Alat (Awet)</option>
+                        </select>
+                    </td>`;
+                
+                // Kolom Checkbox Modal Awal
+                html += `
+                    <td class="p-2 text-center">
+                        <input type="checkbox" ${item.isModalAwal ? 'checked' : ''} onchange="updateCart(${item.id}, 'isModalAwal', this.checked)" class="w-4 h-4 text-blue-600 rounded">
+                    </td>`;
+                    
+                // Kolom Harga
+                html += `
+                    <td class="p-2">
+                        <input type="number" min="0" value="${item.harga}" oninput="updateCart(${item.id}, 'harga', this.value)" class="w-full border border-gray-300 p-1.5 rounded focus:border-blue-500 focus:outline-none bg-white" placeholder="Rp">
+                    </td>`;
+                    
+                // Kolom Qty
+                html += `
+                    <td class="p-2">
+                        <input type="number" min="1" value="${item.qty}" oninput="updateCart(${item.id}, 'qty', this.value)" class="w-full border border-gray-300 p-1.5 rounded focus:border-blue-500 focus:outline-none bg-white text-center" placeholder="Pack">
+                    </td>`;
+                    
+                // Kolom Isi Per Pack
+                let cssIsi = isAlat ? 'bg-gray-200 cursor-not-allowed text-transparent' : '';
+                let placeholderIsi = isAlat ? '-' : 'Pcs';
+                let disabledIsi = isAlat ? 'disabled' : '';
+                html += `
+                    <td class="p-2">
+                        <input type="number" min="1" value="${item.isiPerPack}" oninput="updateCart(${item.id}, 'isiPerPack', this.value)" class="w-full border border-gray-300 p-1.5 rounded focus:border-blue-500 focus:outline-none bg-white text-center ${cssIsi}" placeholder="${placeholderIsi}" ${disabledIsi}>
+                    </td>`;
+                    
+                // Kolom Hapus
+                html += `
+                    <td class="p-2 text-center">
+                        <button type="button" onclick="removeCart(${item.id})" class="text-red-500 hover:text-red-700 bg-red-50 px-2 py-1 rounded transition"><i class="fas fa-times"></i></button>
+                    </td>`;
+                    
+                html += `</tr>`;
+                
+                tbody.innerHTML += html;
+            });
+            updateCartLiveTotal();
+        }
+
+        function simpanBelanja(btnElemen) {
+            const totalOngkir = parseFloat(document.getElementById('bon-ongkir').value) || 0;
+            const totalDiskon = parseFloat(document.getElementById('bon-diskon').value) || 0;
+            let totalBelanjaBrg = 0;
+            
+            for(let i=0; i<cart.length; i++) {
+                const item = cart[i];
+                const harga = parseFloat(item.harga) || 0;
+                if(item.nama.trim() === '' || harga <= 0) {
+                    alert('Mohon isi Nama dan Harga Total (Rp) pada semua baris barang.');
+                    return;
+                }
+                if(item.type === 'bahan' && (parseFloat(item.qty) <= 0 || parseFloat(item.isiPerPack) <= 0)) {
+                    alert(`Mohon isi Jml Beli dan Isi/Bungkus untuk: ${item.nama}`);
+                    return;
+                }
+                totalBelanjaBrg += harga;
+            }
+
+            if(btnElemen) {
+                btnElemen.disabled = true;
+                btnElemen.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...';
+            }
+
+            const bebanTambahan = totalOngkir - totalDiskon;
+            const itemsToSave = [...cart];
+            cart = []; 
+
+            itemsToSave.forEach(item => {
+                const hargaBrg = parseFloat(item.harga);
+                const proporsiBeban = totalBelanjaBrg > 0 ? (hargaBrg / totalBelanjaBrg) * bebanTambahan : 0;
+                const _qty = parseFloat(item.qty) || 1;
+                const _isi = parseFloat(item.isiPerPack) || 1;
+
+                if(item.type === 'aset') {
+                    data.aset.push({ id: generateId(), nama: item.nama, harga: hargaBrg, bebanProporsional: proporsiBeban, qty: _qty, isModalAwal: item.isModalAwal });
+                } else {
+                    data.bahan.push({ id: generateId(), nama: item.nama, hargaBeli: hargaBrg, bebanProporsional: proporsiBeban, qty: _qty, isiPerPack: _isi, isModalAwal: item.isModalAwal });
+                }
+            });
+
+            saveData();
+            showToast('Berhasil mencatat nota belanja!');
+            initCart();
+
+            if(btnElemen) {
+                setTimeout(() => {
+                    btnElemen.disabled = false;
+                    btnElemen.innerHTML = '<i class="fas fa-save mr-2"></i> Simpan Nota Belanja';
+                }, 500);
+            }
+        }
+
+        // --- PRODUK & RESEP LOGIC ---
+        function initFormProduk() {
+            document.getElementById('edit-produk-id').value = '';
+            currentKomposisi = [];
+            document.getElementById('produk-nama').value = '';
+            document.getElementById('produk-jual').value = '';
+            
+            document.getElementById('produk-form-title').innerText = "Buat Produk & Komposisi Resep Baru";
+            document.getElementById('btn-simpan-produk').innerHTML = '<i class="fas fa-save mr-2"></i> Simpan Produk';
+            document.getElementById('btn-simpan-produk').className = "bg-gray-800 hover:bg-black text-white font-bold rounded-lg px-8 py-3 shadow transition";
+            
+            const btnBatal = document.getElementById('btn-batal-edit-produk');
+            if(btnBatal) btnBatal.classList.add('hidden');
+            
+            renderKomposisiForm();
+        }
+
+        function editProdukFull(id) {
+            const item = data.produk.find(p => p.id === id);
+            if(!item) return;
+            
+            showSection('produk', document.querySelectorAll('.nav-item')[5]);
+            window.scrollTo(0, 0);
+
+            document.getElementById('edit-produk-id').value = id;
+            document.getElementById('produk-nama').value = item.nama;
+            document.getElementById('produk-jual').value = item.hargaJual;
+            currentKomposisi = JSON.parse(JSON.stringify(item.komposisi || [])); 
+
+            document.getElementById('produk-form-title').innerHTML = '<i class="fas fa-edit text-blue-600 mr-2"></i>Edit Produk: ' + item.nama;
+            document.getElementById('btn-simpan-produk').innerHTML = '<i class="fas fa-check mr-2"></i> Update Produk & Resep';
+            document.getElementById('btn-simpan-produk').className = "bg-blue-600 hover:bg-blue-800 text-white font-bold rounded-lg px-8 py-3 shadow transition";
+            
+            const btnBatal = document.getElementById('btn-batal-edit-produk');
+            if(btnBatal) btnBatal.classList.remove('hidden');
+
+            renderKomposisiForm();
+        }
+
+        function batalkanEditProduk() {
+            initFormProduk();
+            showToast('Batal edit produk.');
+        }
+
+        function addKomposisiRow() {
+            if(data.bahan.length === 0) {
+                alert("Anda belum memiliki Daftar Bahan. Catat belanja bahan baku terlebih dahulu di Menu 1.");
+                return;
+            }
+            currentKomposisi.push({ id_bahan: data.bahan[0].id, qty: 1 });
+            renderKomposisiForm();
+        }
+
+        function updateKomposisi(index, field, val) {
+            currentKomposisi[index][field] = val;
+            renderKomposisiForm(); 
+        }
+
+        function removeKomposisi(index) {
+            currentKomposisi.splice(index, 1);
+            renderKomposisiForm();
+        }
+
+        function renderKomposisiForm() {
+            const container = document.getElementById('komposisi-container');
+            container.innerHTML = '';
+            let liveHpp = 0;
+
+            if(currentKomposisi.length === 0) {
+                container.innerHTML = '<p class="text-sm text-gray-500 italic px-2">Belum ada bahan ditambahkan.</p>';
+            }
+
+            // HTML di-expand dan dirapikan kembali
+            currentKomposisi.forEach((k, i) => {
+                const b = data.bahan.find(x => x.id == k.id_bahan);
+                if(b) {
+                    liveHpp += getModalPerPcsBahan(b) * k.qty;
+                }
+
+                let optionsHtml = data.bahan.map(x => {
+                    const isSelected = (x.id == k.id_bahan) ? 'selected' : '';
+                    return `<option value="${x.id}" ${isSelected}>${x.nama} (${formatRp(getModalPerPcsBahan(x))}/pcs)</option>`;
+                }).join('');
+
+                container.innerHTML += `
+                <div class="flex flex-wrap md:flex-nowrap gap-2 items-center bg-white p-2 border rounded shadow-sm">
+                    <select class="flex-1 border-gray-300 rounded text-sm p-2 focus:border-green-500 outline-none" onchange="updateKomposisi(${i}, 'id_bahan', this.value)">
+                        ${optionsHtml}
+                    </select>
+                    <div class="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
+                        <span class="text-xs text-gray-500 hidden md:inline">Pakai:</span>
+                        <input type="number" class="w-20 border-gray-300 rounded p-2 text-sm text-center focus:border-green-500 outline-none" placeholder="Qty" min="0.01" step="any" value="${k.qty}" onchange="updateKomposisi(${i}, 'qty', parseFloat(this.value)||0)">
+                        <span class="text-xs text-gray-500">Pcs</span>
+                        <button type="button" class="text-red-500 hover:text-red-700 p-2 ml-auto" onclick="removeKomposisi(${i})">
+                            <i class="fas fa-times-circle text-lg"></i>
+                        </button>
+                    </div>
+                </div>`;
+            });
+
+            document.getElementById('live-hpp').innerText = formatRp(liveHpp);
+        }
+
+        function simpanProduk(e) {
+            e.preventDefault();
+            const editId = document.getElementById('edit-produk-id').value;
+            const nama = document.getElementById('produk-nama').value;
+            const jual = parseFloat(document.getElementById('produk-jual').value);
+
+            if(currentKomposisi.length === 0) {
+                if(!confirm("Produk ini belum ada bahan resep. Lanjutkan menyimpan? (HPP = 0)")) return;
+            }
+
+            if(editId) {
+                const item = data.produk.find(p => p.id == editId);
+                if(item) {
+                    item.nama = nama;
+                    item.hargaJual = jual;
+                    item.komposisi = [...currentKomposisi];
+                    showToast('Perubahan Resep Produk berhasil disimpan!');
+                }
+            } else {
+                data.produk.push({
+                    id: generateId(),
+                    nama: nama,
+                    hargaJual: jual,
+                    komposisi: [...currentKomposisi]
+                });
+                showToast('Produk Baru berhasil disimpan!');
+            }
+
+            saveData();
+            initFormProduk(); 
+        }
+
+        // --- SINGLE FORMS (TETAP) ---
+        function addTetap(e) {
+            e.preventDefault();
+            data.tetap.push({ id: generateId(), nama: document.getElementById('tetap-nama').value, harga: parseFloat(document.getElementById('tetap-harga').value) });
+            document.getElementById('form-tetap').reset();
+            saveData(); showToast('Biaya Tetap ditambahkan!');
+        }
+
+        function removeDataGlobal(type, id) {
+            if(confirm("Hapus baris ini secara permanen?")) {
+                data[type] = data[type].filter(item => item.id !== id);
+                if(type === 'bahan') {
+                    data.produk.forEach(p => { p.komposisi = p.komposisi.filter(k => k.id_bahan != id); });
+                }
+                saveData();
+                showToast('Data dihapus.');
+            }
+        }
+
+        // --- EDIT MODAL (ASET, BAHAN, TETAP) ---
+        function openEditModal(type, id) {
+            const item = data[type].find(i => i.id === id);
+            if(!item) return;
+
+            document.getElementById('edit-id').value = id;
+            document.getElementById('edit-type').value = type;
+            const container = document.getElementById('edit-fields-container');
+            container.innerHTML = '';
+
+            let titleMap = { 'aset': 'Edit Alat', 'bahan': 'Edit Bahan Baku', 'tetap': 'Edit Biaya Tetap' };
+            document.getElementById('edit-title').innerHTML = `<i class="fas fa-edit text-blue-500 mr-2"></i> ${titleMap[type]}`;
+
+            // Helper function to create inputs properly without cramming
+            function makeInput(label, idStr, val, inputType="text") {
+                return `
+                    <div class="mb-3">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">${label}</label>
+                        <input type="${inputType}" id="edit-field-${idStr}" value="${val}" class="w-full border rounded px-3 py-2 focus:outline-none focus:border-blue-500" required step="any">
+                    </div>
+                `;
+            }
+            function makeCheckbox(label, idStr, checked) {
+                let isChecked = checked ? 'checked' : '';
+                return `
+                    <div class="my-4 flex items-center bg-gray-50 p-3 rounded border">
+                        <input type="checkbox" id="edit-field-${idStr}" ${isChecked} class="w-5 h-5 text-blue-600 rounded mr-3">
+                        <label class="block text-sm font-bold text-gray-800">${label}</label>
+                    </div>
+                `;
+            }
+
+            container.innerHTML += makeInput('Nama / Deskripsi', 'nama', item.nama);
+
+            if(type === 'aset') {
+                container.innerHTML += makeInput('Jml Beli (Qty)', 'qty', item.qty||1, 'number');
+                container.innerHTML += makeInput('Harga Awal (Rp)', 'harga', item.harga, 'number');
+                container.innerHTML += makeInput('Beban Ongkir/Diskon (Rp)', 'bebanProporsional', item.bebanProporsional||0, 'number');
+                container.innerHTML += makeCheckbox('Centang jika ini Modal Awal (Capex)', 'isModalAwal', item.isModalAwal);
+            } else if(type === 'bahan') {
+                container.innerHTML += `
+                    <div class="grid grid-cols-2 gap-3">
+                        ${makeInput('Jml Beli (Pack)', 'qty', item.qty||1, 'number')}
+                        ${makeInput('Isi/Pack (Pcs)', 'isiPerPack', item.isiPerPack||1, 'number')}
+                    </div>
+                `;
+                container.innerHTML += makeInput('Harga Beli Asli (Rp)', 'hargaBeli', item.hargaBeli, 'number');
+                container.innerHTML += makeInput('Beban Ongkir/Diskon (Rp)', 'bebanProporsional', item.bebanProporsional||0, 'number');
+                container.innerHTML += makeCheckbox('Centang jika ini Modal Awal (Capex)', 'isModalAwal', item.isModalAwal);
+            } else if(type === 'tetap') {
+                container.innerHTML += makeInput('Total per Bulan (Rp)', 'harga', item.harga, 'number');
+            }
+
+            document.getElementById('edit-modal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+        }
+
+        function saveEdit(e) {
+            e.preventDefault();
+            const id = parseInt(document.getElementById('edit-id').value);
+            const type = document.getElementById('edit-type').value;
+            const item = data[type].find(i => i.id === id);
+
+            if(!item) return;
+
+            item.nama = document.getElementById('edit-field-nama').value;
+            
+            if(type === 'aset') {
+                item.qty = parseFloat(document.getElementById('edit-field-qty').value);
+                item.harga = parseFloat(document.getElementById('edit-field-harga').value);
+                item.bebanProporsional = parseFloat(document.getElementById('edit-field-bebanProporsional').value);
+                item.isModalAwal = document.getElementById('edit-field-isModalAwal').checked;
+            } else if(type === 'bahan') {
+                item.qty = parseFloat(document.getElementById('edit-field-qty').value);
+                item.isiPerPack = parseFloat(document.getElementById('edit-field-isiPerPack').value);
+                item.hargaBeli = parseFloat(document.getElementById('edit-field-hargaBeli').value);
+                item.bebanProporsional = parseFloat(document.getElementById('edit-field-bebanProporsional').value);
+                item.isModalAwal = document.getElementById('edit-field-isModalAwal').checked;
+            } else if(type === 'tetap') {
+                item.harga = parseFloat(document.getElementById('edit-field-harga').value);
+            }
+
+            saveData();
+            closeEditModal();
+            showToast('Perubahan data berhasil disimpan!');
+        }
+
+        // --- RENDERERS ---
+        function renderAll() {
+            renderAset();
+            renderBahan();
+            renderTetap();
+            renderProduk();
+            renderKomposisiForm(); 
+            renderSimulasiInputs(); 
+            updateDashboard();
+        }
+
+        function renderAset() {
+            const tbody = document.getElementById('table-aset');
+            tbody.innerHTML = ''; 
+            let total = 0;
+            
+            data.aset.forEach(item => {
+                const totalItem = item.harga + (item.bebanProporsional||0); 
+                total += totalItem;
+                const isDiskon = (item.bebanProporsional||0) < 0;
+                
+                let modalHtml = item.isModalAwal 
+                    ? '<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-bold">Ya</span>' 
+                    : '-';
+                    
+                let diskonHtml = `<td class="py-2 px-4 text-right ${isDiskon ? 'text-green-600' : 'text-orange-500'}">
+                                     ${isDiskon ? '' : '+'}${formatRp(item.bebanProporsional||0)}
+                                  </td>`;
+                                  
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="py-2 px-4 font-medium">${item.nama}</td>
+                        <td class="py-2 px-4 text-center">${modalHtml}</td>
+                        <td class="py-2 px-4 text-center">${item.qty || 1}</td>
+                        <td class="py-2 px-4 text-right">${formatRp(item.harga)}</td>
+                        ${diskonHtml}
+                        <td class="py-2 px-4 text-right font-bold text-blue-700 bg-blue-50">${formatRp(totalItem)}</td>
+                        <td class="py-2 px-4 text-center space-x-1">
+                            <button onclick="openEditModal('aset', ${item.id})" class="text-blue-500 hover:text-blue-700 bg-blue-50 px-2 py-1 rounded tooltip" title="Edit Data">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="removeDataGlobal('aset', ${item.id})" class="text-red-500 hover:text-red-700 bg-red-50 px-2 py-1 rounded tooltip" title="Hapus">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            const totalAsetEl = document.getElementById('total-aset-table');
+            if(totalAsetEl) totalAsetEl.innerText = formatRp(total);
+        }
+
+        function renderBahan() {
+            const tbody = document.getElementById('table-bahan');
+            tbody.innerHTML = ''; 
+            let total = 0;
+            
+            data.bahan.forEach(item => {
+                const totalBersih = item.hargaBeli + (item.bebanProporsional||0);
+                total += totalBersih;
+                const totalPcs = (item.qty || 1) * (item.isiPerPack || 1);
+                const perPcs = totalPcs > 0 ? (totalBersih / totalPcs) : 0;
+                
+                let modalHtml = item.isModalAwal 
+                    ? '<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-bold">Ya</span>' 
+                    : '-';
+                    
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="py-2 px-3"><strong>${item.nama}</strong></td>
+                        <td class="py-2 px-3 text-center">${modalHtml}</td>
+                        <td class="py-2 px-3 text-right">${formatRp(totalBersih)}</td>
+                        <td class="py-2 px-3 text-center bg-gray-50">${item.qty} x ${item.isiPerPack}</td>
+                        <td class="py-2 px-3 text-center font-bold">${totalPcs}</td>
+                        <td class="py-2 px-3 text-right font-bold text-orange-700 bg-orange-100">${formatRp(perPcs)}</td>
+                        <td class="py-2 px-3 text-center space-x-1 w-32">
+                            <button onclick="openEditModal('bahan', ${item.id})" class="text-blue-500 hover:text-blue-700 bg-blue-50 px-2 py-1 rounded tooltip" title="Edit Data">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="removeDataGlobal('bahan', ${item.id})" class="text-red-500 hover:text-red-700 bg-red-50 px-2 py-1 rounded tooltip" title="Hapus">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            const totalBahanEl = document.getElementById('total-bahan-table');
+            if(totalBahanEl) totalBahanEl.innerText = formatRp(total);
+        }
+
+        function renderTetap() {
+            const tbody = document.getElementById('table-tetap');
+            tbody.innerHTML = ''; 
+            let total = 0;
+            
+            data.tetap.forEach(item => {
+                total += item.harga;
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="py-2 px-4">${item.nama}</td>
+                        <td class="py-2 px-4 text-right font-medium">${formatRp(item.harga)}</td>
+                        <td class="py-2 px-4 text-center space-x-1">
+                            <button onclick="openEditModal('tetap', ${item.id})" class="text-blue-500 hover:text-blue-700 bg-blue-50 px-2 py-1 rounded tooltip" title="Edit Data">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="removeDataGlobal('tetap', ${item.id})" class="text-red-500 hover:text-red-700 bg-red-50 px-2 py-1 rounded tooltip" title="Hapus">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            const totalTetapEl = document.getElementById('total-tetap-table');
+            if(totalTetapEl) totalTetapEl.innerText = formatRp(total);
+        }
+
+        function renderProduk() {
+            const tbody = document.getElementById('table-produk');
+            tbody.innerHTML = '';
+            
+            data.produk.forEach(item => {
+                const hpp = getHPPProduk(item);
+                const untung = item.hargaJual - hpp;
+                
+                let listResep = '<ul class="list-disc pl-4 text-xs text-gray-500">';
+                if(item.komposisi && item.komposisi.length > 0) {
+                    item.komposisi.forEach(k => {
+                        const b = data.bahan.find(x => x.id == k.id_bahan);
+                        if(b) {
+                            listResep += `<li>${b.nama} (${k.qty} pcs)</li>`;
+                        } else {
+                            listResep += `<li><i class="text-red-400">Bahan Dihapus</i></li>`;
+                        }
+                    });
+                } else {
+                    listResep = '<span class="text-xs italic text-gray-400">Tidak ada resep</span>';
+                }
+                listResep += '</ul>';
+
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-gray-50 align-top">
+                        <td class="py-3 px-4 font-bold text-gray-800">${item.nama}</td>
+                        <td class="py-3 px-4">${listResep}</td>
+                        <td class="py-3 px-4 text-right text-red-600 font-medium">${formatRp(hpp)}</td>
+                        <td class="py-3 px-4 text-right text-blue-700 font-medium">${formatRp(item.hargaJual)}</td>
+                        <td class="py-3 px-4 text-right font-bold text-green-700 bg-green-50">${formatRp(untung)}</td>
+                        <td class="py-3 px-4 text-center space-x-1">
+                            <button onclick="editProdukFull(${item.id})" class="text-indigo-500 hover:text-indigo-700 bg-indigo-50 px-2 py-1 rounded tooltip" title="Edit Produk & Resep">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="removeDataGlobal('produk', ${item.id})" class="text-red-500 hover:text-red-700 bg-red-50 px-2 py-1 rounded tooltip" title="Hapus">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            const select = document.getElementById('bep-product-select');
+            const currentVal = select.value; 
+            select.innerHTML = '';
+            
+            data.produk.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id; 
+                opt.text = p.nama; 
+                select.appendChild(opt);
+            });
+            
+            if(currentVal && data.produk.find(p => p.id == currentVal)) {
+                select.value = currentVal;
+            } else if(data.produk.length > 0) {
+                select.value = data.produk[0].id;
+            }
+        }
+
+        // --- CHART & DASHBOARD UPDATE ---
+        function updateDashboard() { 
+            const modAwal = hitungTotalModalAwal();
+            
+            if (document.getElementById('dash-modal-awal')) {
+                document.getElementById('dash-modal-awal').innerText = formatRp(modAwal);
+            }
+            
+            // Perbaikan Bug: Mencegah error null jika elemen HTML label-modal-awal tidak ada
+            const labelModalAwal = document.getElementById('label-modal-awal');
+            if (labelModalAwal) {
+                labelModalAwal.innerText = modAwal.toLocaleString('id-ID');
+            }
+            
+            if (document.getElementById('dash-biaya-tetap')) {
+                document.getElementById('dash-biaya-tetap').innerText = formatRp(data.tetap.reduce((sum, item) => sum + item.harga, 0));
+            }
+            
+            if (document.getElementById('dash-jml-produk')) {
+                document.getElementById('dash-jml-produk').innerText = data.produk.length;
+            }
+            
+            updateBEPView(); 
+        }
+
+        function renderChart(fc, vc, hj, bepUnit, productName) {
+            const ctx = document.getElementById('bepChart');
+            if(!ctx) return;
+            const context2d = ctx.getContext('2d');
+            
+            if (bepChartInstance) {
+                bepChartInstance.destroy();
+            }
+
+            if (hj === 0 || hj <= vc || fc === 0) return; 
+
+            // Bangun sumbu X (Unit) hingga sekitar 2x BEP
+            const maxUnits = Math.ceil(bepUnit * 2) || 100;
+            const labels = [];
+            const dataRevenue = [];
+            const dataTotalCost = [];
+            const dataFixedCost = [];
+
+            const step = Math.max(1, Math.floor(maxUnits / 10));
+
+            for (let i = 0; i <= maxUnits; i += step) {
+                labels.push(i);
+                dataFixedCost.push(fc);
+                dataTotalCost.push(fc + (vc * i));
+                dataRevenue.push(hj * i);
+            }
+
+            bepChartInstance = new Chart(context2d, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Pendapatan (Omzet)',
+                            data: dataRevenue,
+                            borderColor: '#10b981', // green
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Total Biaya (Tetap + Bahan)',
+                            data: dataTotalCost,
+                            borderColor: '#ef4444', // red
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Beban Tetap (Operasional + Cicilan Modal)',
+                            data: dataFixedCost,
+                            borderColor: '#8b5cf6', // purple
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Grafik Titik Impas untuk: ' + productName
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + formatRp(context.parsed.y);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Jumlah Penjualan (Unit)' }
+                        },
+                        y: {
+                            title: { display: true, text: 'Nilai Uang (Rp)' },
+                            ticks: {
+                                callback: function(value) { return 'Rp ' + (value / 1000).toLocaleString('id-ID') + 'k'; }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateBEPView() {
+            const select = document.getElementById('bep-product-select');
+            const targetBulanInput = document.getElementById('target-bulan');
+            const targetBulan = parseInt(targetBulanInput.value) || 12;
+            
+            // Simpan perubahan ke variabel global agar ikut ter-Sync ke server
+            data.targetBulan = targetBulan;
+            
+            document.getElementById('rincian-bulan').innerText = targetBulan;
+            const productId = select.value;
+            
+            if(!productId || data.produk.length === 0) {
+                document.getElementById('bep-unit').innerText = "0";
+                document.getElementById('bep-rupiah').innerText = "Rp 0";
+                if(bepChartInstance) bepChartInstance.destroy();
+                return;
+            }
+
+            const produk = data.produk.find(p => p.id == productId);
+            if (!produk) return; 
+
+            const totalModalAwal = hitungTotalModalAwal();
+            const cicilanModalPerBulan = totalModalAwal / targetBulan;
+            const totalTetap = data.tetap.reduce((sum, item) => sum + item.harga, 0);
+            
+            const bebanBulananTotal = totalTetap + cicilanModalPerBulan;
+
+            const hpp = getHPPProduk(produk);
+            const untungSatuBarang = produk.hargaJual - hpp; 
+
+            if (untungSatuBarang <= 0) {
+                document.getElementById('bep-unit').innerText = "RUGI";
+                document.getElementById('bep-unit').classList.replace("text-green-400", "text-red-500");
+                document.getElementById('bep-rupiah').innerText = "Naikkan Harga";
+                if(bepChartInstance) bepChartInstance.destroy();
+                return;
+            } else {
+                document.getElementById('bep-unit').classList.replace("text-red-500", "text-green-400");
+            }
+
+            const bepUnit = Math.ceil(bebanBulananTotal / untungSatuBarang);
+            const bepRupiah = bepUnit * produk.hargaJual;
+            const alokasiHppTotal = bepUnit * hpp;
+
+            document.getElementById('bep-unit').innerText = bepUnit.toLocaleString('id-ID');
+            document.getElementById('bep-rupiah').innerText = formatRp(bepRupiah);
+
+            document.getElementById('rincian-hpp').innerText = formatRp(alokasiHppTotal);
+            document.getElementById('rincian-operasional').innerText = formatRp(totalTetap);
+            document.getElementById('rincian-cicilan').innerText = formatRp(cicilanModalPerBulan);
+            document.getElementById('label-nama-produk-hpp').innerText = '"' + produk.nama + '"';
+
+            const listBahanEl = document.getElementById('rincian-list-bahan');
+            listBahanEl.innerHTML = '';
+            
+            if(produk.komposisi && produk.komposisi.length > 0) {
+                produk.komposisi.forEach(k => {
+                    const b = data.bahan.find(x => x.id == k.id_bahan);
+                    if(b) {
+                        const totalPcsDibutuhkan = bepUnit * k.qty;
+                        const isiPerPack = b.isiPerPack || 1;
+                        
+                        // Perhitungan Bungkus (Dibulatkan ke atas agar tidak kurang bahan)
+                        const packDibutuhkan = Math.ceil(totalPcsDibutuhkan / isiPerPack); 
+                        const modalPerPcs = getModalPerPcsBahan(b);
+                        const totalDanaBahanIni = totalPcsDibutuhkan * modalPerPcs;
+                        
+                        listBahanEl.innerHTML += `
+                            <li class="mb-2 border-b border-orange-800/30 pb-1">
+                                <span class="font-bold">${b.nama}</span> = <strong class="text-orange-200">${packDibutuhkan} Pack/Bungkus</strong> 
+                                <span class="text-gray-400 text-[10px] ml-1">(${totalPcsDibutuhkan} pcs)</span><br>
+                                <span class="pl-2 text-gray-400 text-xs">↳ Alokasi Dana Kasir: ${formatRp(totalDanaBahanIni)}</span>
+                            </li>`;
+                    }
+                });
+            } else {
+                listBahanEl.innerHTML = '<li class="text-gray-500">Tidak ada resep</li>';
+            }
+
+            renderChart(bebanBulananTotal, hpp, produk.hargaJual, bepUnit, produk.nama);
+        }
+
+        // --- SIMULASI BEP MULTI-PRODUK ---
+        function renderSimulasiInputs() {
+            const container = document.getElementById('simulasi-inputs');
+            container.innerHTML = '';
+            
+            const targetBulan = parseInt(document.getElementById('target-bulan').value) || 12;
+            document.getElementById('sim-multi-target-bulan').innerText = targetBulan + " Bulan";
+            
+            const totalModalAwal = hitungTotalModalAwal();
+            const bebanModalBulan = totalModalAwal / targetBulan;
+            document.getElementById('sim-multi-beban-modal').innerText = bebanModalBulan.toLocaleString('id-ID');
+            
+            if(data.produk.length === 0) {
+                container.innerHTML = '<p class="text-sm text-gray-500 italic col-span-3">Belum ada produk jualan. Tambahkan di Menu 5.</p>';
+                return;
+            }
+
+            data.produk.forEach(p => {
+                const untung = p.hargaJual - getHPPProduk(p);
+                container.innerHTML += `
+                    <div class="bg-white p-3 rounded border border-gray-300 shadow-sm flex items-center justify-between">
+                        <div class="flex-1 pr-2">
+                            <div class="font-bold text-gray-800 text-sm truncate" title="${p.nama}">${p.nama}</div>
+                            <div class="text-xs text-green-600 font-medium">+${formatRp(untung)}/unit</div>
+                        </div>
+                        <div class="w-24">
+                            <input type="number" id="sim-qty-${p.id}" class="w-full border-gray-300 rounded p-2 text-center focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="0" min="0">
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function hitungSimulasi() {
+            if(data.produk.length === 0) return;
+
+            let totalOmzet = 0;
+            let totalHpp = 0;
+            let belanjaListHtml = '';
+
+            let akumulasiBahan = {};
+
+            data.produk.forEach(p => {
+                const inputEl = document.getElementById(`sim-qty-${p.id}`);
+                const qtyLaku = inputEl ? (parseInt(inputEl.value) || 0) : 0;
+                
+                const hppSatuan = getHPPProduk(p);
+                totalOmzet += (p.hargaJual * qtyLaku);
+                totalHpp += (hppSatuan * qtyLaku);
+
+                if(qtyLaku > 0 && p.komposisi) {
+                    p.komposisi.forEach(k => {
+                        const b = data.bahan.find(x => x.id == k.id_bahan);
+                        if(b) {
+                            if(!akumulasiBahan[b.nama]) akumulasiBahan[b.nama] = { qtyTotal: 0, rpTotal: 0 };
+                            akumulasiBahan[b.nama].qtyTotal += (k.qty * qtyLaku);
+                            akumulasiBahan[b.nama].rpTotal += ((k.qty * qtyLaku) * getModalPerPcsBahan(b));
+                        }
+                    });
+                }
+            });
+
+            for (let namaBahan in akumulasiBahan) {
+                belanjaListHtml += `
+                    <li class="flex justify-between border-b border-gray-700 py-1">
+                        <span class="truncate pr-2">${namaBahan} (${akumulasiBahan[namaBahan].qtyTotal} pcs)</span>
+                        <span class="font-bold text-orange-300">${formatRp(akumulasiBahan[namaBahan].rpTotal)}</span>
+                    </li>
+                `;
+            }
+            if(belanjaListHtml === '') belanjaListHtml = '<li class="text-gray-500 italic">Belum ada penjualan.</li>';
+            document.getElementById('simulasi-tooltip-bahan').innerHTML = belanjaListHtml;
+
+
+            const totalTetap = data.tetap.reduce((sum, item) => sum + item.harga, 0);
+            const targetBulan = parseInt(document.getElementById('target-bulan').value) || 12;
+            const totalModalAwal = hitungTotalModalAwal();
+            const cicilanModalPerBulan = totalModalAwal / targetBulan;
+            const labaKotor = totalOmzet - totalHpp; 
+            const labaBersih = labaKotor - (totalTetap + cicilanModalPerBulan);
+
+            document.getElementById('simulasi-omzet').innerText = formatRp(totalOmzet);
+            document.getElementById('simulasi-hpp').innerText = formatRp(totalHpp);
+            document.getElementById('simulasi-laba-kotor').innerText = formatRp(labaKotor);
+            
+            document.getElementById('simulasi-biaya-tetap-label').innerText = totalTetap.toLocaleString('id-ID');
+            document.getElementById('simulasi-cicilan-label').innerText = Math.round(cicilanModalPerBulan).toLocaleString('id-ID');
+
+            const statusEl = document.getElementById('simulasi-status');
+            const kesimpulanEl = document.getElementById('simulasi-kesimpulan');
+
+            statusEl.innerText = formatRp(Math.abs(labaBersih));
+            
+            if (labaBersih > 0) {
+                statusEl.className = "text-5xl font-black mb-2 text-green-400";
+                kesimpulanEl.innerHTML = `Selamat! Bisnis Anda sudah menutupi sewa bulanan dan cicilan balik modal, serta masih untung bersih!`;
+            } else if (labaBersih < 0) {
+                statusEl.className = "text-5xl font-black mb-2 text-red-400";
+                kesimpulanEl.innerHTML = `Wah, target penjualan ini <strong>Rugi</strong>. Anda nombok untuk bayar sewa/balikin modal.`;
+            } else {
+                statusEl.className = "text-5xl font-black mb-2 text-yellow-400";
+                kesimpulanEl.innerHTML = `Anda tepat berada di <strong>Titik Impas (BEP)</strong>. Tidak rugi, tapi belum ada sisa untung.`;
+            }
+
+            document.getElementById('hasil-simulasi-container').classList.remove('hidden');
+        }
+
+        // --- NAVIGATION ---
+        function showSection(id, element) {
+            document.querySelectorAll('.content-section').forEach(sec => sec.classList.add('section-hidden'));
+            document.getElementById(id).classList.remove('section-hidden');
+            
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('nav-active'));
+            if(element) element.classList.add('nav-active');
+            
+            if(id === 'bep-multi') renderSimulasiInputs(); 
+            if(id === 'dashboard') updateDashboard(); 
+
+            const titles = {
+                'dashboard': {title: 'Dasbor Utama', desc: 'Ringkasan performa & target ROI bisnis Anda.'},
+                'belanja': {title: '1. Catat Belanja Baru', desc: 'Masukkan nota pembelian alat maupun bahan baku di sini.'},
+                'aset': {title: '2. Daftar Alat (Berulang)', desc: 'Lihat daftar alat/aset yang sudah Anda beli.'},
+                'bahan': {title: '3. Daftar Bahan Baku (Habis)', desc: 'Lihat rincian modal per porsi untuk bahan baku.'},
+                'biaya-tetap': {title: '4. Biaya Bulanan (Tetap)', desc: 'Pengeluaran rutin bulanan apapun yang terjadi.'},
+                'produk': {title: '5. Produk Jualan & Resep', desc: 'Racik produk dari daftar bahan, dan tentukan harga jual.'},
+                'bep-multi': {title: '6. Simulasi BEP (Banyak Produk)', desc: 'Cari tahu apakah target penjualan campuran Anda sudah balik modal.'}
+            };
+            document.getElementById('page-title').innerText = titles[id].title;
+            document.getElementById('page-desc').innerText = titles[id].desc;
+        }
+
+        // EXPORT JSON
+        function exportJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "Backup_Sistem_BizDash_V13.json");
+            dlAnchorElem.click();
+        }
+
+        // IMPORT JSON
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if(imported.aset && imported.bahan && imported.tetap && imported.produk) {
+                        data = imported; saveData(); showToast('Data sistem berhasil dipulihkan!');
+                    } else { alert("Format file JSON tidak sesuai."); }
+                } catch (err) { alert("Gagal membaca file backup."); }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; 
+        }
+
+        function resetData() {
+            if(confirm("Yakin ingin menghapus SEMUA data? Jangan lupa Backup dulu!")){
+                data = { aset: [], bahan: [], tetap: [], produk: [] };
+                saveData(); showToast('Semua data telah direset.');
+            }
+        }
+
+        // --- EXPORT EXCEL (TERMASUK SUMMARY SHEET YANG DIKEMBALIKAN) ---
+        function exportExcel() {
+            if(typeof XLSX === 'undefined') { alert("Gagal memuat sistem Ekspor."); return; }
+            const wb = XLSX.utils.book_new();
+
+            const wsAset = XLSX.utils.json_to_sheet(data.aset.map(m => ({
+                "ID": m.id, "Nama Alat": m.nama, "Modal Awal": m.isModalAwal ? "Ya" : "Tidak", "Qty Beli": m.qty||1, "Harga Awal": m.harga, "Beban Ongkir/Diskon": (m.bebanProporsional||0), "Modal Bersih": (m.harga) + (m.bebanProporsional||0)
+            })));
+            XLSX.utils.book_append_sheet(wb, wsAset, "Alat");
+
+            const wsBahan = XLSX.utils.json_to_sheet(data.bahan.map(m => {
+                const total = m.hargaBeli + (m.bebanProporsional||0);
+                const pcs = (m.qty||1) * (m.isiPerPack||1);
+                return { "ID": m.id, "Nama Bahan": m.nama, "Modal Awal": m.isModalAwal ? "Ya" : "Tidak", "Jml Beli (Pack/Dus)": m.qty||1, "Isi per Pack": m.isiPerPack||1, "Total Pcs": pcs, "Total Harga Bersih": total, "Harga Modal per Pcs": total/pcs, "Harga Beli Asli": m.hargaBeli, "Beban Ongkir/Diskon": (m.bebanProporsional||0) };
+            }));
+            XLSX.utils.book_append_sheet(wb, wsBahan, "Bahan Baku");
+
+            const wsBiaya = XLSX.utils.json_to_sheet(data.tetap.map(t => ({
+                "ID": t.id, "Deskripsi Pengeluaran": t.nama, "Total per Bulan (Rp)": t.harga
+            })));
+            XLSX.utils.book_append_sheet(wb, wsBiaya, "Biaya Bulanan");
+
+            const produkExportData = data.produk.map(p => {
+                let textResep = "";
+                if(p.komposisi && p.komposisi.length > 0){
+                    textResep = p.komposisi.map(k => {
+                        const b = data.bahan.find(x => x.id == k.id_bahan);
+                        return b ? `${b.nama} (${k.qty} pcs)` : `Bahan Dihapus`;
+                    }).join(', ');
+                }
+                
+                return {
+                    "ID": p.id, 
+                    "Nama Produk": p.nama, 
+                    "Harga Jual": p.hargaJual, 
+                    "HPP/Unit (Auto)": getHPPProduk(p), 
+                    "Untung Bersih/Unit": p.hargaJual - getHPPProduk(p),
+                    "Komposisi / Resep": textResep,
+                    // INI SOLUSI ANDA: Kolom tersembunyi/sistem penyimpan ID Asli
+                    "Data_Sistem_Resep_JANGAN_DIHAPUS": JSON.stringify(p.komposisi || [])
+                }
+            });
+            const wsProduk = XLSX.utils.json_to_sheet(produkExportData);
+            XLSX.utils.book_append_sheet(wb, wsProduk, "Produk & Jual");
+
+            XLSX.writeFile(wb, "Laporan_Bisnis_BizDash_V12.xlsx");
+        }
+
+        // --- IMPORT EXCEL (DIPERBARUI: Membaca ID Resep) ---
+        function importExcel(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const dataRaw = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(dataRaw, {type: 'array'});
+                    let newData = { aset: [], bahan: [], tetap: [], produk: [] };
+
+                    if(workbook.Sheets["Alat"]) {
+                        XLSX.utils.sheet_to_json(workbook.Sheets["Alat"]).forEach(row => {
+                            newData.aset.push({ id: row["ID"] || generateId(), nama: row["Nama Alat"] || "Tanpa Nama", isModalAwal: row["Modal Awal"] === "Ya", qty: parseFloat(row["Qty Beli"]) || 1, harga: parseFloat(row["Harga Awal"]) || 0, bebanProporsional: parseFloat(row["Beban Ongkir/Diskon"]) || 0 });
+                        });
+                    }
+                    if(workbook.Sheets["Bahan Baku"]) {
+                        XLSX.utils.sheet_to_json(workbook.Sheets["Bahan Baku"]).forEach(row => {
+                            newData.bahan.push({ id: row["ID"] || generateId(), nama: row["Nama Bahan"] || "Tanpa Nama", isModalAwal: row["Modal Awal"] === "Ya", qty: parseFloat(row["Jml Beli (Pack/Dus)"]) || 1, isiPerPack: parseFloat(row["Isi per Pack"]) || 1, hargaBeli: parseFloat(row["Harga Beli Asli"]) || parseFloat(row["Total Harga Bersih"]) || 0, bebanProporsional: parseFloat(row["Beban Ongkir/Diskon"]) || 0 });
+                        });
+                    }
+                    if(workbook.Sheets["Biaya Bulanan"]) {
+                        XLSX.utils.sheet_to_json(workbook.Sheets["Biaya Bulanan"]).forEach(row => {
+                            newData.tetap.push({ id: row["ID"] || generateId(), nama: row["Deskripsi Pengeluaran"] || "Tanpa Nama", harga: parseFloat(row["Total per Bulan (Rp)"]) || 0 });
+                        });
+                    }
+                    if(workbook.Sheets["Produk & Jual"]) {
+                        const produkRaw = XLSX.utils.sheet_to_json(workbook.Sheets["Produk & Jual"]);
+                        produkRaw.forEach(row => {
+                            let komposisiSistem = [];
+                            // Membaca kembali kolom rahasia untuk memulihkan resep 100%
+                            if(row["Data_Sistem_Resep_JANGAN_DIHAPUS"]) {
+                                try {
+                                    komposisiSistem = JSON.parse(row["Data_Sistem_Resep_JANGAN_DIHAPUS"]);
+                                } catch(err) { komposisiSistem = []; }
+                            }
+                            
+                            newData.produk.push({ 
+                                id: row["ID"] || generateId(), 
+                                nama: row["Nama Produk"] || "Tanpa Nama", 
+                                hargaJual: parseFloat(row["Harga Jual"]) || 0, 
+                                komposisi: komposisiSistem 
+                            });
+                        });
+                    }
+
+                    data = newData; saveData(); showToast('Data dari EXCEL berhasil diimpor beserta Resepnya!');
+                } catch (error) { alert("Gagal membaca file Excel."); }
+            };
+            reader.readAsArrayBuffer(file);
+            event.target.value = '';
+        }
+
+        window.onload = initData;
+    </script>
+</body>
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Keuangan - BizDash</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-database-compat.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { primary: '#0f172a', secondary: '#334155', accent: '#3b82f6' } } }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-gray-50 flex h-screen overflow-hidden text-gray-800 font-sans" style="visibility: hidden;" id="mainBody">
+
+    <!-- Sidebar -->
+    <aside class="w-20 lg:w-64 bg-primary text-white flex flex-col h-full shadow-2xl z-20 transition-all shrink-0">
+        <div class="p-4 lg:p-6 flex items-center justify-center lg:justify-start border-b border-gray-700">
+            <i class="fas fa-chart-line text-2xl text-accent"></i>
+            <span class="hidden lg:block text-xl font-bold tracking-wider ml-3">Laporan</span>
+        </div>
+        <nav class="flex-1 mt-6">
+            <a href="master.html" class="flex items-center px-4 lg:px-6 py-4 text-gray-300 hover:bg-secondary hover:text-white transition-colors" title="Kembali ke Dasbor Master">
+                <i class="fas fa-boxes text-xl w-8 text-center"></i>
+                <span class="hidden lg:block font-medium">Dasbor Master</span>
+            </a>
+            <a href="setting.html" class="flex items-center px-4 lg:px-6 py-4 text-gray-300 hover:bg-secondary hover:text-white transition-colors" title="Kembali ke Dasbor Admin">
+                <i class="fas fa-user-shield text-xl w-8 text-center"></i>
+                <span class="hidden lg:block font-medium">Dasbor Admin</span>
+            </a>
+            <a href="pos.html" class="flex items-center px-4 lg:px-6 py-4 text-gray-300 hover:bg-secondary hover:text-white transition-colors" title="Buka Kasir">
+                <i class="fas fa-cash-register text-xl w-8 text-center"></i>
+                <span class="hidden lg:block font-medium">Kasir Harian</span>
+            </a>
+            <a href="#" class="flex items-center px-4 lg:px-6 py-4 text-white bg-blue-600 border-l-4 border-blue-400 transition-colors" title="Laporan Keuangan">
+                <i class="fas fa-chart-pie text-xl w-8 text-center"></i>
+                <span class="hidden lg:block font-medium">Laporan Keuangan</span>
+            </a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full bg-gray-100 overflow-y-auto relative custom-scrollbar">
+        <header class="bg-white shadow-sm px-6 py-5 z-10 sticky top-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-200">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800"><i class="fas fa-book text-blue-600 mr-2"></i>Buku Kas & Laporan</h1>
+                <p class="text-sm text-gray-500 mt-1">Rekapitulasi riwayat Tutup Buku per Shift Kasir.</p>
+            </div>
+            <div class="flex bg-gray-100 p-1 rounded-lg border border-gray-200 shadow-inner">
+                <button onclick="changeView('harian')" id="tab-harian" class="px-4 py-2 text-sm font-bold rounded-md bg-white text-blue-600 shadow transition">Per Shift</button>
+                <button onclick="changeView('bulanan')" id="tab-bulanan" class="px-4 py-2 text-sm font-bold rounded-md text-gray-500 hover:text-gray-700 transition">Bulanan</button>
+                <button onclick="changeView('tahunan')" id="tab-tahunan" class="px-4 py-2 text-sm font-bold rounded-md text-gray-500 hover:text-gray-700 transition">Tahunan</button>
+            </div>
+        </header>
+
+        <div class="p-6 space-y-6 max-w-7xl mx-auto w-full">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-between border-l-4 border-green-500">
+                    <div>
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Total Omzet</p>
+                        <h3 class="text-2xl font-black text-gray-800" id="sum-omzet">Rp 0</h3>
+                    </div>
+                    <div class="bg-green-50 p-3 rounded-full text-green-500 text-2xl"><i class="fas fa-chart-line"></i></div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-between border-l-4 border-orange-500">
+                    <div>
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Total HPP (Modal)</p>
+                        <h3 class="text-2xl font-black text-gray-800" id="sum-hpp">Rp 0</h3>
+                    </div>
+                    <div class="bg-orange-50 p-3 rounded-full text-orange-500 text-2xl"><i class="fas fa-box-open"></i></div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-between border-l-4 border-blue-500">
+                    <div>
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Total Laba Kotor</p>
+                        <h3 class="text-2xl font-black text-blue-700" id="sum-laba">Rp 0</h3>
+                    </div>
+                    <div class="bg-blue-50 p-3 rounded-full text-blue-500 text-2xl"><i class="fas fa-wallet"></i></div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-between border-l-4 border-red-500">
+                    <div>
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Selisih Kas Aktual</p>
+                        <h3 class="text-2xl font-black text-gray-800" id="sum-selisih">Rp 0</h3>
+                    </div>
+                    <div class="bg-red-50 p-3 rounded-full text-red-500 text-2xl"><i class="fas fa-exclamation-triangle"></i></div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold text-gray-800"><i class="fas fa-chart-area text-indigo-500 mr-2"></i>Grafik Tren Laba & Pendapatan</h2>
+                </div>
+                <div class="w-full h-[300px] relative">
+                    <canvas id="reportChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+                    <h2 class="text-lg font-bold text-gray-800"><i class="fas fa-table text-blue-500 mr-2"></i>Rincian Data <span id="table-title-label">Per Shift</span></h2>
+                    <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow transition flex items-center text-sm">
+                        <i class="fas fa-file-excel mr-2"></i> Ekspor Excel
+                    </button>
+                </div>
+                
+                <div class="overflow-x-auto border border-gray-200 rounded-xl custom-scrollbar">
+                    <table class="min-w-full table-auto text-sm text-left">
+                        <thead class="bg-gray-100 text-gray-600">
+                            <tr>
+                                <th class="px-4 py-3 font-bold border-b">Periode / Tanggal Shift</th>
+                                <th class="px-4 py-3 font-bold border-b text-right">Omzet Jual</th>
+                                <th class="px-4 py-3 font-bold border-b text-right">HPP Bahan</th>
+                                <th class="px-4 py-3 font-bold border-b text-right text-blue-700">Laba Kotor</th>
+                                <th class="px-4 py-3 font-bold border-b text-right">Uang Fisik Kasir</th>
+                                <th class="px-4 py-3 font-bold border-b text-right">Selisih Kas</th>
+                                <th class="px-4 py-3 font-bold border-b text-center" id="th-aksi">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-tbody" class="divide-y divide-gray-100 text-gray-700">
+                            <tr><td colspan="7" class="text-center py-6 text-gray-400 italic"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Konfigurasi Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdM-1ziZLq2r8P1qpgHM763ke8GUPitvw",
+            authDomain: "dasborusaha.firebaseapp.com",
+            databaseURL: "https://dasborusaha-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "dasborusaha",
+            storageBucket: "dasborusaha.firebasestorage.app",
+            messagingSenderId: "427165972600",
+            appId: "1:427165972600:web:a0731cbf737717d567558d"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+
+        // GANTI DENGAN EMAIL ADMIN ANDA
+        const EMAIL_ADMIN = "wawancellcomp@gmail.com"; 
+
+        // Sistem Pengunci Halaman (Security)
+        auth.onAuthStateChanged((user) => { 
+            if (!user) {
+                window.location.href = 'index.html'; 
+            } else if (user.email !== EMAIL_ADMIN) {
+                alert("Akses Ditolak! Halaman ini khusus Admin.");
+                window.location.href = 'index.html';
+            } else {
+                document.getElementById('mainBody').style.visibility = 'visible';
+                fetchData(); // Load data hanya jika sudah dipastikan aman
+            }
+        });
+
+        let rawBukuKasData = [];
+        let currentView = 'harian'; 
+        let chartInstance = null;
+        let tableDataForExport = [];
+
+        function formatRp(num) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num); }
+
+        function fetchData() {
+            database.ref('bizDash/bukuKas').on('value', (snapshot) => {
+                rawBukuKasData = [];
+                if(snapshot.exists()) {
+                    snapshot.forEach(child => {
+                        let data = child.val();
+                        data.shiftKey = child.key; // "YYYY-MM-DD_Timestamp"
+                        rawBukuKasData.push(data);
+                    });
+                    rawBukuKasData.sort((a, b) => b.shiftKey.localeCompare(a.shiftKey)); // Urutkan terbaru
+                }
+                processAndRenderData();
+            });
+        }
+
+        window.changeView = function(viewStr) {
+            currentView = viewStr;
+            const tabs = ['harian', 'bulanan', 'tahunan'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if(t === currentView) btn.className = "px-4 py-2 text-sm font-bold rounded-md bg-white text-blue-600 shadow transition";
+                else btn.className = "px-4 py-2 text-sm font-bold rounded-md text-gray-500 hover:text-gray-700 transition";
+            });
+
+            const labels = { harian: 'Per Shift', bulanan: 'Bulanan', tahunan: 'Tahunan' };
+            document.getElementById('table-title-label').innerText = labels[currentView];
+
+            if(currentView === 'harian') document.getElementById('th-aksi').classList.remove('hidden');
+            else document.getElementById('th-aksi').classList.add('hidden');
+
+            processAndRenderData();
+        }
+
+        function processAndRenderData() {
+            let processedData = [];
+            
+            if (currentView === 'harian') {
+                processedData = [...rawBukuKasData];
+            } 
+            else if (currentView === 'bulanan') {
+                let grouped = {};
+                rawBukuKasData.forEach(item => {
+                    const actualDate = item.shiftKey.split('_')[0]; 
+                    const monthKey = actualDate.substring(0, 7); 
+                    if(!grouped[monthKey]) grouped[monthKey] = { dateKey: monthKey, totalOmzet: 0, totalHpp: 0, labaKotor: 0, selisih: 0, uangFisik: 0, count: 0 };
+                    grouped[monthKey].totalOmzet += (item.totalOmzet || 0); grouped[monthKey].totalHpp += (item.totalHpp || 0); grouped[monthKey].labaKotor += (item.labaKotor || 0);
+                    grouped[monthKey].selisih += (item.selisih || 0); grouped[monthKey].uangFisik += (item.uangFisik || 0); grouped[monthKey].count++;
+                });
+                processedData = Object.values(grouped).sort((a,b) => b.dateKey.localeCompare(a.dateKey));
+            } 
+            else if (currentView === 'tahunan') {
+                let grouped = {};
+                rawBukuKasData.forEach(item => {
+                    const actualDate = item.shiftKey.split('_')[0]; 
+                    const yearKey = actualDate.substring(0, 4); 
+                    if(!grouped[yearKey]) grouped[yearKey] = { dateKey: yearKey, totalOmzet: 0, totalHpp: 0, labaKotor: 0, selisih: 0, uangFisik: 0, count: 0 };
+                    grouped[yearKey].totalOmzet += (item.totalOmzet || 0); grouped[yearKey].totalHpp += (item.totalHpp || 0); grouped[yearKey].labaKotor += (item.labaKotor || 0);
+                    grouped[yearKey].selisih += (item.selisih || 0); grouped[yearKey].uangFisik += (item.uangFisik || 0); grouped[yearKey].count++;
+                });
+                processedData = Object.values(grouped).sort((a,b) => b.dateKey.localeCompare(a.dateKey));
+            }
+
+            renderSummary(processedData); renderTable(processedData); renderChartData(processedData);
+            tableDataForExport = processedData;
+        }
+
+        function renderSummary(dataArray) {
+            let tOmzet = 0, tHpp = 0, tLaba = 0, tSelisih = 0;
+            dataArray.forEach(d => { tOmzet += (d.totalOmzet || 0); tHpp += (d.totalHpp || 0); tLaba += (d.labaKotor || 0); tSelisih += (d.selisih || 0); });
+            document.getElementById('sum-omzet').innerText = formatRp(tOmzet); document.getElementById('sum-hpp').innerText = formatRp(tHpp); document.getElementById('sum-laba').innerText = formatRp(tLaba);
+            const selisihEl = document.getElementById('sum-selisih'); selisihEl.innerText = formatRp(tSelisih);
+            if(tSelisih < 0) selisihEl.classList.add('text-red-600'); else selisihEl.classList.remove('text-red-600');
+        }
+
+        window.hapusLaporan = async function(shiftKey) {
+            if(confirm("Yakin ingin menghapus laporan shift ini secara permanen? Seluruh data transaksi di shift tersebut juga akan terhapus.")) {
+                await database.ref('bizDash/bukuKas/' + shiftKey).remove();
+                await database.ref('bizDash/transaksi/' + shiftKey).remove();
+                alert("Laporan Shift berhasil dihapus!");
+            }
+        }
+
+        function renderTable(dataArray) {
+            const tbody = document.getElementById('report-tbody'); tbody.innerHTML = '';
+            if(dataArray.length === 0) { tbody.innerHTML = `<tr><td colspan="${currentView==='harian'?7:6}" class="text-center py-6 text-gray-400">Belum ada riwayat buku kas tersimpan.</td></tr>`; return; }
+
+            dataArray.forEach(d => {
+                let aksiUI = "";
+                let displayDate = "";
+                if(currentView === 'harian') {
+                    displayDate = new Date(d.waktuBuka).toLocaleString('id-ID', {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
+                    if(d.status === 'buka') displayDate += ' <span class="bg-green-100 text-green-700 text-[10px] px-1 rounded ml-1 font-bold">SEDANG JALAN</span>';
+                    
+                    aksiUI = `<td class="px-4 py-3 text-center"><button onclick="hapusLaporan('${d.shiftKey}')" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded transition" title="Hapus Data Shift"><i class="fas fa-trash"></i></button></td>`;
+                } else {
+                    const [y, m] = d.dateKey.split('-'); const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+                    displayDate = currentView === 'bulanan' ? `${monthNames[parseInt(m)-1]} ${y}` : d.dateKey;
+                    aksiUI = `<td class="hidden"></td>`;
+                }
+
+                let selisihCol = formatRp(d.selisih || 0); let selisihClass = (d.selisih || 0) < 0 ? 'text-red-600 font-bold' : '';
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-blue-50 transition border-b border-gray-100 bg-white">
+                        <td class="px-4 py-3 font-bold text-gray-800">${displayDate}</td>
+                        <td class="px-4 py-3 text-right font-medium">${formatRp(d.totalOmzet || 0)}</td>
+                        <td class="px-4 py-3 text-right text-gray-500">${formatRp(d.totalHpp || 0)}</td>
+                        <td class="px-4 py-3 text-right font-bold text-blue-700 bg-blue-50/50">${formatRp(d.labaKotor || 0)}</td>
+                        <td class="px-4 py-3 text-right">${formatRp(d.uangFisik || 0)}</td>
+                        <td class="px-4 py-3 text-right ${selisihClass}">${selisihCol}</td>
+                        ${aksiUI}
+                    </tr>`;
+            });
+        }
+
+        function renderChartData(dataArray) {
+            const ctx = document.getElementById('reportChart').getContext('2d');
+            const chartData = [...dataArray].reverse();
+            const labels = []; const dataOmzet = []; const dataLaba = [];
+
+            chartData.forEach(d => {
+                let lbl = "";
+                if(currentView === 'harian') {
+                    lbl = new Date(d.waktuBuka).toLocaleString('id-ID', {day:'numeric', month:'short'});
+                } else if(currentView === 'bulanan') {
+                    const [y, m] = d.dateKey.split('-'); const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+                    lbl = `${monthNames[parseInt(m)-1]} '${y.substring(2)}`;
+                } else { lbl = d.dateKey; }
+                
+                labels.push(lbl); dataOmzet.push(d.totalOmzet || 0); dataLaba.push(d.labaKotor || 0);
+            });
+
+            if(chartInstance) chartInstance.destroy();
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Omzet Jual', data: dataOmzet, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 2, fill: true, tension: 0.3 },
+                        { label: 'Laba Kotor', data: dataLaba, borderColor: '#10b981', backgroundColor: 'transparent', borderWidth: 2, fill: false, tension: 0.3 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + formatRp(context.parsed.y); } } } }, scales: { y: { beginAtZero: true, ticks: { callback: function(value) { return 'Rp ' + (value/1000).toLocaleString() + 'k'; } } }, x: { grid: { display: false } } } }
+            });
+        }
+
+        window.exportToExcel = function() {
+            if(typeof XLSX === 'undefined') return alert("Gagal memuat sistem Ekspor."); 
+            if(tableDataForExport.length === 0) return alert("Tidak ada data untuk diekspor."); 
+            const exportData = tableDataForExport.map(d => {
+                return {
+                    "Periode / Waktu Buka": currentView === 'harian' ? new Date(d.waktuBuka).toLocaleString('id-ID') : d.dateKey,
+                    "Total Omzet": d.totalOmzet || 0, "Total HPP (Modal)": d.totalHpp || 0, "Laba Kotor": d.labaKotor || 0,
+                    "Uang Kasir (Fisik)": d.uangFisik || 0, "Selisih Uang": d.selisih || 0, "Jumlah Shift Tergabung": d.count || 1
+                };
+            });
+            const wb = XLSX.utils.book_new(); const ws = XLSX.utils.json_to_sheet(exportData);
+            XLSX.utils.book_append_sheet(wb, ws, "Rekap Laporan");
+            XLSX.writeFile(wb, `Laporan_Keuangan_${currentView.toUpperCase()}_BizDash.xlsx`);
+        }
+    </script>
+</body>
+</html>
