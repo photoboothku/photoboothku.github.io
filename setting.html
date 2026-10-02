@@ -10,6 +10,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Script Cloudinary Upload Widget -->
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    <!-- Script SheetJS untuk Ekspor Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <style>
         body { font-family: 'Poppins', sans-serif; }
         .font-voucher { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; }
@@ -123,27 +126,47 @@
             <!-- Panel Generator Voucher (Kiri) -->
             <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-yellow-500 lg:col-span-1">
                 <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-ticket-alt text-yellow-500 mr-2"></i>Buat Voucher Sistem</h2>
-                <form id="voucherGeneratorForm" class="space-y-4">
+                <form id="voucherGeneratorForm" class="space-y-3">
+                    <input type="hidden" id="editVoucherMode" value="">
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Jenis Voucher</label>
-                        <select id="jenisVoucher" required class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm">
-                            <option value="Diskon %">Diskon Persentase (%)</option>
-                            <option value="Diskon Nominal">Diskon Nominal (Rp)</option>
-                        </select>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Kode Voucher (Kosongkan untuk acak otomatis)</label>
+                        <input type="text" id="vCode" placeholder="Cth: PROMO20" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm uppercase font-voucher">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Jenis Diskon</label>
+                            <select id="vJenis" required class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm" onchange="toggleMaxDiskon()">
+                                <option value="Diskon %">Persentase (%)</option>
+                                <option value="Diskon Nominal">Nominal (Rp)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1" id="labelBesaran">Besaran (%)</label>
+                            <input type="text" id="vBesaran" required placeholder="Cth: 20" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm" oninput="formatInputBesaran(this)">
+                        </div>
+                    </div>
+                    <div id="vMaxDiskonContainer" class="block">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Maksimal Diskon (Rp)</label>
+                        <input type="text" id="vMaxDiskon" placeholder="Cth: 15000" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm" oninput="this.value = formatRupiahLive(this.value)">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Berlaku s/d</label>
+                            <input type="date" id="vExpired" required class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm">
+                        </div>
+                        <div id="containerJumlah">
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Jumlah Dibuat</label>
+                            <input type="number" id="vJumlah" required min="1" max="100" value="1" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm">
+                        </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Besaran (Contoh: 30 atau 15000)</label>
-                        <input type="text" id="besaranVoucher" required placeholder="Nilai" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Kepemilikan Email (Opsional)</label>
+                        <input type="email" id="vPemilik" placeholder="Kosongkan jika untuk umum" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm">
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Masa Berlaku s/d</label>
-                        <input type="date" id="expiredVoucher" required class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm">
+                    <div class="flex gap-2 pt-2">
+                        <button type="button" id="btnBatalEditVoucher" onclick="batalEditVoucher()" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2.5 px-4 rounded-lg text-sm shadow transition">Batal</button>
+                        <button type="submit" id="btnSimpanVoucher" class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2.5 rounded-lg transition shadow-md text-sm">Simpan Voucher</button>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Jumlah Dibuat</label>
-                        <input type="number" id="jumlahVoucher" required min="1" max="100" value="1" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm">
-                    </div>
-                    <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2.5 rounded-lg transition shadow-md">Generate Kode</button>
                 </form>
             </div>
         </div>
@@ -152,7 +175,12 @@
         <!-- ROW 2: VOUCHER LIST                        -->
         <!-- ========================================== -->
         <div class="bg-white p-6 rounded-2xl shadow">
-            <h2 class="text-xl font-bold mb-4 text-gray-800">Daftar Voucher Sistem</h2>
+            <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-bold text-gray-800">Daftar Voucher Sistem</h2>
+    <button onclick="eksporVoucherExcel(event)" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg shadow transition flex items-center text-xs">
+        <i class="fas fa-file-excel mr-1"></i> Ekspor Excel
+    </button>
+</div>
             <div class="overflow-x-auto h-80 border border-gray-200 rounded-xl custom-scrollbar">
                 <table class="min-w-full table-auto text-sm">
                     <thead class="bg-gray-100 sticky top-0 z-10 shadow-sm">
@@ -397,29 +425,114 @@
         // ==========================================
         // 1. FITUR VOUCHER GENERATOR & LIST
         // ==========================================
-        function generateRandomCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let code = '';
-            for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length)); return code;
+        window.formatRupiahLive = function(angka) {
+            let number_string = angka.replace(/[^,\d]/g, '').toString(), split = number_string.split(','), sisa = split[0].length % 3, rupiah = split[0].substr(0, sisa), ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+            if(ribuan) { let separator = sisa ? '.' : ''; rupiah += separator + ribuan.join('.'); }
+            return split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
         }
+
+        window.parseRupiahAsli = function(angkaStr) {
+            if(!angkaStr) return 0;
+            return parseInt(angkaStr.toString().replace(/\./g, '')) || 0;
+        }
+
+        window.toggleMaxDiskon = function() {
+            const jenis = document.getElementById('vJenis').value;
+            const containerMax = document.getElementById('vMaxDiskonContainer');
+            const labelBesaran = document.getElementById('labelBesaran');
+            const inputBesaran = document.getElementById('vBesaran');
+            
+            if(jenis === 'Diskon %') {
+                containerMax.classList.remove('hidden'); document.getElementById('vMaxDiskon').required = true;
+                labelBesaran.innerText = 'Besaran (%)'; inputBesaran.placeholder = "Cth: 20";
+                inputBesaran.value = inputBesaran.value.replace(/\./g, ''); 
+            } else {
+                containerMax.classList.add('hidden'); document.getElementById('vMaxDiskon').required = false;
+                labelBesaran.innerText = 'Besaran (Rp)'; inputBesaran.placeholder = "Cth: 50000";
+                inputBesaran.value = formatRupiahLive(inputBesaran.value);
+            }
+        }
+
+        window.formatInputBesaran = function(el) {
+            if(document.getElementById('vJenis').value === 'Diskon Nominal') el.value = formatRupiahLive(el.value);
+            else { el.value = el.value.replace(/[^0-9]/g, ''); if(parseInt(el.value) > 100) el.value = '100'; }
+        }
+
+        window.editVoucher = async function(kode) {
+            const snap = await get(ref(db, 'vouchers/' + kode));
+            if(snap.exists()) {
+                const data = snap.val();
+                document.getElementById('editVoucherMode').value = kode;
+                document.getElementById('vCode').value = kode; document.getElementById('vCode').disabled = true; document.getElementById('vCode').classList.add('bg-gray-200', 'cursor-not-allowed');
+                document.getElementById('vExpired').value = data.expired; document.getElementById('vJenis').value = data.jenis;
+                toggleMaxDiskon(); 
+                
+                if(data.jenis === 'Diskon %') { document.getElementById('vBesaran').value = data.besaran; document.getElementById('vMaxDiskon').value = formatRupiahLive((data.max_diskon || 0).toString()); } 
+                else { document.getElementById('vBesaran').value = formatRupiahLive((data.besaran || 0).toString()); document.getElementById('vMaxDiskon').value = ""; }
+                
+                document.getElementById('vPemilik').value = data.pemilik || "";
+                document.getElementById('containerJumlah').classList.add('hidden');
+                
+                const btnSubmit = document.getElementById('btnSimpanVoucher'); btnSubmit.innerText = "Update Voucher"; btnSubmit.classList.replace('bg-yellow-500', 'bg-blue-600'); btnSubmit.classList.replace('hover:bg-yellow-600', 'hover:bg-blue-700'); btnSubmit.classList.replace('text-gray-900', 'text-white');
+                document.getElementById('btnBatalEditVoucher').classList.remove('hidden');
+            }
+        }
+
+        window.batalEditVoucher = function() {
+            document.getElementById('voucherGeneratorForm').reset(); document.getElementById('editVoucherMode').value = "";
+            document.getElementById('vCode').disabled = false; document.getElementById('vCode').classList.remove('bg-gray-200', 'cursor-not-allowed');
+            document.getElementById('containerJumlah').classList.remove('hidden'); toggleMaxDiskon();
+            
+            const btnSubmit = document.getElementById('btnSimpanVoucher'); btnSubmit.innerText = "Simpan Voucher"; btnSubmit.classList.replace('bg-blue-600', 'bg-yellow-500'); btnSubmit.classList.replace('hover:bg-blue-700', 'hover:bg-yellow-600'); btnSubmit.classList.replace('text-white', 'text-gray-900');
+            document.getElementById('btnBatalEditVoucher').classList.add('hidden');
+        }
+
+        function generateRandomCode() { const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let code = ''; for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length)); return code; }
 
         document.getElementById('voucherGeneratorForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const jenis = document.getElementById('jenisVoucher').value; const besaran = document.getElementById('besaranVoucher').value;
-            const expired = document.getElementById('expiredVoucher').value; const jumlah = parseInt(document.getElementById('jumlahVoucher').value);
+            const mode = document.getElementById('editVoucherMode').value;
+            const jenis = document.getElementById('vJenis').value;
+            const expired = document.getElementById('vExpired').value;
+            const pemilik = document.getElementById('vPemilik').value.trim();
+            const jumlah = parseInt(document.getElementById('vJumlah').value) || 1;
+            let besaran = document.getElementById('vBesaran').value; let max_diskon = 0;
+            
+            if(jenis === 'Diskon Nominal') besaran = parseRupiahAsli(besaran);
+            else { besaran = parseInt(besaran); max_diskon = parseRupiahAsli(document.getElementById('vMaxDiskon').value); }
+            
+            const dataVoucher = { jenis: jenis, besaran: besaran, expired: expired, pemilik: pemilik, status: 'aktif', dibuatPada: Date.now() };
+            if(jenis === 'Diskon %') dataVoucher.max_diskon = max_diskon;
 
-            for (let i = 0; i < jumlah; i++) {
-                await set(ref(db, 'vouchers/' + generateRandomCode()), { status: 'aktif', jenis: jenis, besaran: besaran, expired: expired, dibuatPada: Date.now() });
+            if(mode === "") {
+                const kodeManual = document.getElementById('vCode').value.trim().toUpperCase();
+                if(kodeManual) {
+                    const snap = await get(ref(db, 'vouchers/' + kodeManual));
+                    if(snap.exists()) return alert("Gagal! Kode voucher sudah digunakan.");
+                    await set(ref(db, 'vouchers/' + kodeManual), dataVoucher);
+                } else {
+                    for (let i = 0; i < jumlah; i++) await set(ref(db, 'vouchers/' + generateRandomCode()), dataVoucher);
+                }
+                alert("Voucher berhasil dibuat!");
+            } else {
+                const existSnap = await get(ref(db, 'vouchers/' + mode));
+                if(existSnap.exists()) { dataVoucher.status = existSnap.val().status; if(existSnap.val().digunakanOleh) dataVoucher.digunakanOleh = existSnap.val().digunakanOleh; }
+                await set(ref(db, 'vouchers/' + mode), dataVoucher);
+                alert("Perubahan Voucher berhasil disimpan!");
             }
-            alert(`${jumlah} Voucher berhasil dibuat!`); e.target.reset();
+            batalEditVoucher();
         });
 
         onValue(ref(db, 'vouchers'), (snapshot) => {
             const list = document.getElementById('voucherList'); list.innerHTML = '';
             const today = new Date().toISOString().split('T')[0];
 
-            snapshot.forEach((child) => {
-                const data = child.val(); let statusBadge = "";
-                
+            let voucherArray = [];
+            snapshot.forEach((child) => { let data = child.val(); data.key = child.key; voucherArray.push(data); });
+            voucherArray.sort((a, b) => { if (a.jenis === b.jenis) return parseInt(b.besaran) - parseInt(a.besaran); return a.jenis.localeCompare(b.jenis); });
+
+            voucherArray.forEach((data) => {
+                let statusBadge = "";
                 if(data.status === 'terpakai' || data.status?.includes('Claimed')) {
                     statusBadge = `<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-bold">Terpakai</span><div class="text-[10px] mt-1 text-gray-500">${data.digunakanOleh||data.pemilik||''}</div>`;
                 } else if (data.expired < today) {
@@ -428,21 +541,29 @@
                     statusBadge = `<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-[10px] font-bold">Aktif</span><div class="text-[10px] mt-1 text-blue-500">${data.pemilik || 'Bebas'}</div>`;
                 }
                 
-                let tampilanBesaran = data.jenis === "Diskon %" ? data.besaran + "%" : "Rp " + parseInt(data.besaran).toLocaleString('id-ID');
+                let tampilanBesaran = data.jenis === "Diskon %" 
+                    ? `<span class="font-black text-blue-600">${data.besaran}%</span><br><span class="text-[10px] text-gray-500">Maks: Rp ${parseInt(data.max_diskon||0).toLocaleString('id-ID')}</span>` 
+                    : `<span class="font-black text-blue-600">Rp ${parseInt(data.besaran).toLocaleString('id-ID')}</span>`;
 
                 list.innerHTML += `
                     <tr class="hover:bg-blue-50 transition border-b border-gray-100">
-                        <td class="px-4 py-3 font-voucher font-bold text-gray-900 text-base bg-white">${child.key}</td>
-                        <td class="px-4 py-3"><span class="text-xs text-gray-500">${data.jenis}</span><br><span class="font-black text-blue-600">${tampilanBesaran}</span></td>
+                        <td class="px-4 py-3 font-voucher font-bold text-gray-900 text-sm bg-white">${data.key}</td>
+                        <td class="px-4 py-3"><span class="text-xs text-gray-500">${data.jenis}</span><br>${tampilanBesaran}</td>
                         <td class="px-4 py-3 text-gray-500 text-xs">${data.expired}</td>
                         <td class="px-4 py-3">${statusBadge}</td>
-                        <td class="px-4 py-3 text-center">
-                            <button class="bg-red-100 text-red-600 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded text-xs font-bold transition shadow-sm delete-voucher" data-id="${child.key}"><i class="fas fa-trash-alt"></i></button>
+                        <td class="px-4 py-3 text-center space-x-1 flex justify-center">
+                            <button onclick="editVoucher('${data.key}')" class="bg-blue-100 text-blue-600 hover:bg-blue-500 hover:text-white px-2 py-1.5 rounded text-xs font-bold transition shadow-sm" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button class="bg-red-100 text-red-600 hover:bg-red-500 hover:text-white px-2 py-1.5 rounded text-xs font-bold transition shadow-sm delete-voucher" data-id="${data.key}" title="Hapus"><i class="fas fa-trash-alt"></i></button>
                         </td>
                     </tr>`;
             });
             
-            document.querySelectorAll('.delete-voucher').forEach(btn => { btn.addEventListener('click', async (e) => { const id = e.currentTarget.getAttribute('data-id'); if(confirm(`Yakin menghapus voucher ${id}?`)) await remove(ref(db, 'vouchers/' + id)); }); });
+            document.querySelectorAll('.delete-voucher').forEach(btn => { 
+                btn.addEventListener('click', async (e) => { 
+                    const id = e.currentTarget.getAttribute('data-id'); 
+                    if(confirm(`Yakin menghapus voucher ${id}?`)) await remove(ref(db, 'vouchers/' + id)); 
+                }); 
+            });
         });
 
         // ==========================================
@@ -682,6 +803,56 @@
                 });
             } else { grid.innerHTML = '<div class="col-span-full text-gray-400 text-sm">Beranda publik kosong.</div>'; }
         });
+
+        // ==========================================
+        // FITUR EKSPOR VOUCHER KE EXCEL
+        // ==========================================
+        window.eksporVoucherExcel = async function(event) {
+            if(typeof XLSX === 'undefined') return alert("Gagal memuat sistem Ekspor Excel.");
+            
+            const btn = event.currentTarget;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Memproses...';
+            btn.disabled = true;
+
+            try {
+                const snapshot = await get(ref(db, 'vouchers'));
+                if (!snapshot.exists()) {
+                    alert("Tidak ada data voucher untuk diekspor.");
+                    btn.innerHTML = originalHtml; btn.disabled = false;
+                    return;
+                }
+
+                let exportData = [];
+                snapshot.forEach((child) => {
+                    const data = child.val();
+                    exportData.push({
+                        "Kode Voucher": child.key,
+                        "Jenis Diskon": data.jenis,
+                        "Besaran Diskon": data.jenis === "Diskon %" ? data.besaran + "%" : "Rp " + parseInt(data.besaran).toLocaleString('id-ID'),
+                        "Berlaku s/d": data.expired,
+                        "Status": data.status.toUpperCase(),
+                        "Kepemilikan": data.pemilik || "Bebas / Siapa Saja",
+                        "Digunakan Oleh": data.digunakanOleh || "-"
+                    });
+                });
+
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(exportData);
+                
+                // Menyesuaikan lebar kolom Excel agar rapi
+                ws['!cols'] = [{wch: 15}, {wch: 15}, {wch: 15}, {wch: 12}, {wch: 15}, {wch: 25}, {wch: 25}];
+                
+                XLSX.utils.book_append_sheet(wb, ws, "Daftar Voucher");
+                XLSX.writeFile(wb, "Daftar_Kode_Voucher.xlsx");
+            } catch (error) {
+                alert("Terjadi kesalahan saat menarik data voucher.");
+            } finally {
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }
+        }
+
 
     </script>
 </body>
