@@ -628,10 +628,7 @@
             if(tipe === 'facebook') return facebookProvider;
             if(tipe === 'apple') return appleProvider;
             return googleProvider;
-        }
-        
-        // Memaksa pilihan akun saat login (Mencegah auto-login setelah logout)
-        provider.setCustomParameters({ prompt: 'select_account' });
+        };
         
         let validVoucherCode = "";
         let currentUserData = null;
