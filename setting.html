@@ -61,6 +61,12 @@
                         <label class="block text-xs font-bold text-gray-600 mb-1">Teks Promo & Penawaran Khusus Dasbor Pelanggan</label>
                         <textarea id="setPromoText" rows="2" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 focus:ring-2 focus:ring-indigo-500" placeholder="Ketik info promo untuk pelanggan di sini..."></textarea>
                     </div>
+                    <!-- TAMBAHAN BARU: Input Embed LumaBooth -->
+                    <div class="md:col-span-2 p-4 bg-purple-50 border border-purple-200 rounded-xl shadow-inner mt-2">
+                        <label class="block text-xs font-bold text-purple-800 mb-1"><i class="fas fa-camera-retro mr-1"></i> Link Embed Live Gallery LumaBooth (Fotoshare)</label>
+                        <input type="url" id="setLumaBoothUrl" class="w-full border border-purple-300 rounded-lg p-2 bg-white focus:ring-2 focus:ring-purple-500 text-sm" placeholder="Paste link src dari iframe (contoh: https://fotoshare.co/e/xxxxxxx)">
+                        <p class="text-[10px] text-purple-600 mt-1">Hanya ambil link dari atribut <strong>src="..."</strong> pada kode embed LumaBooth. Kosongkan jika event sudah selesai.</p>
+                    </div>
                     <div class="md:col-span-2 text-right">
                         <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg shadow transition">Simpan Pengaturan</button>
                     </div>
@@ -376,6 +382,9 @@
                 document.getElementById('setPotwDeadline').value = data.potwDeadline || '';
                 document.getElementById('setBannerUrl').value = data.bannerUrl || '';
                 document.getElementById('setPromoText').value = data.promoText || '';
+                
+                // Tambahan: Membaca data LumaBooth dari Firebase
+                document.getElementById('setLumaBoothUrl').value = data.lumaBoothUrl || '';
             }
         });
 
@@ -385,15 +394,27 @@
                 targetSpend: parseInt(document.getElementById('setTargetSpend').value),
                 potwDeadline: document.getElementById('setPotwDeadline').value,
                 bannerUrl: document.getElementById('setBannerUrl').value,
-                promoText: document.getElementById('setPromoText').value
+                promoText: document.getElementById('setPromoText').value,
+                
+                // Tambahan: Menyimpan data LumaBooth ke Firebase
+                lumaBoothUrl: document.getElementById('setLumaBoothUrl').value.trim()
             };
             await set(ref(db, 'settings/global'), data);
             alert("Pengaturan Global Berhasil Disimpan!");
         });
 
         document.getElementById('btnUploadBannerPromo').addEventListener('click', () => {
-            cloudinary.createUploadWidget({ cloudName: 'y2k0oqrl', uploadPreset: 'photobooth', sources: ['local', 'url', 'camera'] }, (error, result) => {
-                if (!error && result && result.event === "success") document.getElementById('setBannerUrl').value = result.info.secure_url;
+            cloudinary.createUploadWidget({ 
+                cloudName: 'y2k0oqrl', 
+                uploadPreset: 'photobooth', 
+                sources: ['local', 'url', 'camera'],
+                multiple: false,
+                clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp'],
+                maxImageWidth: 1920 // Standar HD untuk Banner Web
+            }, (error, result) => {
+                if (!error && result && result.event === "success") {
+                    document.getElementById('setBannerUrl').value = result.info.secure_url;
+                }
             }).open();
         });
 
@@ -507,11 +528,26 @@
             if(mode === "") {
                 const kodeManual = document.getElementById('vCode').value.trim().toUpperCase();
                 if(kodeManual) {
+                    // Pengecekan untuk kode manual
                     const snap = await get(ref(db, 'vouchers/' + kodeManual));
                     if(snap.exists()) return alert("Gagal! Kode voucher sudah digunakan.");
                     await set(ref(db, 'vouchers/' + kodeManual), dataVoucher);
                 } else {
-                    for (let i = 0; i < jumlah; i++) await set(ref(db, 'vouchers/' + generateRandomCode()), dataVoucher);
+                    // PERBAIKAN: Pengecekan ketat untuk kode otomatis
+                    for (let i = 0; i < jumlah; i++) {
+                        let newCode = "";
+                        let isDuplicate = true;
+                        
+                        // Sistem akan terus mengacak sampai dapat kode yang 100% baru
+                        while(isDuplicate) {
+                            newCode = generateRandomCode();
+                            const checkSnap = await get(ref(db, 'vouchers/' + newCode));
+                            if(!checkSnap.exists()) {
+                                isDuplicate = false; // Kode unik ditemukan, keluar dari loop
+                            }
+                        }
+                        await set(ref(db, 'vouchers/' + newCode), dataVoucher);
+                    }
                 }
                 alert("Voucher berhasil dibuat!");
             } else {
@@ -723,16 +759,39 @@
             document.querySelectorAll('#memberList tr').forEach(row => { const text = row.innerText.toLowerCase(); row.style.display = text.includes(term) ? '' : 'none'; });
         });
 
-        onValue(ref(db, 'pendaftaran'), async (snapPend) => {
-            if(!snapPend.exists()) return; const pData = snapPend.val();
-            const snapUsers = await get(ref(db, 'users')); const uData = snapUsers.exists() ? snapUsers.val() : {};
+        // --- PERBAIKAN: Baca dari node 'users' agar semua yang login langsung tampil ---
+        onValue(ref(db, 'users'), async (snapUsers) => {
+            const uData = snapUsers.exists() ? snapUsers.val() : {};
+            
+            // Ambil riwayat order untuk menghitung jumlah "Selesai"
+            const snapPend = await get(ref(db, 'pendaftaran'));
+            const pData = snapPend.exists() ? snapPend.val() : {};
 
             let membersMap = {};
+
+            // 1. Masukkan semua user yang pernah login ke list member
+            Object.keys(uData).forEach(safeEmail => {
+                const u = uData[safeEmail];
+                if(u.email) {
+                    membersMap[u.email] = { 
+                        email: u.email, 
+                        safeEmail: safeEmail, 
+                        nama: u.nama || 'Pelanggan', 
+                        nohp: u.nohp || '', 
+                        totalSelesai: 0, 
+                        lastActivity: u.lastLogin || 0 
+                    };
+                }
+            });
+
+            // 2. Hitung jumlah pesanan selesai dari tabel pendaftaran
             Object.values(pData).forEach(p => {
                 if(!p.email) return; 
-                if(!membersMap[p.email]) membersMap[p.email] = { email: p.email, safeEmail: formatSafeEmail(p.email), nama: p.nama, nohp: p.nohp, totalSelesai: 0, lastActivity: p.timestamp };
+                // Jika user ada di pendaftaran tapi belum login (kasus input lama)
+                if(!membersMap[p.email]) {
+                    membersMap[p.email] = { email: p.email, safeEmail: formatSafeEmail(p.email), nama: p.nama, nohp: p.nohp || '', totalSelesai: 0, lastActivity: p.timestamp };
+                }
                 if(p.status && p.status.includes('Selesai')) membersMap[p.email].totalSelesai++;
-                if(p.timestamp > membersMap[p.email].lastActivity) membersMap[p.email].lastActivity = p.timestamp;
             });
 
             const mList = document.getElementById('memberList'); mList.innerHTML = '';
@@ -740,15 +799,15 @@
             document.getElementById('totalMembers').innerText = `Total: ${mArr.length} Member`;
 
             mArr.forEach(m => {
-                if(uData[m.safeEmail] && uData[m.safeEmail].nohp) m.nohp = uData[m.safeEmail].nohp;
-
                 let tierBadge = "";
                 if(m.totalSelesai <= 2) tierBadge = `<span class="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-[10px] font-bold border border-gray-300">Baru</span>`;
                 else if(m.totalSelesai <= 8) tierBadge = `<span class="bg-orange-50 text-orange-800 px-2 py-1 rounded-full text-[10px] font-bold border border-orange-300">Reguler</span>`;
                 else if(m.totalSelesai <= 15) tierBadge = `<span class="bg-slate-100 text-slate-800 px-2 py-1 rounded-full text-[10px] font-bold border border-slate-400">Setia</span>`;
                 else tierBadge = `<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-[10px] font-bold border border-yellow-500 shadow-sm"><i class="fas fa-crown"></i> VIP</span>`;
 
-                const promoLink = `https://wa.me/${m.nohp}?text=${encodeURIComponent(`Halo ${m.nama}, ada promo spesial dari Canon-Ipad Booth khusus untuk Anda pelanggan setia kami!`)}`;
+                // Matikan tombol WA jika nomor HP belum diisi
+                const btnWaDisabled = m.nohp ? "" : "opacity-50 cursor-not-allowed pointer-events-none";
+                const promoLink = m.nohp ? `https://wa.me/${m.nohp}?text=${encodeURIComponent(`Halo ${m.nama}, ada promo spesial dari Canon-Ipad Booth khusus untuk Anda pelanggan setia kami!`)}` : '#';
 
                 mList.innerHTML += `
                     <tr class="hover:bg-orange-50 transition border-b border-gray-100 bg-white">
@@ -758,7 +817,7 @@
                         <td class="px-4 py-3">${tierBadge}</td>
                         <td class="px-4 py-3 text-center">
                             <div class="flex justify-center gap-2">
-                                <a href="${promoLink}" target="_blank" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded text-[10px] font-bold shadow-sm transition"><i class="fab fa-whatsapp mr-1"></i>Promo</a>
+                                <a href="${promoLink}" target="_blank" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded text-[10px] font-bold shadow-sm transition ${btnWaDisabled}"><i class="fab fa-whatsapp mr-1"></i>Promo</a>
                                 <button onclick="bukaUploadModalCloudinary('${m.safeEmail}')" class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1.5 rounded text-[10px] font-bold shadow-sm transition"><i class="fas fa-cloud-upload-alt mr-1"></i>Upload Foto</button>
                             </div>
                         </td>
