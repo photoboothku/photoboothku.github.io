@@ -604,7 +604,16 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, OAuthProvider, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getDatabase, ref, get, set, push, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-        // Konfigurasi Firebase Anda yang sudah ada...
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdM-1ziZLq2r8P1qpgHM763ke8GUPitvw",
+            authDomain: "dasborusaha.firebaseapp.com",
+            databaseURL: "https://dasborusaha-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "dasborusaha",
+            storageBucket: "dasborusaha.firebasestorage.app",
+            messagingSenderId: "427165972600",
+            appId: "1:427165972600:web:a0731cbf737717d567558d"
+        };
+        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
