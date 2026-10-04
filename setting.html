@@ -749,8 +749,23 @@
         // 4. MANAJEMEN MEMBER / PELANGGAN
         // ==========================================
         window.bukaUploadModalCloudinary = function(safeEmail) {
-            cloudinary.createUploadWidget({ cloudName: 'y2k0oqrl', uploadPreset: 'photobooth', sources: ['local', 'url', 'camera'] }, async (error, result) => {
-                if (!error && result && result.event === "success") { await push(ref(db, `admin_uploaded_photos/${safeEmail}`), result.info.secure_url); alert("Foto berhasil diunggah ke Galeri Pelanggan bersangkutan!"); }
+            cloudinary.createUploadWidget({ 
+                cloudName: 'y2k0oqrl', 
+                uploadPreset: 'photobooth', 
+                sources: ['local', 'url', 'camera'],
+                multiple: true, 
+                clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp'],
+                maxImageWidth: 3600, 
+                maxImageHeight: 3600,
+                tags: [safeEmail] // KUNCI PENTING: Mencegah foto hilang dari Cloudinary API
+            }, (error, result) => {
+                if (!error && result && result.event === "success") { 
+                    // Menembak data ke Firebase tanpa memblokir proses kompresi
+                    push(ref(db, `admin_uploaded_photos/${safeEmail}`), result.info.secure_url).catch(e => console.log(e)); 
+                }
+                if (!error && result && result.event === "queues-end") {
+                    alert("Semua foto berhasil dikompres dan diunggah ke Galeri Pelanggan!");
+                }
             }).open();
         }
 
