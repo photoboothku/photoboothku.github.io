@@ -266,6 +266,20 @@
                 </div>
             </div>
 
+            <!-- Live LumaBooth Gallery (Ditampilkan jika Admin mengisi link) -->
+            <div id="lumaBoothContainer" class="bg-white rounded-2xl shadow p-6 md:p-8 border-t-4 border-purple-500 hidden mb-6">
+                <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800"><i class="fas fa-camera-retro text-purple-500 mr-2"></i>Live Event Gallery (LumaBooth)</h3>
+                        <p class="text-sm text-gray-500 mt-1">Foto instan dari mesin photobooth. (Tampil sementara selama event berlangsung)</p>
+                    </div>
+                    <span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-bold animate-pulse"><i class="fas fa-circle mr-1"></i> LIVE</span>
+                </div>
+                <div class="w-full rounded-xl overflow-hidden shadow-inner border border-gray-200 bg-gray-50 h-[400px] md:h-[600px] relative">
+                    <iframe id="lumaBoothIframe" src="" class="absolute top-0 left-0 w-full h-full" frameborder="0" allow="web-share" allowfullscreen></iframe>
+                </div>
+            </div>
+
             <!-- Galeri Pelanggan -->
             <div class="bg-white rounded-2xl shadow p-6 md:p-8 border-t border-gray-100">
                 <h3 class="text-xl font-bold text-gray-800 mb-2"><i class="fas fa-images text-blue-500 mr-2"></i>Galeri Foto Photobooth Kamu</h3>
@@ -499,11 +513,13 @@
                     <div id="existingUserPanel" class="mb-6 p-5 bg-blue-50 border border-blue-200 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4 shadow-inner">
                         <div class="text-sm">
                             <strong class="text-blue-800 text-base mb-1 block"><i class="fas fa-user-circle mr-2"></i>Sudah punya akun?</strong>
-                            <span class="text-gray-600">Login via Google agar form terisi otomatis dan tersimpan ke dasbor.</span>
+                            <span class="text-gray-600">Login untuk mengisi form otomatis.</span>
                         </div>
-                        <button id="loginExistingBtn" type="button" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap shadow-md transition transform hover:-translate-y-0.5">
-                            <i class="fab fa-google mr-2"></i>Login Google
-                        </button>
+                        <div class="flex gap-2 w-full md:w-auto">
+                            <button onclick="loginPelanggan('google')" type="button" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-lg font-bold text-sm shadow-md transition" title="Google"><i class="fab fa-google"></i></button>
+                            <button onclick="loginPelanggan('facebook')" type="button" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-bold text-sm shadow-md transition" title="Facebook"><i class="fab fa-facebook-f"></i></button>
+                            <button onclick="loginPelanggan('apple')" type="button" class="flex-1 bg-gray-900 hover:bg-black text-white px-4 py-2.5 rounded-lg font-bold text-sm shadow-md transition" title="Apple"><i class="fab fa-apple"></i></button>
+                        </div>
                     </div>
 
                     <form id="registrationForm" class="space-y-5">
@@ -546,9 +562,11 @@
                             <i class="fas fa-info-circle mr-1"></i> Jangan khawatir, voucher tetap berlaku walaupun Anda datang telat melewati jadwal yang ditentukan.
                         </div>
 
-                        <button id="btnDaftarBaru" type="button" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl shadow-lg flex justify-center text-lg transition transform hover:-translate-y-0.5">
-                            <i class="fab fa-google mr-2 mt-1"></i> Daftar Akun & Konfirmasi Jadwal
-                        </button>
+                        <div id="btnDaftarBaru" class="grid grid-cols-3 gap-2">
+                            <button type="button" onclick="daftarBaru('google')" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm"><i class="fab fa-google mr-1"></i> Google</button>
+                            <button type="button" onclick="daftarBaru('facebook')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm"><i class="fab fa-facebook-f mr-1"></i> Facebook</button>
+                            <button type="button" onclick="daftarBaru('apple')" class="bg-gray-900 hover:bg-black text-white font-bold py-3 rounded-xl shadow-lg transition text-sm"><i class="fab fa-apple mr-1"></i> Apple</button>
+                        </div>
                         
                         <button id="btnSimpanJadwalSaja" type="submit" class="hidden w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg flex justify-center text-lg transition transform hover:-translate-y-0.5">
                             <i class="fas fa-paper-plane mr-2 mt-1"></i> Selesaikan Pesanan
@@ -583,23 +601,25 @@
     <!-- Firebase Scripts & App Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, OAuthProvider, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getDatabase, ref, get, set, push, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDdM-1ziZLq2r8P1qpgHM763ke8GUPitvw",
-            authDomain: "dasborusaha.firebaseapp.com",
-            databaseURL: "https://dasborusaha-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "dasborusaha",
-            storageBucket: "dasborusaha.firebasestorage.app",
-            messagingSenderId: "427165972600",
-            appId: "1:427165972600:web:a0731cbf737717d567558d"
-        };
-
+        // Konfigurasi Firebase Anda yang sudah ada...
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
-        const provider = new GoogleAuthProvider();
+        
+        // Inisialisasi 3 Provider
+        const googleProvider = new GoogleAuthProvider();
+        googleProvider.setCustomParameters({ prompt: 'select_account' });
+        const facebookProvider = new FacebookAuthProvider();
+        const appleProvider = new OAuthProvider('apple.com');
+
+        function getProvider(tipe) {
+            if(tipe === 'facebook') return facebookProvider;
+            if(tipe === 'apple') return appleProvider;
+            return googleProvider;
+        }
         
         // Memaksa pilihan akun saat login (Mencegah auto-login setelah logout)
         provider.setCustomParameters({ prompt: 'select_account' });
@@ -640,6 +660,9 @@
         // ==========================================
         // 1. DATA AWAL BERANDA (Paket & Testimoni)
         // ==========================================
+        // ==========================================
+        // 1. DATA AWAL BERANDA (Paket, Testimoni & Global)
+        // ==========================================
         onValue(ref(db, 'settings/global'), (snap) => {
             if(snap.exists()) {
                 globalSettings = snap.val();
@@ -653,6 +676,17 @@
                 if(globalSettings.bannerUrl && globalSettings.bannerUrl !== "") { bannerImg.src = globalSettings.bannerUrl; bannerImg.classList.remove('hidden'); showBannerArea = true; } else { bannerImg.classList.add('hidden'); }
                 if(globalSettings.promoText && globalSettings.promoText !== "") { bannerText.innerText = globalSettings.promoText; bannerText.classList.remove('hidden'); showBannerArea = true; } else { bannerText.classList.add('hidden'); }
                 if(showBannerArea) bannerContainer.classList.remove('hidden'); else bannerContainer.classList.add('hidden');
+
+                // Logika memunculkan Live LumaBooth Embed
+                const lumaContainer = document.getElementById('lumaBoothContainer');
+                const lumaIframe = document.getElementById('lumaBoothIframe');
+                if(globalSettings.lumaBoothUrl && globalSettings.lumaBoothUrl !== "") {
+                    lumaIframe.src = globalSettings.lumaBoothUrl;
+                    lumaContainer.classList.remove('hidden');
+                } else {
+                    lumaContainer.classList.add('hidden');
+                    lumaIframe.src = "";
+                }
             }
         });
 
@@ -836,21 +870,38 @@
             window.location.hash = "#pelanggan-dashboard"; window.location.reload();
         }
 
-        document.getElementById('btnDaftarBaru').addEventListener('click', async () => {
-            if(!document.getElementById('paket').value || !document.getElementById('waktu').value) return alert("Pilih paket & jadwal!");
-            try { const result = await signInWithPopup(auth, provider); await simpanPendaftaran(result.user.email); } 
-            catch (e) { alert("Login dibatalkan"); }
-        });
+        window.daftarBaru = async function(tipe) {
+            // Cegat jika yang diklik adalah tombol Apple
+            if(tipe === 'apple') {
+                return alert("Mohon maaf, login menggunakan Apple ID belum tersedia saat ini. Silakan gunakan metode login lainnya.");
+            }
 
-        document.getElementById('loginExistingBtn').addEventListener('click', async () => {
+            if(!document.getElementById('paket').value || !document.getElementById('waktu').value) return alert("Pilih paket & jadwal!");
+            try { 
+                const result = await signInWithPopup(auth, getProvider(tipe)); 
+                await simpanPendaftaran(result.user.email); 
+            } catch (e) { alert("Login dibatalkan atau gagal"); }
+        }
+
+        window.loginPelanggan = async function(tipe) {
+            // Cegat jika yang diklik adalah tombol Apple
+            if(tipe === 'apple') {
+                return alert("Mohon maaf, login menggunakan Apple ID belum tersedia saat ini. Silakan gunakan metode login lainnya.");
+            }
+
             try {
-                const res = await signInWithPopup(auth, provider); currentUserData = res.user;
-                document.getElementById('existingUserPanel').classList.add('hidden'); document.getElementById('dataDiriGroup').classList.add('hidden'); document.getElementById('btnDaftarBaru').classList.add('hidden');
-                document.getElementById('btnSimpanJadwalSaja').classList.remove('hidden'); document.getElementById('userGreeting').classList.remove('hidden');
-                document.getElementById('userGreeting').innerHTML = `<i class="fas fa-check-circle mr-2"></i> Berhasil Login! Halo, ${currentUserData.displayName}. Pilih Jadwal Anda:`;
-                document.getElementById('nama').value = currentUserData.displayName; document.getElementById('nohp').value = "000";
+                const res = await signInWithPopup(auth, getProvider(tipe)); 
+                currentUserData = res.user;
+                document.getElementById('existingUserPanel').classList.add('hidden'); 
+                document.getElementById('dataDiriGroup').classList.add('hidden'); 
+                document.getElementById('btnDaftarBaru').classList.add('hidden');
+                document.getElementById('btnSimpanJadwalSaja').classList.remove('hidden'); 
+                document.getElementById('userGreeting').classList.remove('hidden');
+                document.getElementById('userGreeting').innerHTML = `<i class="fas fa-check-circle mr-2"></i> Berhasil Login! Halo, ${currentUserData.displayName || 'Pelanggan'}. Pilih Jadwal Anda:`;
+                document.getElementById('nama').value = currentUserData.displayName || ''; 
+                document.getElementById('nohp').value = "000";
             } catch(e) {}
-        });
+        }
 
         document.getElementById('registrationForm').addEventListener('submit', async (e) => { e.preventDefault(); if(currentUserData) await simpanPendaftaran(currentUserData.email); });
 
@@ -860,7 +911,7 @@
         const navBtns = [document.getElementById('navLoginPelangganBtn'), document.getElementById('mobileNavLoginBtn'), document.getElementById('heroLoginBtn')];
         navBtns.forEach(btn => btn.addEventListener('click', async () => {
             document.getElementById('mobileMenuDropdown').classList.add('hidden'); 
-            if(!auth.currentUser) { try { await signInWithPopup(auth, provider); } catch(e) { return; } }
+            if(!auth.currentUser) { try { await signInWithPopup(auth, googleProvider); } catch(e) { return; } }
             tampilkanDasbor(auth.currentUser);
         }));
 
@@ -978,6 +1029,14 @@
             document.getElementById('mainWebsiteContent').classList.add('hidden'); document.getElementById('pelanggan-dashboard').classList.remove('hidden');
             document.getElementById('dashCustomerName').innerText = user.displayName; document.getElementById('dashCustomerEmail').innerText = user.email;
             const safeEmail = formatSafeEmail(user.email);
+            
+            // --- TAMBAHAN BARU: Otomatis simpan data user ke database saat login ---
+            await update(ref(db, 'users/' + safeEmail), {
+                email: user.email,
+                nama: user.displayName || 'Pelanggan',
+                lastLogin: Date.now()
+            });
+            // -----------------------------------------------------------------------
             
             onValue(ref(db, 'testimonials'), (snap) => {
                 hasGivenTestimonial = false;
@@ -1214,53 +1273,70 @@
         // 6. CLOUDINARY & AKSI FOTO
         // ==========================================
         let hiddenPhotosList = [];
-        async function loadCloudinaryPhotos(email) {
+        let oldCloudinaryPhotos = [];
+        let currentFirebasePhotos = [];
+
+        function loadCloudinaryPhotos(email) {
             const safeEmail = formatSafeEmail(email);
-            onValue(ref(db, 'hidden_photos/' + safeEmail), async (snap) => {
+            
+            // 1. Ambil foto lama dari API Cloudinary (Mencegah foto lama hilang)
+            fetch(`https://res.cloudinary.com/y2k0oqrl/image/list/${safeEmail}.json`)
+                .then(res => res.ok ? res.json() : { resources: [] })
+                .then(data => {
+                    oldCloudinaryPhotos = data.resources.map(img => `https://res.cloudinary.com/y2k0oqrl/image/upload/v${img.version}/${img.public_id}.${img.format}`);
+                    gabungDanRenderGaleri();
+                })
+                .catch(() => gabungDanRenderGaleri());
+
+            // 2. Pantau foto tersembunyi
+            onValue(ref(db, 'hidden_photos/' + safeEmail), (snap) => {
                 hiddenPhotosList = snap.exists() ? Object.values(snap.val()) : [];
-                renderCloudinary(safeEmail);
-            }, {onlyOnce: true});
+                gabungDanRenderGaleri();
+            });
+
+            // 3. Pantau foto baru yang diunggah Admin ke Firebase (Super Cepat)
+            onValue(ref(db, 'admin_uploaded_photos/' + safeEmail), (snap) => {
+                currentFirebasePhotos = snap.exists() ? Object.values(snap.val()).reverse() : [];
+                gabungDanRenderGaleri();
+            });
         }
 
-        async function renderCloudinary(safeEmail) {
+        function gabungDanRenderGaleri() {
             const grid = document.getElementById('cloudinaryGalleryGrid');
-            try {
-                const res = await fetch(`https://res.cloudinary.com/${cloudName}/image/list/${safeEmail}.json`);
-                if(!res.ok) throw new Error("List Not Found"); const data = await res.json(); 
+            if(!grid) return;
+            
+            // Gabungkan foto baru & lama, lalu hapus jika ada URL yang terduplikat
+            let allPhotos = [...new Set([...currentFirebasePhotos, ...oldCloudinaryPhotos])];
+            grid.innerHTML = ''; 
+            userCloudinaryPhotos = []; 
+            let found = false;
+
+            allPhotos.forEach(imgUrl => {
+                // Lewati/Sembunyikan foto jika masuk dalam daftar hidden
+                if (hiddenPhotosList.includes(imgUrl)) return; 
                 
-                grid.innerHTML = ''; userCloudinaryPhotos = []; let found = false;
+                found = true; 
+                userCloudinaryPhotos.push(imgUrl);
+                const dlUrl = imgUrl.replace('/upload/', '/upload/fl_attachment/');
                 
-                data.resources.forEach(img => {
-                    const imgUrl = `https://res.cloudinary.com/${cloudName}/image/upload/v${img.version}/${img.public_id}.${img.format}`;
-                    if(hiddenPhotosList.includes(imgUrl)) return;
-                    found = true; userCloudinaryPhotos.push(imgUrl);
-                    
-                    const dlUrl = `https://res.cloudinary.com/${cloudName}/image/upload/fl_attachment/v${img.version}/${img.public_id}.${img.format}`;
-                    grid.innerHTML += `
-                        <div class="relative group overflow-hidden rounded-xl shadow-md cursor-pointer aspect-square bg-gray-200" onclick="openPhotoModal('${imgUrl}', '${dlUrl}')">
-                            <img src="${imgUrl}" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-300" loading="lazy">
-                            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
-                                <span class="text-white font-bold text-xs bg-blue-600 px-4 py-2 rounded-full shadow-lg border border-blue-400"><i class="fas fa-search-plus mr-1"></i>Kelola</span>
-                            </div>
-                        </div>`;
-                });
-                if(!found) {
-                    grid.innerHTML = `
-                        <div class="col-span-full text-center py-10 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-                            <i class="far fa-images text-4xl mb-3 block opacity-30"></i>
-                            <p class="text-gray-500 mb-4">Galeri Anda masih kosong.</p>
-                            <button onclick="document.getElementById('btnOpenBookingMandiri').click()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow transition">Booking Photobooth Sekarang</button>
-                        </div>`;
-                }
-            } catch(e) { 
+                grid.innerHTML += `
+                    <div class="relative group overflow-hidden rounded-xl shadow-md cursor-pointer aspect-square bg-gray-200" onclick="openPhotoModal('${imgUrl}', '${dlUrl}')">
+                        <img src="${imgUrl}" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-300" loading="lazy">
+                        <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+                            <span class="text-white font-bold text-xs bg-blue-600 px-4 py-2 rounded-full shadow-lg border border-blue-400"><i class="fas fa-search-plus mr-1"></i>Kelola</span>
+                        </div>
+                    </div>`;
+            });
+
+            if (!found) {
                 grid.innerHTML = `
-                        <div class="col-span-full text-center py-10 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-                            <i class="far fa-images text-4xl mb-3 block opacity-30"></i>
-                            <p class="text-gray-500 mb-4">Galeri Anda masih kosong atau tidak dapat memuat gambar.</p>
-                            <button onclick="document.getElementById('btnOpenBookingMandiri').click()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow transition">Booking Photobooth Sekarang</button>
-                        </div>`; 
+                    <div class="col-span-full text-center py-10 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+                        <i class="far fa-images text-4xl mb-3 block opacity-30"></i>
+                        <p class="text-gray-500 mb-4">Galeri Anda masih kosong.</p>
+                        <button onclick="document.getElementById('btnOpenBookingMandiri').click()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow transition">Booking Photobooth Sekarang</button>
+                    </div>`;
             }
-            updateTestimoniUI(); 
+            updateTestimoniUI(); // Perbarui status tombol testimoni
         }
 
         let cViewUrl = "", cDlUrl = "";
@@ -1273,14 +1349,13 @@
         document.getElementById('downloadPhotoBtn').addEventListener('click', () => window.open(cDlUrl, '_blank'));
 
         document.getElementById('setProfileBtn').addEventListener('click', async () => { await update(ref(db, 'users/' + formatSafeEmail(auth.currentUser.email)), { profilePic: cViewUrl }); document.getElementById('dashProfilePic').src = cViewUrl; alert("Foto profil diperbarui!"); });
-        document.getElementById('hidePhotoBtn').addEventListener('click', async () => { if(confirm("Yakin sembunyikan foto?")) { await push(ref(db, 'hidden_photos/' + formatSafeEmail(auth.currentUser.email)), cViewUrl); document.getElementById('photoModal').classList.add('hidden'); loadCloudinaryPhotos(auth.currentUser.email); }});
+        document.getElementById('hidePhotoBtn').addEventListener('click', async () => { if(confirm("Yakin sembunyikan foto?")) { await push(ref(db, 'hidden_photos/' + formatSafeEmail(auth.currentUser.email)), cViewUrl); document.getElementById('photoModal').classList.add('hidden'); }});
         
         document.getElementById('setBerandaBtn').addEventListener('click', async () => {
             if(globalUserRating <= 3) return alert("Fitur ini dinonaktifkan karena rating testimoni Anda 3 Bintang ke bawah.");
             const pk = 'PUB-' + Date.now();
             await set(ref(db, 'homepage_photos/' + pk), { url: cViewUrl, ownerName: auth.currentUser.displayName, ownerEmail: auth.currentUser.email, likes: 0, dislikes: 0, timestamp: Date.now() });
             alert("Berhasil dikirim ke Galeri Publik! Tunggu Like dari orang lain untuk masuk Photo of The Week.");
-            loadPublicGallery();
         });
 
         // ==========================================
