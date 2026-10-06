@@ -411,6 +411,11 @@
     <!-- WRAPPER KONTEN UTAMA WEBSITE                   -->
     <!-- ============================================== -->
     <div id="mainWebsiteContent">
+        <!-- Widget Hall of Fame (Mengambang) -->
+        <div id="hallOfFameWidget" class="fixed right-0 top-1/4 z-40 bg-gradient-to-b from-yellow-400 to-yellow-600 p-2 rounded-l-2xl shadow-[-5px_5px_15px_rgba(0,0,0,0.3)] w-20 md:w-24 max-h-[50vh] overflow-y-auto custom-scrollbar border-y-2 border-l-2 border-yellow-200 transition-transform transform translate-x-0 hover:-translate-x-2 hidden">
+            <div class="text-center text-[9px] md:text-xs font-black text-gray-900 mb-2 leading-tight drop-shadow-sm"><i class="fas fa-trophy block mb-1 text-lg"></i>HALL OF FAME</div>
+            <div id="hallOfFameList" class="flex flex-col gap-2"></div>
+        </div>
         <!-- Hero Section -->
         <section id="beranda" class="hero-bg h-screen flex flex-col items-center justify-center text-center px-4 relative">
             <div class="max-w-3xl z-10 mt-16">
@@ -451,8 +456,8 @@
                 <div class="inline-block bg-gradient-to-r from-yellow-400 to-yellow-600 text-gray-900 px-6 py-2 rounded-full font-black text-xl mb-6 shadow-[0_0_20px_rgba(234,179,8,0.6)] border border-yellow-300">
                     <i class="fas fa-crown mr-2"></i> PHOTO OF THE WEEK <i class="fas fa-crown ml-2"></i>
                 </div>
-                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-white drop-shadow-md">Top 5 Momen Paling Disukai</h2>
-                <p class="text-gray-300 mb-12 max-w-2xl mx-auto">Berikan dukungan <i class="fas fa-thumbs-up text-blue-400 mx-1"></i> pada foto di galeri publik. 5 Foto terbaik setiap pekannya otomatis tampil di sini dan mendapatkan <strong class="text-yellow-400">Voucher Diskon 20%</strong>!</p>
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-white drop-shadow-md">Top 3 Jawara Pekan Lalu</h2>
+                <p id="potwRewardText" class="text-gray-300 mb-12 max-w-2xl mx-auto">Selamat kepada 3 pemenang minggu lalu! Berikan dukungan 1 Like per pekan pada foto di Galeri Publik di bawah. Pemenang diumumkan secara otomatis setiap minggunya.</p>
                 
                 <div id="potwGalleryGrid" class="grid grid-cols-2 md:grid-cols-5 gap-4">
                     <div class="col-span-full text-center text-gray-400 py-10"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat jawara minggu ini...</div>
@@ -513,13 +518,11 @@
                     <div id="existingUserPanel" class="mb-6 p-5 bg-blue-50 border border-blue-200 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4 shadow-inner">
                         <div class="text-sm">
                             <strong class="text-blue-800 text-base mb-1 block"><i class="fas fa-user-circle mr-2"></i>Sudah punya akun?</strong>
-                            <span class="text-gray-600">Login untuk mengisi form otomatis.</span>
+                            <span class="text-gray-600">Login via Google agar form terisi otomatis dan tersimpan ke dasbor.</span>
                         </div>
-                        <div class="flex gap-2 w-full md:w-auto">
-                            <button onclick="loginPelanggan('google')" type="button" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-lg font-bold text-sm shadow-md transition" title="Google"><i class="fab fa-google"></i></button>
-                            <button onclick="loginPelanggan('facebook')" type="button" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-bold text-sm shadow-md transition" title="Facebook"><i class="fab fa-facebook-f"></i></button>
-                            <button onclick="loginPelanggan('apple')" type="button" class="flex-1 bg-gray-900 hover:bg-black text-white px-4 py-2.5 rounded-lg font-bold text-sm shadow-md transition" title="Apple"><i class="fab fa-apple"></i></button>
-                        </div>
+                        <button id="loginExistingBtn" type="button" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap shadow-md transition transform hover:-translate-y-0.5">
+                            <i class="fab fa-google mr-2"></i>Login Google
+                        </button>
                     </div>
 
                     <form id="registrationForm" class="space-y-5">
@@ -562,11 +565,9 @@
                             <i class="fas fa-info-circle mr-1"></i> Jangan khawatir, voucher tetap berlaku walaupun Anda datang telat melewati jadwal yang ditentukan.
                         </div>
 
-                        <div id="btnDaftarBaru" class="grid grid-cols-3 gap-2">
-                            <button type="button" onclick="daftarBaru('google')" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm"><i class="fab fa-google mr-1"></i> Google</button>
-                            <button type="button" onclick="daftarBaru('facebook')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm"><i class="fab fa-facebook-f mr-1"></i> Facebook</button>
-                            <button type="button" onclick="daftarBaru('apple')" class="bg-gray-900 hover:bg-black text-white font-bold py-3 rounded-xl shadow-lg transition text-sm"><i class="fab fa-apple mr-1"></i> Apple</button>
-                        </div>
+                        <button id="btnDaftarBaru" type="button" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl shadow-lg flex justify-center text-lg transition transform hover:-translate-y-0.5">
+                            <i class="fab fa-google mr-2 mt-1"></i> Daftar Akun & Konfirmasi Jadwal
+                        </button>
                         
                         <button id="btnSimpanJadwalSaja" type="submit" class="hidden w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg flex justify-center text-lg transition transform hover:-translate-y-0.5">
                             <i class="fas fa-paper-plane mr-2 mt-1"></i> Selesaikan Pesanan
@@ -601,8 +602,8 @@
     <!-- Firebase Scripts & App Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, OAuthProvider, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getDatabase, ref, get, set, push, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getDatabase, ref, get, set, push, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDdM-1ziZLq2r8P1qpgHM763ke8GUPitvw",
@@ -618,17 +619,8 @@
         const auth = getAuth(app);
         const db = getDatabase(app);
         
-        // Inisialisasi 3 Provider
-        const googleProvider = new GoogleAuthProvider();
-        googleProvider.setCustomParameters({ prompt: 'select_account' });
-        const facebookProvider = new FacebookAuthProvider();
-        const appleProvider = new OAuthProvider('apple.com');
-
-        function getProvider(tipe) {
-            if(tipe === 'facebook') return facebookProvider;
-            if(tipe === 'apple') return appleProvider;
-            return googleProvider;
-        };
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
         
         let validVoucherCode = "";
         let currentUserData = null;
@@ -669,11 +661,52 @@
         // ==========================================
         // 1. DATA AWAL BERANDA (Paket, Testimoni & Global)
         // ==========================================
+        window.getLatestDeadlineDate = function(dayOfWeek) {
+            let parsedDay = parseInt(dayOfWeek);
+            // Pengaman 1: Jika data lama berupa tanggal (bukan 0-6) atau NaN, anggap hari Minggu (0) agar tidak error
+            if (isNaN(parsedDay) || parsedDay < 0 || parsedDay > 6) {
+                parsedDay = 0;
+            }
+            
+            let d = new Date(); d.setHours(12, 0, 0, 0); 
+            let loopCount = 0;
+            
+            // Pengaman 2: Batasi perulangan maksimal 7 kali pencarian hari (Mencegah Infinite Loop)
+            while (d.getDay() !== parsedDay && loopCount < 7) { 
+                d.setDate(d.getDate() - 1); 
+                loopCount++;
+            }
+            return d.getTime(); 
+        }
+
+        window.isRekapitulasi = false;
+        window.currentCycleId = "";
+
         onValue(ref(db, 'settings/global'), (snap) => {
             if(snap.exists()) {
                 globalSettings = snap.val();
-                if(globalSettings.targetSpend) document.getElementById('spendProgressText').innerText = `Rp 0 / Rp ${parseInt(globalSettings.targetSpend).toLocaleString('id-ID')}`;
                 
+                // Setel Status Waktu & Siklus Mingguan
+                if (globalSettings.potwDeadline && globalSettings.potwDeadline !== 'libur') {
+                    window.currentCycleId = window.getLatestDeadlineDate(globalSettings.potwDeadline);
+                    
+                    let d = new Date();
+                    // Masa rekap: Hari H rekapitulasi, jam 00:00 sampai 11:59
+                    if(d.getDay() === parseInt(globalSettings.potwDeadline) && d.getHours() < 12) {
+                        window.isRekapitulasi = true;
+                    } else {
+                        window.isRekapitulasi = false;
+                        // Jika sudah lewat jam 12 siang dan server belum mencatat rekap minggu ini, eksekusi rekap!
+                        if(globalSettings.last_cycle_id !== window.currentCycleId) {
+                            jalankanFinalisasiOtomatis(window.currentCycleId);
+                        }
+                    }
+                } else {
+                    window.isRekapitulasi = false; window.currentCycleId = "LIBUR";
+                }
+
+                // Pengaturan Banner & LumaBooth
+                if(globalSettings.targetSpend) document.getElementById('spendProgressText').innerText = `Rp 0 / Rp ${parseInt(globalSettings.targetSpend).toLocaleString('id-ID')}`;
                 const bannerContainer = document.getElementById('dashGlobalPromoContainer');
                 const bannerImg = document.getElementById('dashGlobalBanner');
                 const bannerText = document.getElementById('dashGlobalPromoText');
@@ -683,18 +716,58 @@
                 if(globalSettings.promoText && globalSettings.promoText !== "") { bannerText.innerText = globalSettings.promoText; bannerText.classList.remove('hidden'); showBannerArea = true; } else { bannerText.classList.add('hidden'); }
                 if(showBannerArea) bannerContainer.classList.remove('hidden'); else bannerContainer.classList.add('hidden');
 
-                // Logika memunculkan Live LumaBooth Embed
                 const lumaContainer = document.getElementById('lumaBoothContainer');
-                const lumaIframe = document.getElementById('lumaBoothIframe');
-                if(globalSettings.lumaBoothUrl && globalSettings.lumaBoothUrl !== "") {
-                    lumaIframe.src = globalSettings.lumaBoothUrl;
-                    lumaContainer.classList.remove('hidden');
-                } else {
-                    lumaContainer.classList.add('hidden');
-                    lumaIframe.src = "";
+                if(globalSettings.lumaBoothUrl && globalSettings.lumaBoothUrl !== "") { document.getElementById('lumaBoothIframe').src = globalSettings.lumaBoothUrl; lumaContainer.classList.remove('hidden'); } 
+                else { lumaContainer.classList.add('hidden'); document.getElementById('lumaBoothIframe').src = ""; }
+            
+                // Pembaruan Teks Hadiah POTW Otomatis
+                const potwDesc = document.getElementById('potwRewardText');
+                if(potwDesc) {
+                    let rType = globalSettings.rewardType || 'Diskon %';
+                    let rVal = globalSettings.rewardValue || '20';
+                    let hadiahText = "";
+                    if(rType === 'Diskon %') hadiahText = `Voucher Diskon ${rVal}%`;
+                    else if(rType === 'Diskon Nominal' || rType === 'Saldo E-Wallet') hadiahText = `${rType} Rp ${parseInt(rVal).toLocaleString('id-ID')}`;
+                    else hadiahText = `Hadiah Eksklusif: ${rVal}`; // Untuk Cinderamata
+                    
+                    potwDesc.innerHTML = `Selamat kepada 3 pemenang minggu lalu! Pemenang diumumkan otomatis setiap akhir batas rekapitulasi mingguan dan masing-masing berhak mengklaim <strong class="text-yellow-400 bg-black/30 px-2 py-0.5 rounded shadow">${hadiahText}</strong>!`;
                 }
             }
+            
         });
+
+        // MESIN REKAPITULASI OTOMATIS
+        async function jalankanFinalisasiOtomatis(cycleId) {
+            const snap = await get(ref(db, 'homepage_photos'));
+            if(!snap.exists()) return;
+            
+            let photos = [];
+            snap.forEach(c => { if(!c.val().isWinner) photos.push({key: c.key, ...c.val()}); });
+            photos.sort((a,b) => (b.likes||0) - (a.likes||0));
+            
+            let top3 = photos.slice(0, 3).filter(p => (p.likes||0) > 0);
+            let updates = {};
+            
+            // Simpan 3 juara ke tabel terpisah
+            top3.forEach((p, idx) => {
+                updates[`potw_winners/${cycleId}_${idx+1}`] = { ...p, rank: idx+1, cycleId: cycleId };
+                updates[`homepage_photos/${p.key}/isWinner`] = true; // Kunci foto pemenang agar tak masuk lomba lagi
+            });
+            
+            // Reset semua like untuk mulai persaingan baru minggu depan
+            photos.forEach(p => {
+                if(!top3.find(t => t.key === p.key)) {
+                    updates[`homepage_photos/${p.key}/likes`] = 0;
+                }
+            });
+            
+            // Hapus daftar antrean like user dan tandai siklus selesai
+            updates[`weekly_votes`] = null; 
+            updates['settings/global/last_cycle_id'] = cycleId;
+            
+            await update(ref(db), updates);
+            window.location.reload(); 
+        }
 
         async function loadPaketData() {
             try {
@@ -876,38 +949,21 @@
             window.location.hash = "#pelanggan-dashboard"; window.location.reload();
         }
 
-        window.daftarBaru = async function(tipe) {
-            // Cegat jika yang diklik adalah tombol Apple
-            if(tipe === 'apple') {
-                return alert("Mohon maaf, login menggunakan Apple ID belum tersedia saat ini. Silakan gunakan metode login lainnya.");
-            }
-
+        document.getElementById('btnDaftarBaru').addEventListener('click', async () => {
             if(!document.getElementById('paket').value || !document.getElementById('waktu').value) return alert("Pilih paket & jadwal!");
-            try { 
-                const result = await signInWithPopup(auth, getProvider(tipe)); 
-                await simpanPendaftaran(result.user.email); 
-            } catch (e) { alert("Login dibatalkan atau gagal"); }
-        }
+            try { const result = await signInWithPopup(auth, provider); await simpanPendaftaran(result.user.email); } 
+            catch (e) { alert("Login dibatalkan"); }
+        });
 
-        window.loginPelanggan = async function(tipe) {
-            // Cegat jika yang diklik adalah tombol Apple
-            if(tipe === 'apple') {
-                return alert("Mohon maaf, login menggunakan Apple ID belum tersedia saat ini. Silakan gunakan metode login lainnya.");
-            }
-
+        document.getElementById('loginExistingBtn').addEventListener('click', async () => {
             try {
-                const res = await signInWithPopup(auth, getProvider(tipe)); 
-                currentUserData = res.user;
-                document.getElementById('existingUserPanel').classList.add('hidden'); 
-                document.getElementById('dataDiriGroup').classList.add('hidden'); 
-                document.getElementById('btnDaftarBaru').classList.add('hidden');
-                document.getElementById('btnSimpanJadwalSaja').classList.remove('hidden'); 
-                document.getElementById('userGreeting').classList.remove('hidden');
-                document.getElementById('userGreeting').innerHTML = `<i class="fas fa-check-circle mr-2"></i> Berhasil Login! Halo, ${currentUserData.displayName || 'Pelanggan'}. Pilih Jadwal Anda:`;
-                document.getElementById('nama').value = currentUserData.displayName || ''; 
-                document.getElementById('nohp').value = "000";
+                const res = await signInWithPopup(auth, provider); currentUserData = res.user;
+                document.getElementById('existingUserPanel').classList.add('hidden'); document.getElementById('dataDiriGroup').classList.add('hidden'); document.getElementById('btnDaftarBaru').classList.add('hidden');
+                document.getElementById('btnSimpanJadwalSaja').classList.remove('hidden'); document.getElementById('userGreeting').classList.remove('hidden');
+                document.getElementById('userGreeting').innerHTML = `<i class="fas fa-check-circle mr-2"></i> Berhasil Login! Halo, ${currentUserData.displayName}. Pilih Jadwal Anda:`;
+                document.getElementById('nama').value = currentUserData.displayName; document.getElementById('nohp').value = "000";
             } catch(e) {}
-        }
+        });
 
         document.getElementById('registrationForm').addEventListener('submit', async (e) => { e.preventDefault(); if(currentUserData) await simpanPendaftaran(currentUserData.email); });
 
@@ -917,7 +973,7 @@
         const navBtns = [document.getElementById('navLoginPelangganBtn'), document.getElementById('mobileNavLoginBtn'), document.getElementById('heroLoginBtn')];
         navBtns.forEach(btn => btn.addEventListener('click', async () => {
             document.getElementById('mobileMenuDropdown').classList.add('hidden'); 
-            if(!auth.currentUser) { try { await signInWithPopup(auth, googleProvider); } catch(e) { return; } }
+            if(!auth.currentUser) { try { await signInWithPopup(auth, provider); } catch(e) { return; } }
             tampilkanDasbor(auth.currentUser);
         }));
 
@@ -1189,8 +1245,11 @@
                 
                 snap.forEach(child => {
                     const v = child.val();
-                    let b = v.jenis === "Diskon %" ? v.besaran+"%" : "Rp "+parseInt(v.besaran).toLocaleString('id-ID');
-                    
+                    let b = "";
+                    if(v.jenis === "Diskon %") b = v.besaran + "%";
+                    else if(v.jenis === "Cinderamata") b = v.besaran;
+                    else b = "Rp " + parseInt(v.besaran).toLocaleString('id-ID');
+
                     if(v.pemilik === user.email && v.status === 'aktif') {
                         hasAktif = true;
                         vAktifList.innerHTML += `
@@ -1394,43 +1453,67 @@
         });
 
         function loadPublicGallery() {
-            onValue(ref(db, 'homepage_photos'), (snap) => {
-                const pGrid = document.getElementById('publicGalleryGrid'); const potwGrid = document.getElementById('potwGalleryGrid');
-                pGrid.innerHTML = ''; potwGrid.innerHTML = '';
+            // Tampilkan Jawara Minggu Lalu (Top 3) & Hall of Fame
+            onValue(ref(db, 'potw_winners'), (snap) => {
+                const potwGrid = document.getElementById('potwGalleryGrid'); potwGrid.innerHTML = '';
+                const hofList = document.getElementById('hallOfFameList'); hofList.innerHTML = '';
+                const hofWidget = document.getElementById('hallOfFameWidget');
+                
                 if(snap.exists()) {
-                    let photos = []; snap.forEach(c => { let p = c.val(); p.key = c.key; photos.push(p); });
-                    
-                    let sortedForPotw = [...photos].sort((a,b) => (b.likes||0) - (a.likes||0));
-                    let top5 = sortedForPotw.slice(0, 5).filter(p => (p.likes||0) > 0); 
+                    let winners = []; snap.forEach(c => winners.push({key: c.key, ...c.val()}));
+                    let currentWinners = winners.filter(w => w.cycleId === globalSettings.last_cycle_id);
+                    let hallOfFame = winners.filter(w => w.rank === 1).sort((a,b) => b.cycleId - a.cycleId);
 
-                    if(top5.length > 0) {
-                        top5.forEach((p, index) => {
-                            const dlUrlPub = p.url.replace('/upload/', '/upload/fl_attachment/');
-                            let winnerUI = "";
-                            if(index === 0) {
-                                winnerUI = `<div class="absolute -top-4 -left-2 text-yellow-400 text-4xl crown-glow z-20 transform -rotate-12"><i class="fas fa-crown"></i></div><div class="absolute top-2 left-8 bg-gradient-to-r from-yellow-400 to-yellow-600 text-xs text-gray-900 font-bold px-3 py-1 rounded-full z-10 shadow border border-yellow-200">#1 JUARA</div>`;
-                            }
+                    // Render Top 3 Minggu Lalu
+                    if(currentWinners.length > 0) {
+                        currentWinners.sort((a,b) => a.rank - b.rank).forEach((p, index) => {
+                            let rankUI = `<div class="absolute top-2 left-2 bg-gradient-to-r from-gray-200 to-gray-400 text-xs text-gray-900 font-bold px-3 py-1 rounded-full z-10 shadow border border-gray-100">#${p.rank}</div>`;
+                            if(p.rank === 1) rankUI = `<div class="absolute -top-4 -left-2 text-yellow-400 text-4xl crown-glow z-20 transform -rotate-12"><i class="fas fa-crown"></i></div><div class="absolute top-2 left-8 bg-gradient-to-r from-yellow-400 to-yellow-600 text-xs text-gray-900 font-bold px-3 py-1 rounded-full z-10 shadow border border-yellow-200">#1 JUARA</div>`;
                             
                             potwGrid.innerHTML += `
-                                <div class="rounded-xl overflow-hidden shadow-lg aspect-square bg-gray-800 relative transform transition ${index===0 ? 'scale-105 ring-4 ring-yellow-400 shadow-[0_0_20px_#facc15] z-10' : 'border-2 border-yellow-500'} cursor-pointer" onclick="openPublicModal('${p.url}', '${dlUrlPub}')">
-                                    ${winnerUI}
+                                <div class="col-span-1 rounded-xl overflow-hidden shadow-lg aspect-square bg-gray-800 relative transform transition ${p.rank===1 ? 'scale-105 ring-4 ring-yellow-400 shadow-[0_0_20px_#facc15] z-10' : 'border-2 border-gray-400 opacity-90'}">
+                                    ${rankUI}
                                     <img src="${p.url}" class="w-full h-full object-cover">
                                     <div class="absolute bottom-0 w-full bg-gradient-to-t from-black/90 to-transparent p-4 text-left pointer-events-none">
                                         <p class="font-bold text-sm truncate">${p.ownerName}</p>
                                         <p class="text-xs text-yellow-400 font-bold mt-1"><i class="fas fa-heart mr-1"></i> ${p.likes} Suka</p>
                                     </div>
                                 </div>`;
-                            
                             if(auth.currentUser && auth.currentUser.email === p.ownerEmail) { cekDanBerikanRewardPOTW(p.key, p.ownerEmail); }
                         });
-                    } else { potwGrid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-5">Belum ada foto yang mendapat Like minggu ini.</div>`; }
+                    } else { potwGrid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-5">Belum ada pemenang di rekapitulasi pekan lalu.</div>`; }
 
+                    // Render Hall of Fame
+                    if(hallOfFame.length > 0) {
+                        hofWidget.classList.remove('hidden');
+                        hallOfFame.forEach(p => {
+                            const dateStr = new Date(p.cycleId).toLocaleDateString('id-ID', {day:'numeric', month:'short'});
+                            hofList.innerHTML += `
+                                <div class="relative rounded-lg overflow-hidden border border-yellow-200 shadow aspect-square group cursor-pointer" onclick="openPublicModal('${p.url}', '${p.url.replace('/upload/', '/upload/fl_attachment/')}')">
+                                    <img src="${p.url}" class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 bg-black/60 flex flex-col justify-end p-1 text-[8px] text-white leading-tight opacity-0 group-hover:opacity-100 transition"><span class="font-bold text-yellow-300 truncate">${p.ownerName}</span><span>${dateStr}</span></div>
+                                </div>`;
+                        });
+                    }
+                } else { potwGrid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-5">Belum ada pemenang.</div>`; }
+            });
+
+            // Tampilkan Galeri Publik (Lomba Berlangsung)
+            onValue(ref(db, 'homepage_photos'), (snap) => {
+                const pGrid = document.getElementById('publicGalleryGrid'); pGrid.innerHTML = '';
+                if(snap.exists()) {
+                    let photos = []; snap.forEach(c => { let p = c.val(); p.key = c.key; photos.push(p); });
+                    
                     photos.sort((a,b) => b.timestamp - a.timestamp).forEach(p => {
-                        const curUserEmail = auth.currentUser ? formatSafeEmail(auth.currentUser.email) : null;
-                        const userVote = (curUserEmail && p.voters && p.voters[curUserEmail]) ? p.voters[curUserEmail] : null;
-                        const likeColor = userVote === 'like' ? 'text-blue-600 bg-blue-100 border-blue-300' : 'text-gray-500 bg-gray-100 hover:bg-gray-200 border-transparent';
-                        const dislikeColor = userVote === 'dislike' ? 'text-red-600 bg-red-100 border-red-300' : 'text-gray-500 bg-gray-100 hover:bg-gray-200 border-transparent';
                         const dlUrlPub = p.url.replace('/upload/', '/upload/fl_attachment/');
+                        
+                        // Sembunyikan tombol Like jika foto sudah menang di minggu sebelumnya
+                        let btnUI = "";
+                        if(p.isWinner) {
+                            btnUI = `<span class="text-[10px] font-bold text-yellow-500 bg-yellow-50 px-2 py-1 rounded border border-yellow-200"><i class="fas fa-crown mr-1"></i>Mantan Juara</span>`;
+                        } else {
+                            btnUI = `<button onclick="votePhoto('${p.key}')" class="bg-gray-100 hover:bg-blue-100 text-gray-600 hover:text-blue-600 text-xs font-bold px-4 py-1.5 rounded-lg transition flex items-center border shadow-sm"><i class="fas fa-heart mr-1"></i> ${p.likes||0}</button>`;
+                        }
 
                         pGrid.innerHTML += `
                             <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition border border-gray-100 pb-3 flex flex-col group">
@@ -1439,10 +1522,7 @@
                                 </div>
                                 <div class="px-4 pt-4 flex justify-between items-center">
                                     <span class="text-xs font-bold text-gray-800 truncate flex-1"><i class="fas fa-user-circle text-gray-400 mr-1"></i>${p.ownerName}</span>
-                                    <div class="flex gap-2">
-                                        <button onclick="votePhoto('${p.key}', 'like')" class="${likeColor} text-xs font-bold px-3 py-1.5 rounded-lg transition flex items-center border shadow-sm"><i class="fas fa-thumbs-up mr-1"></i> ${p.likes||0}</button>
-                                        <button onclick="votePhoto('${p.key}', 'dislike')" class="${dislikeColor} text-xs font-bold px-3 py-1.5 rounded-lg transition flex items-center border shadow-sm"><i class="fas fa-thumbs-down mr-1"></i> ${p.dislikes||0}</button>
-                                    </div>
+                                    ${btnUI}
                                 </div>
                             </div>`;
                     });
@@ -1450,38 +1530,57 @@
             });
         }
 
-        window.votePhoto = async function(photoKey, type) {
+        window.votePhoto = async function(photoKey) {
             if(!auth.currentUser) {
                 alert("Silakan Login Akun terlebih dahulu untuk memberikan dukungan!");
                 document.getElementById('heroLoginBtn').click();
                 return;
             }
+            if(window.currentCycleId === "LIBUR") return alert("Mohon maaf, event Photo of the Week minggu ini sedang Diliburkan.");
+            if(window.isRekapitulasi) return alert("📢 MOHON DITUNGGU\n\nSistem saat ini sedang dalam proses perhitungan suara (Berakhir jam 12:00 siang). Silakan kembali setelah proses rekapitulasi selesai.");
+
             const safeEmail = formatSafeEmail(auth.currentUser.email);
+            const voteRef = ref(db, `weekly_votes/${window.currentCycleId}/${safeEmail}`);
+            const cekVote = await get(voteRef);
             
             const snap = await get(ref(db, `homepage_photos/${photoKey}`));
             if(!snap.exists()) return;
-            const p = snap.val();
-            let voters = p.voters || {};
-            let l = p.likes || 0; let d = p.dislikes || 0;
+            let l = snap.val().likes || 0;
             
-            const oldVote = voters[safeEmail];
-            if(oldVote === type) return; 
-            
-            if(oldVote === 'like') l--;
-            if(oldVote === 'dislike') d--;
-            if(type === 'like') l++;
-            if(type === 'dislike') d++;
-            voters[safeEmail] = type;
-            
-            await update(ref(db, `homepage_photos/${photoKey}`), { likes: l, dislikes: d, voters: voters });
+            if(cekVote.exists()) {
+                const votedPhoto = cekVote.val();
+                if(votedPhoto === photoKey) {
+                    // Batalkan Like jika menekan foto yang sama
+                    await update(ref(db, `homepage_photos/${photoKey}`), { likes: l > 0 ? l - 1 : 0 });
+                    await remove(voteRef);
+                } else {
+                    alert("⚠️ JATAH HABIS\n\nAnda sudah menggunakan jatah 1 Like untuk pekan ini pada foto lain.\n\nSatu akun hanya diperbolehkan memberikan 1 dukungan per minggunya.");
+                }
+            } else {
+                // Berikan Like Baru
+                await update(ref(db, `homepage_photos/${photoKey}`), { likes: l + 1 });
+                await set(voteRef, photoKey);
+                alert("❤️ Berhasil! Dukungan Anda telah direkam.");
+            }
         }
 
         async function cekDanBerikanRewardPOTW(photoKey, ownerEmail) {
-            const vCode = "T5-" + photoKey.substring(photoKey.length - 4);
+            const vCode = "WIN-" + photoKey.substring(photoKey.length - 5).toUpperCase();
             const snap = await get(ref(db, 'vouchers/' + vCode));
             if(!snap.exists()) {
                 const expDate = new Date(); expDate.setMonth(expDate.getMonth() + 1); 
-                await set(ref(db, 'vouchers/' + vCode), { status: 'aktif', pemilik: ownerEmail, jenis: 'Diskon %', besaran: '20', max_diskon: 15000, expired: expDate.toISOString().split('T')[0] });
+                let rType = globalSettings.rewardType || 'Diskon %';
+                let rVal = globalSettings.rewardValue || '20';
+                
+                await set(ref(db, 'vouchers/' + vCode), { 
+                    status: 'aktif', 
+                    pemilik: ownerEmail, 
+                    jenis: rType, 
+                    besaran: rVal, 
+                    max_diskon: rType === 'Diskon %' ? 15000 : 0, 
+                    expired: expDate.toISOString().split('T')[0],
+                    dibuatPada: Date.now()
+                });
             }
         }
     </script>
