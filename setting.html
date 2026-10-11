@@ -23,296 +23,249 @@
 <body class="bg-gray-100 p-4 md:p-6 min-h-screen" style="visibility: hidden;" id="mainBody">
     
     <div class="max-w-7xl mx-auto space-y-6">
-        <div class="flex justify-between items-center mb-6 border-b border-gray-300 pb-4">
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-800"><i class="fas fa-user-shield text-blue-600 mr-2"></i>Dasbor Admin</h1>
-            <div class="flex gap-2">
-                <a href="index.html" target="_blank" class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-4 py-2 rounded-lg font-bold text-sm shadow transition"><i class="fas fa-external-link-alt mr-1"></i>Lihat Web</a>
-                <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow transition">Keluar</button>
+        <!-- Header & Navigasi -->
+        <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border-b-4 border-blue-600 mb-6 sticky top-0 z-50">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-4 pb-4 border-b border-gray-100">
+                <h1 class="text-2xl font-bold text-gray-800"><i class="fas fa-user-shield text-blue-600 mr-2"></i>Dasbor Admin</h1>
+                <div class="flex gap-2">
+                    <a href="index.html" target="_blank" class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-4 py-2 rounded-lg font-bold text-sm transition"><i class="fas fa-external-link-alt mr-1"></i>Lihat Web</a>
+                    <button id="logoutBtn" class="bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2 rounded-lg font-bold text-sm transition">Keluar</button>
+                </div>
+            </div>
+            
+            <!-- Menu Tabs -->
+            <div class="flex overflow-x-auto gap-2 custom-scrollbar pb-2">
+                <button onclick="switchAdminTab('tab-antrean')" id="btn-tab-antrean" class="admin-tab-btn bg-blue-600 text-white shadow-md whitespace-nowrap px-5 py-2 font-bold text-sm rounded-lg transition"><i class="fas fa-clipboard-list mr-2"></i>Antrean & POS</button>
+                <button onclick="switchAdminTab('tab-promo')" id="btn-tab-promo" class="admin-tab-btn bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap px-5 py-2 font-bold text-sm rounded-lg transition"><i class="fas fa-ticket-alt mr-2"></i>Voucher & Promo</button>
+                <button onclick="switchAdminTab('tab-paket')" id="btn-tab-paket" class="admin-tab-btn bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap px-5 py-2 font-bold text-sm rounded-lg transition"><i class="fas fa-box-open mr-2"></i>Paket & Add-ons</button>
+                <button onclick="switchAdminTab('tab-pelanggan')" id="btn-tab-pelanggan" class="admin-tab-btn bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap px-5 py-2 font-bold text-sm rounded-lg transition"><i class="fas fa-users mr-2"></i>Pelanggan & Ulasan</button>
+                <button onclick="switchAdminTab('tab-pengaturan')" id="btn-tab-pengaturan" class="admin-tab-btn bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap px-5 py-2 font-bold text-sm rounded-lg transition"><i class="fas fa-cog mr-2"></i>Pengaturan Web</button>
             </div>
         </div>
 
         <!-- ========================================== -->
-        <!-- ROW 1: PENGATURAN GLOBAL, PAKET & ADD-ONS  -->
+        <!-- TAB 1: MANAJEMEN ANTREAN                   -->
         <!-- ========================================== -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Pengaturan Global Web & Dasbor -->
-            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-indigo-500 lg:col-span-2">
-                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-sliders-h text-indigo-500 mr-2"></i>Pengaturan Dasbor & Promosi</h2>
+        <div id="tab-antrean" class="admin-tab-content block space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-blue-500">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800">Antrean Hari Ini</h2>
+                        <p class="text-xs text-gray-500 mt-1">Gunakan panah (↑/↓) untuk menukar urutan antrean jika diperlukan.</p>
+                    </div>
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <a href="pos.html" target="_blank" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg font-bold text-sm shadow flex-1 md:flex-none text-center transition"><i class="fas fa-cash-register mr-1"></i> Buka POS</a>
+                        <button id="btnOpenOfflineModal" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-lg font-bold text-sm shadow flex-1 md:flex-none transition"><i class="fas fa-walking mr-1"></i> Walk-in (Offline)</button>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto border border-gray-200 rounded-xl custom-scrollbar">
+                    <table class="min-w-full table-auto text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-center text-gray-600 font-bold border-b">Antrean</th>
+                                <th class="px-4 py-3 text-left text-gray-600 font-bold border-b">Pelanggan & Kontak</th>
+                                <th class="px-4 py-3 text-left text-gray-600 font-bold border-b w-64">Paket & Addons</th>
+                                <th class="px-4 py-3 text-center text-gray-600 font-bold border-b w-40">Status / Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendaftarList" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: VOUCHER & PROMO                     -->
+        <!-- ========================================== -->
+        <div id="tab-promo" class="admin-tab-content hidden space-y-6">
+            <!-- Pengaturan Link Promo Spesial -->
+            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-cyan-500">
+                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-link text-cyan-500 mr-2"></i>Link Promo Medsos (Auto-Klaim)</h2>
+                <form id="promoLinkForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div><label class="block text-xs font-bold text-gray-600 mb-1">Kata Kunci Link (Tanpa Spasi)</label><input type="text" id="prmNama" placeholder="Cth: TAHUNBARU" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm uppercase font-voucher" required></div>
+                    <div><label class="block text-xs font-bold text-gray-600 mb-1">Batas Akhir Promosi</label><input type="date" id="prmDeadline" required class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm"></div>
+                    <div><label class="block text-xs font-bold text-gray-600 mb-1">Voucher Berlaku (Hari)</label><input type="number" id="prmValidDays" placeholder="Cth: 30" required min="1" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm"></div>
+                    <div class="bg-cyan-50 p-4 rounded-xl border border-cyan-200 md:col-span-3 grid grid-cols-1 md:grid-cols-4 gap-4 shadow-inner">
+                        <div><label class="block text-[10px] font-bold text-cyan-800 mb-1">Jenis Diskon</label><select id="prmJenis" required class="w-full border border-gray-300 rounded-lg p-2 bg-white text-sm"><option value="Diskon %">Persentase (%)</option><option value="Diskon Nominal">Nominal (Rp)</option></select></div>
+                        <div><label class="block text-[10px] font-bold text-cyan-800 mb-1" id="prmLabelBesaran">Besaran (%)</label><input type="text" id="prmBesaran" required placeholder="Cth: 20" class="w-full border border-gray-300 rounded-lg p-2 bg-white text-sm" oninput="if(document.getElementById('prmJenis').value === 'Diskon Nominal') this.value = formatRupiahLive(this.value); else { this.value = this.value.replace(/[^0-9]/g, ''); if(parseInt(this.value) > 100) this.value = '100'; }"></div>
+                        <div id="prmMaxContainer"><label class="block text-[10px] font-bold text-cyan-800 mb-1">Max Diskon (Rp)</label><input type="text" id="prmMax" placeholder="Cth: 15000" class="w-full border border-gray-300 rounded-lg p-2 bg-white text-sm" oninput="this.value = formatRupiahLive(this.value)"></div>
+                        <div><label class="block text-[10px] font-bold text-cyan-800 mb-1">Minimal Belanja (Rp)</label><input type="text" id="prmMinSpend" placeholder="Cth: 100000" required class="w-full border border-gray-300 rounded-lg p-2 bg-white text-sm" oninput="this.value = formatRupiahLive(this.value)"></div>
+                    </div>
+                    <div class="md:col-span-3 flex justify-between items-center mt-2">
+                        <div class="text-xs text-gray-500">Link untuk disebar: <br><strong id="generatedPromoLink" class="text-blue-600 bg-blue-50 px-2 py-1 rounded border border-blue-200 mt-1 inline-block select-all">https://photoboothku.github.io/?promo=</strong></div>
+                        <button type="submit" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-6 rounded-lg transition shadow-md text-sm"><i class="fas fa-save mr-2"></i>Simpan Promo</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Panel Generator Voucher (Kiri) -->
+                <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-yellow-500 lg:col-span-1">
+                    <h2 class="text-lg font-bold mb-4 text-gray-800">Buat Voucher Sistem</h2>
+                    <form id="voucherGeneratorForm" class="space-y-3">
+                        <input type="hidden" id="editVoucherMode" value="">
+                        <div><label class="block text-xs font-bold text-gray-700 mb-1">Kode Voucher (Kosongkan = Acak)</label><input type="text" id="vCode" placeholder="Cth: PROMO20" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm uppercase font-voucher"></div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">Jenis Diskon</label><select id="vJenis" required class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm" onchange="toggleMaxDiskon()"><option value="Diskon %">Persentase (%)</option><option value="Diskon Nominal">Nominal (Rp)</option></select></div>
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1" id="labelBesaran">Besaran (%)</label><input type="text" id="vBesaran" required placeholder="Cth: 20" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm" oninput="formatInputBesaran(this)"></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div id="vMaxDiskonContainer" class="block"><label class="block text-xs font-bold text-gray-700 mb-1">Maks Diskon (Rp)</label><input type="text" id="vMaxDiskon" placeholder="Cth: 15000" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm" oninput="this.value = formatRupiahLive(this.value)"></div>
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">Min Belanja (Rp)</label><input type="text" id="vMinSpend" placeholder="Cth: 0 (Bebas)" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm" oninput="this.value = formatRupiahLive(this.value)"></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">Berlaku s/d</label><input type="date" id="vExpired" required class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm"></div>
+                            <div id="containerJumlah"><label class="block text-xs font-bold text-gray-700 mb-1">Jumlah Dibuat</label><input type="number" id="vJumlah" required min="1" max="100" value="1" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm"></div>
+                        </div>
+                        <div><label class="block text-xs font-bold text-gray-700 mb-1">Email Pemilik Khusus (Opsional)</label><input type="email" id="vPemilik" placeholder="Kosongkan jika untuk umum" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm"></div>
+                        <div class="flex gap-2 pt-2">
+                            <button type="button" id="btnBatalEditVoucher" onclick="batalEditVoucher()" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg text-sm transition">Batal</button>
+                            <button type="submit" id="btnSimpanVoucher" class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2 rounded-lg transition shadow-md text-sm">Simpan Voucher</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Daftar Voucher -->
+                <div class="bg-white p-6 rounded-2xl shadow lg:col-span-2">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold text-gray-800">Daftar Voucher Sistem</h2>
+                        <button onclick="eksporVoucherExcel(event)" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg shadow transition flex items-center text-xs"><i class="fas fa-file-excel mr-1"></i> Ekspor Excel</button>
+                    </div>
+                    <div class="overflow-x-auto h-[400px] border border-gray-200 rounded-xl custom-scrollbar">
+                        <table class="min-w-full table-auto text-sm">
+                            <thead class="bg-gray-50 sticky top-0 z-10 shadow-sm">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-gray-600 font-bold">Kode</th>
+                                    <th class="px-4 py-3 text-left text-gray-600 font-bold">Jenis & Aturan</th>
+                                    <th class="px-4 py-3 text-left text-gray-600 font-bold">Berlaku s/d</th>
+                                    <th class="px-4 py-3 text-left text-gray-600 font-bold">Status/Pemilik</th>
+                                    <th class="px-4 py-3 text-center text-gray-600 font-bold">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="voucherList" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: PAKET & ADD-ONS                     -->
+        <!-- ========================================== -->
+        <div id="tab-paket" class="admin-tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Daftar Paket Harga (Utama) -->
+                <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-green-500 lg:col-span-2">
+                    <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-box-open text-green-500 mr-2"></i>Paket Photobooth Utama</h2>
+                    <div class="mb-4 space-y-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <input type="hidden" id="paketId">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <input type="text" id="namaPaket" placeholder="Nama Paket (cth: Paket Grup)" required class="border border-gray-300 p-2 w-full rounded-lg text-sm">
+                            <input type="number" id="hargaPaket" placeholder="Harga (Rp)" required class="border border-gray-300 p-2 w-full rounded-lg text-sm">
+                        </div>
+                        <textarea id="deskripsiPaket" placeholder="Deskripsi/Detail paket..." rows="2" class="border border-gray-300 p-2 w-full rounded-lg text-sm"></textarea>
+                        <div class="flex gap-2">
+                            <button id="savePaketBtn" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-bold shadow text-sm transition">Simpan Paket</button>
+                            <button id="cancelEditBtn" class="hidden bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-bold text-sm">Batal</button>
+                        </div>
+                    </div>
+                    <ul id="paketList" class="space-y-3 max-h-64 overflow-y-auto pr-2 custom-scrollbar grid grid-cols-1 md:grid-cols-2 gap-3"></ul>
+                </div>
+
+                <!-- Harga Tambahan (Add-ons) -->
+                <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-pink-500 lg:col-span-1">
+                    <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-plus-circle text-pink-500 mr-2"></i>Harga Add-ons</h2>
+                    <form id="addonForm" class="space-y-3">
+                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Tambah Orang (Rp)</label><input type="number" id="hargaOrang" class="w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50" required></div>
+                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Tambah Lembar (Rp)</label><input type="number" id="hargaLembar" class="w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50" required></div>
+                        <div class="border-t border-gray-200 pt-3 mt-2">
+                            <label class="block text-xs font-bold text-gray-800 mb-2">Upgrade Ukuran Cetak</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div><label class="block text-[10px] text-gray-500">2R</label><input type="number" id="harga2R" class="w-full border border-gray-300 rounded p-1.5 text-xs bg-gray-100" value="0" readonly></div>
+                                <div><label class="block text-[10px] text-gray-500">4R (+Rp)</label><input type="number" id="harga4R" class="w-full border border-gray-300 rounded p-1.5 text-xs bg-gray-50" required></div>
+                                <div><label class="block text-[10px] text-gray-500">10 Inci (+Rp)</label><input type="number" id="harga10Inci" class="w-full border border-gray-300 rounded p-1.5 text-xs bg-gray-50" required></div>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 rounded-lg text-sm shadow transition mt-2"><i class="fas fa-save mr-1"></i> Simpan Add-ons</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: PELANGGAN & ULASAN                  -->
+        <!-- ========================================== -->
+        <div id="tab-pelanggan" class="admin-tab-content hidden space-y-6">
+            <!-- Data Member -->
+            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-orange-500">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+                    <div class="flex items-center gap-3"><h2 class="text-xl font-bold text-gray-800">Database Member</h2><span class="text-xs font-bold text-white bg-orange-500 px-3 py-1 rounded-full shadow" id="totalMembers">Total: 0</span></div>
+                    <div class="w-full md:w-64 relative"><i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i><input type="text" id="searchMember" placeholder="Cari Nama / Email..." class="w-full border border-gray-300 rounded-lg p-2 pl-9 bg-gray-50 focus:ring-2 focus:ring-orange-500 focus:bg-white text-sm transition"></div>
+                </div>
+                <div class="overflow-x-auto border border-gray-200 rounded-xl custom-scrollbar max-h-[300px]">
+                    <table class="min-w-full table-auto text-sm">
+                        <thead class="bg-gray-50 sticky top-0 z-10 shadow-sm">
+                            <tr><th class="px-4 py-3 text-left font-bold">Email</th><th class="px-4 py-3 text-left font-bold">Nama Lengkap</th><th class="px-4 py-3 text-left font-bold">Total Order</th><th class="px-4 py-3 text-left font-bold">Tingkatan</th><th class="px-4 py-3 text-center font-bold">Aksi</th></tr>
+                        </thead>
+                        <tbody id="memberList" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Moderasi & Ulasan -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-red-500"><h2 class="text-lg font-bold mb-3"><i class="fas fa-images text-red-500 mr-2"></i>Moderasi Galeri Publik</h2><div id="publicGalleryModeration" class="grid grid-cols-2 gap-3 max-h-64 overflow-y-auto p-1 custom-scrollbar"></div></div>
+                <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-green-500"><h2 class="text-lg font-bold mb-3"><i class="fas fa-star text-yellow-400 mr-2"></i>Ulasan Pelanggan</h2><ul id="testimoniListAdmin" class="space-y-3 max-h-64 overflow-y-auto pr-2 custom-scrollbar"></ul></div>
+                <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-purple-500"><h2 class="text-lg font-bold mb-3"><i class="fas fa-envelope-open-text text-purple-500 mr-2"></i>Kotak Saran</h2><ul id="saranListAdmin" class="space-y-3 max-h-64 overflow-y-auto pr-2 custom-scrollbar"></ul></div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 5: PENGATURAN WEB & DASBOR             -->
+        <!-- ========================================== -->
+        <div id="tab-pengaturan" class="admin-tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-indigo-500">
+                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-sliders-h text-indigo-500 mr-2"></i>Pengaturan Inti Sistem</h2>
                 <form id="globalSettingsForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Target Reward Belanja (Loyalty)</label>
-                        <div class="flex items-center bg-gray-50 border border-gray-300 rounded-lg p-2 focus-within:ring-2 focus-within:ring-indigo-500">
-                            <span class="text-gray-500 font-bold mr-2">Rp</span>
-                            <input type="number" id="setTargetSpend" class="w-full bg-transparent focus:outline-none font-bold text-gray-800" placeholder="500000">
-                        </div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Target Reward Loyalty (Rp)</label>
+                        <input type="number" id="setTargetSpend" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 focus:ring-2 focus:ring-indigo-500" placeholder="500000">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Hari Rekapitulasi Photo of the Week</label>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Hari Rekap Photo of the Week</label>
                         <select id="setPotwDeadline" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 focus:ring-2 focus:ring-indigo-500 text-sm">
-                            <option value="libur">🛑 Libur (Tidak ada event)</option>
-                            <option value="0">Minggu</option>
-                            <option value="1">Senin</option>
-                            <option value="2">Selasa</option>
-                            <option value="3">Rabu</option>
-                            <option value="4">Kamis</option>
-                            <option value="5">Jumat</option>
-                            <option value="6">Sabtu</option>
+                            <option value="libur">🛑 Libur (Tidak ada event)</option><option value="0">Minggu</option><option value="1">Senin</option><option value="2">Selasa</option><option value="3">Rabu</option><option value="4">Kamis</option><option value="5">Jumat</option><option value="6">Sabtu</option>
                         </select>
-                        <p class="text-[10px] text-gray-500 mt-1">Pada hari ini jam 00:00 - 12:00 siang voting dinonaktifkan. Jam 12:01 sistem otomatis mengunci juara dan mereset voting.</p>
                     </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Upload Banner Promo (Tampil di Dasbor Pelanggan & Beranda)</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="setBannerUrl" readonly class="w-full border border-gray-300 rounded-lg p-2 bg-gray-100 text-gray-500 text-sm" placeholder="URL Banner akan muncul di sini setelah upload">
-                            <button type="button" id="btnUploadBannerPromo" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg shadow whitespace-nowrap transition"><i class="fas fa-cloud-upload-alt mr-2"></i>Upload Gambar</button>
-                        </div>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Teks Promo & Penawaran Khusus Dasbor Pelanggan</label>
-                        <textarea id="setPromoText" rows="2" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 focus:ring-2 focus:ring-indigo-500" placeholder="Ketik info promo untuk pelanggan di sini..."></textarea>
-                    </div>
-                    <!-- TAMBAHAN BARU: Input Embed LumaBooth -->
-                    <div class="md:col-span-2 p-4 bg-purple-50 border border-purple-200 rounded-xl shadow-inner mt-2">
-                        <label class="block text-xs font-bold text-purple-800 mb-1"><i class="fas fa-camera-retro mr-1"></i> Link Embed Live Gallery LumaBooth (Fotoshare)</label>
-                        <input type="url" id="setLumaBoothUrl" class="w-full border border-purple-300 rounded-lg p-2 bg-white focus:ring-2 focus:ring-purple-500 text-sm" placeholder="Paste link src dari iframe (contoh: https://fotoshare.co/e/xxxxxxx)">
-                        <p class="text-[10px] text-purple-600 mt-1">Hanya ambil link dari atribut <strong>src="..."</strong> pada kode embed LumaBooth. Kosongkan jika event sudah selesai.</p>
-                    </div>
-                    <!-- Pengaturan Hadiah POTW Dinamis -->
+                    
                     <div class="md:col-span-2 p-4 bg-yellow-50 border border-yellow-200 rounded-xl shadow-inner mt-2">
-                        <label class="block text-xs font-bold text-yellow-800 mb-2"><i class="fas fa-gift mr-1"></i> Pengaturan Hadiah Photo of the Week (Top 3)</label>
+                        <label class="block text-xs font-bold text-yellow-800 mb-2"><i class="fas fa-gift mr-1"></i> Hadiah Photo of the Week (Top 3)</label>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-[10px] font-bold text-gray-600 mb-1">Jenis Hadiah</label>
-                                <select id="setRewardType" class="w-full border border-gray-300 rounded-lg p-2 bg-white focus:ring-2 focus:ring-yellow-500 text-sm">
-                                    <option value="Diskon %">Voucher Diskon (%)</option>
-                                    <option value="Diskon Nominal">Voucher Potongan (Rp)</option>
-                                    <option value="Saldo E-Wallet">Saldo E-Wallet (Rp)</option>
-                                    <option value="Cinderamata">Barang / Cinderamata</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-gray-600 mb-1">Besaran / Keterangan</label>
-                                <input type="text" id="setRewardValue" placeholder="Cth: 20 atau Mug Custom" class="w-full border border-gray-300 rounded-lg p-2 bg-white focus:ring-2 focus:ring-yellow-500 text-sm">
-                            </div>
+                            <div><select id="setRewardType" class="w-full border border-gray-300 rounded-lg p-2 bg-white text-sm"><option value="Diskon %">Voucher Diskon (%)</option><option value="Diskon Nominal">Voucher Potongan (Rp)</option><option value="Saldo E-Wallet">Saldo E-Wallet (Rp)</option><option value="Cinderamata">Barang / Cinderamata</option></select></div>
+                            <div><input type="text" id="setRewardValue" placeholder="Cth: 20 atau Mug Custom" class="w-full border border-gray-300 rounded-lg p-2 bg-white text-sm"></div>
                         </div>
                     </div>
-                    <div class="md:col-span-2 text-right">
-                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg shadow transition">Simpan Pengaturan</button>
+
+                    <div class="md:col-span-2 border-t border-gray-200 pt-4 mt-2">
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Upload Banner Dasbor Pelanggan</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="setBannerUrl" readonly class="w-full border border-gray-300 rounded-lg p-2 bg-gray-100 text-gray-500 text-sm">
+                            <button type="button" id="btnUploadBannerPromo" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg shadow whitespace-nowrap"><i class="fas fa-cloud-upload-alt"></i> Upload</button>
+                        </div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Teks Promo Dasbor</label>
+                        <textarea id="setPromoText" rows="2" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 focus:ring-2 focus:ring-indigo-500"></textarea>
+                    </div>
+                    <div class="md:col-span-2 p-4 bg-purple-50 border border-purple-200 rounded-xl shadow-inner mt-2">
+                        <label class="block text-xs font-bold text-purple-800 mb-1"><i class="fas fa-camera-retro mr-1"></i> Link Embed Live Gallery (LumaBooth)</label>
+                        <input type="url" id="setLumaBoothUrl" class="w-full border border-purple-300 rounded-lg p-2 bg-white focus:ring-2 focus:ring-purple-500 text-sm">
+                    </div>
+                    <div class="md:col-span-2 text-right mt-4">
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition">Simpan Pengaturan Web</button>
                     </div>
                 </form>
-            </div>
-
-            <!-- Harga Tambahan (Add-ons) Baru -->
-            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-pink-500 lg:col-span-1">
-                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-plus-circle text-pink-500 mr-2"></i>Harga Tambahan (Add-ons)</h2>
-                <form id="addonForm" class="space-y-3">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Tambah Orang (Rp/Orang)</label>
-                        <input type="number" id="hargaOrang" class="w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50" placeholder="Contoh: 10000" value="0" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Tambah Lembar Cetak (Rp/Lembar)</label>
-                        <input type="number" id="hargaLembar" class="w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50" placeholder="Contoh: 15000" value="0" required>
-                    </div>
-                    <div class="border-t border-gray-200 pt-3 mt-2">
-                        <label class="block text-xs font-bold text-gray-800 mb-2">Biaya Upgrade Ukuran Cetak</label>
-                        <div class="grid grid-cols-3 gap-2">
-                            <div>
-                                <label class="block text-[10px] text-gray-500">2R (Default)</label>
-                                <input type="number" id="harga2R" class="w-full border border-gray-300 rounded p-1.5 text-xs bg-gray-100" value="0" readonly title="Ukuran standar gratis">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] text-gray-500">4R (+Rp)</label>
-                                <input type="number" id="harga4R" class="w-full border border-gray-300 rounded p-1.5 text-xs bg-gray-50" placeholder="5000" value="0" required>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] text-gray-500">10 Inci (+Rp)</label>
-                                <input type="number" id="harga10Inci" class="w-full border border-gray-300 rounded p-1.5 text-xs bg-gray-50" placeholder="20000" value="0" required>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 rounded-lg text-sm shadow transition mt-2"><i class="fas fa-save mr-1"></i> Simpan Add-ons</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- ========================================== -->
-        <!-- ROW 1.5: PAKET & VOUCHER GENERATOR         -->
-        <!-- ========================================== -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Manajemen Paket Photobooth -->
-            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-green-500 lg:col-span-2">
-                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-box-open text-green-500 mr-2"></i>Daftar Paket Harga (Utama)</h2>
-                <div class="mb-4 space-y-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
-                    <input type="hidden" id="paketId">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <input type="text" id="namaPaket" placeholder="Nama Paket (cth: Paket Grup)" required class="border border-gray-300 p-2 w-full rounded-lg text-sm">
-                        <input type="number" id="hargaPaket" placeholder="Harga (Rp)" required class="border border-gray-300 p-2 w-full rounded-lg text-sm">
-                    </div>
-                    <textarea id="deskripsiPaket" placeholder="Deskripsi/Detail paket..." rows="2" class="border border-gray-300 p-2 w-full rounded-lg text-sm"></textarea>
-                    <div class="flex gap-2">
-                        <button id="savePaketBtn" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-bold shadow text-sm transition">Simpan Paket</button>
-                        <button id="cancelEditBtn" class="hidden bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-bold text-sm">Batal</button>
-                    </div>
-                </div>
-                <ul id="paketList" class="space-y-3 max-h-40 overflow-y-auto pr-2 custom-scrollbar grid grid-cols-1 md:grid-cols-2 gap-3"></ul>
-            </div>
-
-            <!-- Panel Generator Voucher (Kiri) -->
-            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-yellow-500 lg:col-span-1">
-                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-ticket-alt text-yellow-500 mr-2"></i>Buat Voucher Sistem</h2>
-                <form id="voucherGeneratorForm" class="space-y-3">
-                    <input type="hidden" id="editVoucherMode" value="">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Kode Voucher (Kosongkan untuk acak otomatis)</label>
-                        <input type="text" id="vCode" placeholder="Cth: PROMO20" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm uppercase font-voucher">
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Jenis Diskon</label>
-                            <select id="vJenis" required class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm" onchange="toggleMaxDiskon()">
-                                <option value="Diskon %">Persentase (%)</option>
-                                <option value="Diskon Nominal">Nominal (Rp)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1" id="labelBesaran">Besaran (%)</label>
-                            <input type="text" id="vBesaran" required placeholder="Cth: 20" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm" oninput="formatInputBesaran(this)">
-                        </div>
-                    </div>
-                    <div id="vMaxDiskonContainer" class="block">
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Maksimal Diskon (Rp)</label>
-                        <input type="text" id="vMaxDiskon" placeholder="Cth: 15000" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm" oninput="this.value = formatRupiahLive(this.value)">
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Berlaku s/d</label>
-                            <input type="date" id="vExpired" required class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm">
-                        </div>
-                        <div id="containerJumlah">
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Jumlah Dibuat</label>
-                            <input type="number" id="vJumlah" required min="1" max="100" value="1" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Kepemilikan Email (Opsional)</label>
-                        <input type="email" id="vPemilik" placeholder="Kosongkan jika untuk umum" class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm">
-                    </div>
-                    <div class="flex gap-2 pt-2">
-                        <button type="button" id="btnBatalEditVoucher" onclick="batalEditVoucher()" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2.5 px-4 rounded-lg text-sm shadow transition">Batal</button>
-                        <button type="submit" id="btnSimpanVoucher" class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2.5 rounded-lg transition shadow-md text-sm">Simpan Voucher</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- ========================================== -->
-        <!-- ROW 2: VOUCHER LIST                        -->
-        <!-- ========================================== -->
-        <div class="bg-white p-6 rounded-2xl shadow">
-            <div class="flex justify-between items-center mb-4">
-    <h2 class="text-xl font-bold text-gray-800">Daftar Voucher Sistem</h2>
-    <button onclick="eksporVoucherExcel(event)" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg shadow transition flex items-center text-xs">
-        <i class="fas fa-file-excel mr-1"></i> Ekspor Excel
-    </button>
-</div>
-            <div class="overflow-x-auto h-80 border border-gray-200 rounded-xl custom-scrollbar">
-                <table class="min-w-full table-auto text-sm">
-                    <thead class="bg-gray-100 sticky top-0 z-10 shadow-sm">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-gray-600 font-bold">Kode Voucher</th>
-                            <th class="px-4 py-3 text-left text-gray-600 font-bold">Jenis & Besaran</th>
-                            <th class="px-4 py-3 text-left text-gray-600 font-bold">Berlaku s/d</th>
-                            <th class="px-4 py-3 text-left text-gray-600 font-bold">Status & Pemilik</th>
-                            <th class="px-4 py-3 text-center text-gray-600 font-bold">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="voucherList" class="divide-y divide-gray-100"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- ========================================== -->
-        <!-- ROW 3: MANAJEMEN ANTREAN                   -->
-        <!-- ========================================== -->
-        <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-blue-500">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                <div>
-                    <h2 class="text-xl font-bold text-gray-800"><i class="fas fa-clipboard-list text-blue-500 mr-2"></i>Manajemen Antrean Pesanan</h2>
-                    <p class="text-xs text-gray-500 mt-1">Antrean diurutkan berdasarkan Nomor. Anda dapat memindahkan posisi antrean dengan tombol panah (↑/↓).</p>
-                </div>
-                <div class="flex gap-2 w-full md:w-auto">
-                    <a href="pos.html" target="_blank" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg font-bold text-sm shadow flex-1 md:flex-none text-center transition"><i class="fas fa-cash-register mr-1"></i> Buka POS</a>
-                    <button id="btnOpenOfflineModal" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-lg font-bold text-sm shadow flex-1 md:flex-none transition"><i class="fas fa-walking mr-1"></i> Walk-in (Offline)</button>
-                </div>
-            </div>
-            
-            <div class="overflow-x-auto border border-gray-200 rounded-xl custom-scrollbar">
-                <table class="min-w-full table-auto text-sm">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="px-4 py-3 text-center text-gray-600 font-bold border-b">Antrean</th>
-                            <th class="px-4 py-3 text-left text-gray-600 font-bold border-b">Pelanggan & Kontak WA</th>
-                            <th class="px-4 py-3 text-left text-gray-600 font-bold border-b w-64">Paket, Addons & Waktu</th>
-                            <th class="px-4 py-3 text-center text-gray-600 font-bold border-b w-40">Status / Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pendaftarList" class="divide-y divide-gray-100"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- ========================================== -->
-        <!-- ROW 4: DATA MEMBER PELANGGAN SETIA         -->
-        <!-- ========================================== -->
-        <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-orange-500">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-                <div class="flex items-center gap-3">
-                    <h2 class="text-xl font-bold text-gray-800"><i class="fas fa-users text-orange-500"></i> Data Member</h2>
-                    <span class="text-xs font-bold text-white bg-orange-500 px-3 py-1 rounded-full shadow" id="totalMembers">Total: 0</span>
-                </div>
-                <div class="w-full md:w-64 relative">
-                    <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
-                    <input type="text" id="searchMember" placeholder="Cari Nama / Email..." class="w-full border border-gray-300 rounded-lg p-2 pl-9 bg-gray-50 focus:ring-2 focus:ring-orange-500 focus:bg-white text-sm transition">
-                </div>
-            </div>
-            
-            <div class="overflow-x-auto border border-gray-200 rounded-xl custom-scrollbar max-h-[400px]">
-                <table class="min-w-full table-auto text-sm">
-                    <thead class="bg-gray-100 sticky top-0 z-10 shadow-sm">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-gray-600 font-bold">Email Member</th>
-                            <th class="px-4 py-3 text-left text-gray-600 font-bold">Nama Lengkap</th>
-                            <th class="px-4 py-3 text-left text-gray-600 font-bold">Total Selesai</th>
-                            <th class="px-4 py-3 text-left text-gray-600 font-bold">Tingkatan</th>
-                            <th class="px-4 py-3 text-center text-gray-600 font-bold">Aksi (WA Promo & Foto)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="memberList" class="divide-y divide-gray-100"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- ========================================== -->
-        <!-- ROW 5: GALERI, TESTIMONI, DAN SARAN        -->
-        <!-- ========================================== -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Moderasi Galeri Publik -->
-            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-red-500">
-                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-images text-red-500 mr-2"></i>Moderasi Galeri Publik</h2>
-                <div id="publicGalleryModeration" class="grid grid-cols-2 md:grid-cols-2 gap-3 max-h-80 overflow-y-auto p-1 custom-scrollbar"></div>
-            </div>
-
-            <!-- Testimoni Bintang 5 -->
-            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-green-500">
-                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-star text-yellow-400 mr-2"></i>Ulasan Pelanggan</h2>
-                <ul id="testimoniListAdmin" class="space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar"></ul>
-            </div>
-
-            <!-- Kotak Saran -->
-            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-purple-500">
-                <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-envelope-open-text text-purple-500 mr-2"></i>Kotak Saran & Kritik</h2>
-                <ul id="saranListAdmin" class="space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar"></ul>
             </div>
         </div>
 
@@ -401,6 +354,25 @@
 
         function formatSafeEmail(email) { return email.replace(/[@.]/g, '_'); }
 
+        window.switchAdminTab = function(tabId) {
+            // Sembunyikan semua tab konten
+            document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.add('hidden'));
+            
+            // Kembalikan semua tombol ke warna abu-abu default
+            document.querySelectorAll('.admin-tab-btn').forEach(el => {
+                el.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
+                el.classList.add('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+            });
+            
+            // Munculkan tab yang dipilih
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            // Beri warna biru menyala pada tombol yang aktif
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.remove('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+            activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow-md');
+        }
+
         // ==========================================
         // 0. PENGATURAN GLOBAL DASBOR & WEB
         // ==========================================
@@ -476,6 +448,53 @@
             alert("Pengaturan Harga Add-ons berhasil disimpan!");
         });
 
+        // PENGATURAN LINK PROMO MEDSOS
+        const prmJenisEl = document.getElementById('prmJenis');
+        prmJenisEl.addEventListener('change', () => {
+            if(prmJenisEl.value === 'Diskon %') { document.getElementById('prmMaxContainer').classList.remove('hidden'); document.getElementById('prmLabelBesaran').innerText = 'Besaran (%)'; document.getElementById('prmBesaran').value = document.getElementById('prmBesaran').value.replace(/\./g, ''); } 
+            else { document.getElementById('prmMaxContainer').classList.add('hidden'); document.getElementById('prmLabelBesaran').innerText = 'Besaran (Rp)'; document.getElementById('prmBesaran').value = formatRupiahLive(document.getElementById('prmBesaran').value); }
+        });
+
+        document.getElementById('prmNama').addEventListener('input', (e) => {
+            const val = e.target.value.toUpperCase().replace(/\s+/g, ''); e.target.value = val;
+            document.getElementById('generatedPromoLink').innerText = `https://photoboothku.github.io/?promo=${val}`;
+        });
+
+        onValue(ref(db, 'settings/promo_link'), (snap) => {
+            if(snap.exists()) {
+                const d = snap.val();
+                document.getElementById('prmNama').value = d.nama || '';
+                document.getElementById('prmDeadline').value = d.deadline || '';
+                document.getElementById('prmValidDays').value = d.validDays || '';
+                document.getElementById('prmJenis').value = d.jenis || 'Diskon %';
+                document.getElementById('prmMinSpend').value = formatRupiahLive((d.minSpend || 0).toString());
+                
+                if(d.jenis === 'Diskon Nominal') document.getElementById('prmBesaran').value = formatRupiahLive((d.besaran || 0).toString());
+                else document.getElementById('prmBesaran').value = d.besaran || '';
+                
+                document.getElementById('prmMax').value = formatRupiahLive((d.maxDiskon || 0).toString());
+                prmJenisEl.dispatchEvent(new Event('change'));
+                document.getElementById('prmNama').dispatchEvent(new Event('input'));
+            }
+        });
+
+        document.getElementById('promoLinkForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const jenis = document.getElementById('prmJenis').value;
+            const data = {
+                nama: document.getElementById('prmNama').value,
+                deadline: document.getElementById('prmDeadline').value,
+                validDays: parseInt(document.getElementById('prmValidDays').value),
+                jenis: jenis,
+                besaran: jenis === 'Diskon Nominal' ? parseRupiahAsli(document.getElementById('prmBesaran').value) : parseInt(document.getElementById('prmBesaran').value),
+                maxDiskon: parseRupiahAsli(document.getElementById('prmMax').value),
+                minSpend: parseRupiahAsli(document.getElementById('prmMinSpend').value),
+                updatedAt: Date.now()
+            };
+            await set(ref(db, 'settings/promo_link'), data);
+            alert("Sistem Promo Link berhasil diperbarui dan siap disebarkan!");
+        });
+
         // ==========================================
         // 1. FITUR VOUCHER GENERATOR & LIST
         // ==========================================
@@ -524,6 +543,8 @@
                 if(data.jenis === 'Diskon %') { document.getElementById('vBesaran').value = data.besaran; document.getElementById('vMaxDiskon').value = formatRupiahLive((data.max_diskon || 0).toString()); } 
                 else { document.getElementById('vBesaran').value = formatRupiahLive((data.besaran || 0).toString()); document.getElementById('vMaxDiskon').value = ""; }
                 
+                document.getElementById('vMinSpend').value = data.min_spend ? formatRupiahLive(data.min_spend.toString()) : "";
+
                 document.getElementById('vPemilik').value = data.pemilik || "";
                 document.getElementById('containerJumlah').classList.add('hidden');
                 
@@ -552,10 +573,13 @@
             const jumlah = parseInt(document.getElementById('vJumlah').value) || 1;
             let besaran = document.getElementById('vBesaran').value; let max_diskon = 0;
             
+            let min_spend = parseRupiahAsli(document.getElementById('vMinSpend').value) || 0;
+            
             if(jenis === 'Diskon Nominal') besaran = parseRupiahAsli(besaran);
             else { besaran = parseInt(besaran); max_diskon = parseRupiahAsli(document.getElementById('vMaxDiskon').value); }
             
-            const dataVoucher = { jenis: jenis, besaran: besaran, expired: expired, pemilik: pemilik, status: 'aktif', dibuatPada: Date.now() };
+            // TAMBAHKAN min_spend KE DALAM dataVoucher INI:
+            const dataVoucher = { jenis: jenis, besaran: besaran, expired: expired, pemilik: pemilik, status: 'aktif', dibuatPada: Date.now(), min_spend: min_spend };
             if(jenis === 'Diskon %') dataVoucher.max_diskon = max_diskon;
 
             if(mode === "") {
@@ -933,12 +957,19 @@
                 let exportData = [];
                 snapshot.forEach((child) => {
                     const data = child.val();
+                    
+                    // Format tampilan untuk Maks Diskon dan Min Belanja
+                    let maxDiskonText = (data.max_diskon && data.max_diskon > 0) ? "Rp " + parseInt(data.max_diskon).toLocaleString('id-ID') : "-";
+                    let minSpendText = (data.min_spend && data.min_spend > 0) ? "Rp " + parseInt(data.min_spend).toLocaleString('id-ID') : "-";
+
                     exportData.push({
                         "Kode Voucher": child.key,
                         "Jenis Diskon": data.jenis,
-                        "Besaran Diskon": data.jenis === "Diskon %" ? data.besaran + "%" : "Rp " + parseInt(data.besaran).toLocaleString('id-ID'),
+                        "Besaran Diskon": data.jenis === "Diskon %" ? data.besaran + "%" : (data.jenis === "Cinderamata" ? data.besaran : "Rp " + parseInt(data.besaran).toLocaleString('id-ID')),
+                        "Maks Diskon": maxDiskonText,
+                        "Minimal Belanja": minSpendText,
                         "Berlaku s/d": data.expired,
-                        "Status": data.status.toUpperCase(),
+                        "Status": data.status ? data.status.toUpperCase() : "AKTIF",
                         "Kepemilikan": data.pemilik || "Bebas / Siapa Saja",
                         "Digunakan Oleh": data.digunakanOleh || "-"
                     });
@@ -947,8 +978,8 @@
                 const wb = XLSX.utils.book_new();
                 const ws = XLSX.utils.json_to_sheet(exportData);
                 
-                // Menyesuaikan lebar kolom Excel agar rapi
-                ws['!cols'] = [{wch: 15}, {wch: 15}, {wch: 15}, {wch: 12}, {wch: 15}, {wch: 25}, {wch: 25}];
+                // Menyesuaikan lebar kolom Excel agar rapi (ditambah 2 kolom baru)
+                ws['!cols'] = [{wch: 18}, {wch: 16}, {wch: 16}, {wch: 15}, {wch: 18}, {wch: 12}, {wch: 12}, {wch: 25}, {wch: 25}];
                 
                 XLSX.utils.book_append_sheet(wb, ws, "Daftar Voucher");
                 XLSX.writeFile(wb, "Daftar_Kode_Voucher.xlsx");
