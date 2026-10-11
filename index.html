@@ -927,6 +927,27 @@
             let tglPilih, paketVal, nohpVal, igVal, lombaVal, originType, finalVoucherCode;
             let tambahOrang = 0, tambahCetak = 0, ukuranCetak = "2R"; // Defaults
             
+            // CEK SYARAT MINIMAL BELANJA JIKA PAKAI VOUCHER
+            const tempVoucher = sourceData ? sourceData.voucher : validVoucherCode;
+            const tempPaket = sourceData ? sourceData.paket : document.getElementById('paket').value;
+            
+            if(tempVoucher) {
+                const snapV = await get(ref(db, 'vouchers/' + tempVoucher));
+                if(snapV.exists() && snapV.val().min_spend) {
+                    const minSpend = parseInt(snapV.val().min_spend);
+                    const hargaPaketDipilih = paketPricesMap[tempPaket] || 0;
+                    
+                    // Tambahkan harga addons jika ada
+                    let extraCost = 0;
+                    // (Simulasi sederhana: jika total harga paket < minimal belanja)
+                    if(hargaPaketDipilih < minSpend) {
+                        alert(`❌ VOUCHER DITOLAK!\n\nVoucher [${tempVoucher}] mensyaratkan Minimal Belanja sebesar Rp ${minSpend.toLocaleString('id-ID')}.\n\nHarga paket yang Anda pilih (Rp ${hargaPaketDipilih.toLocaleString('id-ID')}) belum memenuhi syarat. Silakan pilih paket yang lebih tinggi atau kosongkan pilihan voucher.`);
+                        if(sourceData) { document.getElementById('bookingMandiriModal').classList.remove('hidden'); }
+                        return; // Membatalkan proses simpan
+                    }
+                }
+            }
+
             if (sourceData) {
                 tglPilih = sourceData.waktu.split('T')[0];
                 paketVal = sourceData.paket;
@@ -1006,11 +1027,80 @@
         }));
 
         document.getElementById('btnLogoutPelanggan').addEventListener('click', () => signOut(auth).then(() => window.location.reload()));
-        onAuthStateChanged(auth, (user) => { 
-            if (user && window.location.hash === "#pelanggan-dashboard") { 
+        // ==========================================
+        // FITUR KLAIM PROMO DARI LINK MEDSOS (TERHUBUNG KE ADMIN)
+        // ==========================================
+        let pendingPromoClaim = new URLSearchParams(window.location.search).get('promo');
+
+        onAuthStateChanged(auth, async (user) => { 
+            if (user) { 
                 document.getElementById('navLoginPelangganBtn').innerHTML = "<i class='fas fa-user mr-2'></i>Dasbor Saya"; 
-                tampilkanDasbor(user); 
-            } 
+                
+                // 1. PROSES KLAIM PROMO BACA DARI DATABASE ADMIN
+                if (pendingPromoClaim) {
+                    const snapPromoConfig = await get(ref(db, 'settings/promo_link'));
+                    
+                    if (snapPromoConfig.exists()) {
+                        const config = snapPromoConfig.val();
+                        const todayStr = new Date().toISOString().split('T')[0];
+                        
+                        // Validasi 1: Cocokkan kata kunci link & batas waktu promosi
+                        if (pendingPromoClaim.toUpperCase() === config.nama && config.deadline >= todayStr) {
+                            
+                            const safeEmail = formatSafeEmail(user.email);
+                            const promoRef = ref(db, `claimed_promos/${safeEmail}/${config.nama}`);
+                            const snapUserClaim = await get(promoRef);
+                            
+                            // Validasi 2: Pastikan 1 Akun hanya bisa 1x Klaim
+                            if (snapUserClaim.exists()) {
+                                alert(`Maaf, Anda sudah pernah mengklaim voucher dari link promo "${config.nama}" ini sebelumnya.`);
+                            } else {
+                                // BUAT VOUCHER BERDASARKAN ATURAN ADMIN
+                                const vCode = config.nama.substring(0, 3) + "-" + Math.floor(1000 + Math.random() * 9000);
+                                const expDate = new Date(); expDate.setDate(expDate.getDate() + (config.validDays || 30)); 
+                                
+                                await set(ref(db, 'vouchers/' + vCode), { 
+                                    status: 'aktif', 
+                                    pemilik: user.email, 
+                                    jenis: config.jenis,
+                                    besaran: config.besaran,
+                                    max_diskon: config.jenis === 'Diskon %' ? (config.maxDiskon || 0) : 0, 
+                                    min_spend: config.minSpend || 0,
+                                    expired: expDate.toISOString().split('T')[0],
+                                    dibuatPada: Date.now()
+                                });
+                                
+                                await set(promoRef, true); // Kunci klaim
+                                
+                                let teksHadiah = config.jenis === 'Diskon %' ? `${config.besaran}%` : `Rp ${parseInt(config.besaran).toLocaleString('id-ID')}`;
+                                alert(`🎉 BERHASIL KLAIM!\n\nAnda mendapat Voucher Spesial Promo ${config.nama}: ${teksHadiah}\nMinimal Belanja: Rp ${parseInt(config.minSpend||0).toLocaleString('id-ID')}\nKode Voucher: ${vCode}\n\nSilakan cek di tab "Voucher Saya" pada dasbor Anda.`);
+                            }
+                        } else {
+                            alert("❌ GAGAL! Maaf, link promo tidak valid, salah nama, atau masa promosinya sudah berakhir.");
+                        }
+                    } else {
+                        alert("Sistem promo sedang tidak aktif.");
+                    }
+                    
+                    // Bersihkan URL agar bersih kembali
+                    window.history.replaceState({}, document.title, window.location.pathname + "#pelanggan-dashboard");
+                    pendingPromoClaim = null;
+                    tampilkanDasbor(user);
+                    return; 
+                }
+
+                // 2. TAMPILKAN DASBOR NORMAL JIKA TIDAK ADA PROMO
+                if (window.location.hash === "#pelanggan-dashboard") { 
+                    tampilkanDasbor(user); 
+                } 
+            } else {
+                // JIKA USER BELUM LOGIN TAPI MENGKLIK LINK PROMO
+                if (pendingPromoClaim) {
+                    setTimeout(() => {
+                        alert("🎁 Anda mendapatkan Link Promo Spesial!\n\nSilakan klik tombol 'Login / Dasbor Akun' menggunakan Google untuk mengklaim vouchernya secara otomatis.");
+                    }, 500);
+                }
+            }
         });
 
         document.getElementById('btnSyncDash').addEventListener('click', () => {
